@@ -1,4 +1,4 @@
-include(CMakePrintHelpers)
+#include(CMakePrintHelpers)
 
 set(SAMPLE_APP_HEADERS 
   ${CMAKE_CURRENT_SOURCE_DIR}/inc/test_deleter.hpp
@@ -8,7 +8,7 @@ set(SAMPLE_APP_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 )
 
-cmake_print_variables(SAMPLE_APP_HEADERS SAMPLE_APP_SOURCES)
+#cmake_print_variables(SAMPLE_APP_HEADERS SAMPLE_APP_SOURCES)
 
 set(EXEC_TARGET unique_rc_sample)
 

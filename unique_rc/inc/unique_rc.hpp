@@ -23,14 +23,12 @@ concept is_not_pointer_default_constructable_v =
   std::conjunction_v<std::negation<std::is_pointer<T>>, std::is_default_constructible<T>>;
 
 template<typename T, typename U>
-concept has_static_invalid_convertible_and_comparable = requires
-{
+concept has_static_invalid_convertible_and_comparable = requires {
   { T::invalid() } noexcept -> std::convertible_to<U>;
   { T::invalid() } noexcept -> std::equality_comparable_with<U>;
 };
 
-template<typename Handle, typename Deleter> 
-class unique_rc_holder_impl
+template<typename Handle, typename Deleter> class unique_rc_holder_impl
 {
 
   template<typename H1, typename D1, typename = void> struct HandleResolver
@@ -57,9 +55,7 @@ public:
 
   constexpr unique_rc_holder_impl() = default;
 
-  raii_inline explicit constexpr unique_rc_holder_impl(handle h) noexcept 
-  : hdt_{ h, {} } 
-  {}
+  raii_inline explicit constexpr unique_rc_holder_impl(handle h) noexcept : hdt_{ h, {} } {}
 
   template<typename D> raii_inline constexpr unique_rc_holder_impl(handle h, D &&d) : hdt_{ h, std::forward<D>(d) } {}
 
@@ -162,8 +158,8 @@ struct unique_rc_holder<Handle, Deleter, false, false> : unique_rc_holder_impl<H
 
 // There is no class template argument deduction from pointer type
 // because it is impossible to distinguish a pointer obtained from array and non - array forms of new.
-template<typename Handle, typename Deleter> 
-requires has_static_invalid_convertible_and_comparable<Deleter, Handle>
+template<typename Handle, typename Deleter>
+  requires has_static_invalid_convertible_and_comparable<Deleter, Handle>
 class unique_rc
 {
 public:
@@ -175,8 +171,8 @@ private:
   // helper template for detecting a safe conversion from another
   // unique_ptr
   template<typename H, typename D>
-	using safe_conversion_from = std::conjunction<
-	  std::is_convertible<typename unique_rc<H, D>::handle, handle>, std::negation<std::is_array<H>>>;
+  using safe_conversion_from =
+    std::conjunction<std::is_convertible<typename unique_rc<H, D>::handle, handle>, std::negation<std::is_array<H>>>;
 
 
 public:
@@ -227,11 +223,11 @@ public:
   {}
 
   constexpr unique_rc &operator=(unique_rc &&) = default;
-  
+
   // Assignment from another type
   template<typename H, typename D>
   raii_inline constexpr unique_rc &operator=(unique_rc<H, D> &&rhs) noexcept
-    requires std::conjunction_v<safe_conversion_from<H, D>, std::is_assignable<deleter_type&, D&&>>
+    requires std::conjunction_v<safe_conversion_from<H, D>, std::is_assignable<deleter_type &, D &&>>
   {
     reset(rhs.release());
     get_deleter() = std::forward<Deleter>(rhs.get_deleter());
@@ -241,8 +237,8 @@ public:
 
   unique_rc(const unique_rc &) = delete;
   unique_rc &operator=(const unique_rc &) = delete;
-  
-  
+
+
   // Destructor, invokes the deleter if the stored handle is valid
   raii_inline constexpr ~unique_rc() noexcept
   {
