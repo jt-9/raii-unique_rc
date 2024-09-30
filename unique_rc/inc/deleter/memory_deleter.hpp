@@ -5,8 +5,9 @@
 #include "defs.hpp"
 
 #include <concepts>
-#include <new>
 #include <cstddef>
+#include <new>
+
 
 RAII_NS_BEGIN
 
@@ -23,7 +24,7 @@ struct memory_delete
     requires std::is_convertible_v<U, handle>
   {}
 
-  [[nodiscard]] raii_inline static constexpr nullptr_t invalid() noexcept { return nullptr; }
+  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
 
   raii_inline constexpr void operator()(handle h) const noexcept
   {
@@ -47,7 +48,7 @@ template<typename Handle> struct memory_delete<Handle[]>
     requires std::is_convertible_v<U (*)[], handle (*)[]>
   {}
 
-  [[nodiscard]] raii_inline static constexpr nullptr_t invalid() noexcept { return nullptr; }
+  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
 
   template<typename U>
   raii_inline constexpr void operator()(U h) const noexcept
