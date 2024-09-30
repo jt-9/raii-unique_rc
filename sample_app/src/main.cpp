@@ -12,6 +12,7 @@
 
 #include <string>
 #include <string_view>
+#include <cstdint>
 
 // #include <print>
 // #include <iostream>
@@ -39,6 +40,7 @@ void measureAndPrintUniquePtrSize() noexcept
   fmt::println("Sizeof 'std::tuple<int*, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(tp));
 }
 }// namespace playground
+
 
 
 int main([[maybe_unused]] int argc, const char *argv[]) noexcept
@@ -82,7 +84,12 @@ int main([[maybe_unused]] int argc, const char *argv[]) noexcept
   }
 
   {
-    unique_rc<float*, NoStaticInvalidPointerDummy0<float*>> nsrc{new float{4.1f}};
+    unique_rc<int*, raii::memory_delete<int*>> rc1{new int{-23549}};
+    unique_rc<std::int32_t*, raii::memory_delete<std::int32_t*>> rc2{new std::int32_t{4}};
+
+    rc2 = std::move(rc1);
+
+    fmt::println("After move assignment from unique_rc<int*, raii::memory_delete<int*>> to unique_rc<std::int32_t*, raii::memory_delete<std::int32_t*>> {}", *rc2.get());
   }
 
   return 0;
