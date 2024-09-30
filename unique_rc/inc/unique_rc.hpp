@@ -22,7 +22,15 @@ template<typename T>
 concept is_not_pointer_default_constructable_v =
   std::conjunction_v<std::negation<std::is_pointer<T>>, std::is_default_constructible<T>>;
 
-template<typename Handle, typename Deleter> class unique_rc_holder_impl
+template<typename T, typename U>
+concept has_static_invalid_convertible_and_comparable = requires
+{
+  { T::invalid() } noexcept -> std::convertible_to<U>;
+  { T::invalid() } noexcept -> std::equality_comparable_with<U>;
+};
+
+template<typename Handle, typename Deleter> 
+class unique_rc_holder_impl
 {
 
   template<typename H1, typename D1, typename = void> struct HandleResolver
@@ -47,8 +55,6 @@ public:
     "unique_rc's deleter type must be a function object type"
     " or an lvalue reference type");
 
-  raii_inline static constexpr handle invalid() noexcept { return Deleter::invalid(); }
-
   constexpr unique_rc_holder_impl() = default;
 
   raii_inline explicit constexpr unique_rc_holder_impl(handle h) noexcept 
@@ -59,7 +65,7 @@ public:
 
   raii_inline constexpr unique_rc_holder_impl(unique_rc_holder_impl &&other) noexcept : hdt_{ std::move(other.hdt_) }
   {
-    other.get_handle() = invalid();
+    other.get_handle() = Deleter::invalid();
   }
 
   // cppcheck-suppress operatorEqVarError - false positive, member variable is assigned indirectly via get_handle() in
@@ -83,7 +89,7 @@ public:
   raii_inline constexpr void reset(handle h) noexcept
   {
     const handle old_h = std::exchange(get_handle(), h);
-    if (old_h != invalid()) {
+    if (old_h != Deleter::invalid()) {
       assert(old_h != h && "Failed self-reset check, like p.reset(p.get())");
       get_deleter()(old_h);
     }
@@ -92,7 +98,7 @@ public:
   raii_inline constexpr handle release() noexcept
   {
     handle h = get_handle();
-    get_handle() = invalid();
+    get_handle() = Deleter::invalid();
 
     return h;
   }
@@ -156,7 +162,9 @@ struct unique_rc_holder<Handle, Deleter, false, false> : unique_rc_holder_impl<H
 
 // There is no class template argument deduction from pointer type
 // because it is impossible to distinguish a pointer obtained from array and non - array forms of new.
-template<typename Handle, typename Deleter> class unique_rc
+template<typename Handle, typename Deleter> 
+requires has_static_invalid_convertible_and_comparable<Deleter, Handle>
+class unique_rc
 {
 public:
   using handle = typename unique_rc_holder_impl<Handle, std::remove_reference<Deleter>>::handle;
@@ -255,7 +263,7 @@ public:
 
   [[nodiscard]] raii_inline constexpr explicit operator bool() const noexcept { return invalid() != get(); }
 
-  raii_inline static constexpr handle invalid() noexcept(noexcept(Deleter::invalid())) { return Deleter::invalid(); }
+  raii_inline static constexpr auto invalid() noexcept(noexcept(Deleter::invalid())) { return Deleter::invalid(); }
 
   raii_inline constexpr void swap(unique_rc &other) noexcept(
     std::is_nothrow_swappable_v<unique_rc_holder<Handle, Deleter>>)

@@ -8,6 +8,7 @@
 
 #include <concepts>
 #include <windows.h>
+#include <cstddef>
 
 RAII_NS_BEGIN
 
@@ -25,7 +26,7 @@ struct gdi_delete_object_nullptr
     requires std::is_convertible_v<U, handle>
   {}
 
-  [[nodiscard]] raii_inline static constexpr handle invalid() noexcept { return nullptr; }
+  [[nodiscard]] raii_inline static constexpr nullptr_t invalid() noexcept { return nullptr; }
 
   raii_inline constexpr void operator()(handle h) const noexcept { DeleteObject(h); }
 };
@@ -37,7 +38,7 @@ struct gdi_delete_dc_nullptr
 
   constexpr gdi_delete_dc_nullptr() noexcept = default;
 
-  [[nodiscard]] raii_inline static constexpr handle invalid() noexcept { return nullptr; }
+  [[nodiscard]] raii_inline static constexpr nullptr_t invalid() noexcept { return nullptr; }
 
   raii_inline constexpr void operator()(handle h) const noexcept { DeleteDC(h); }
 };
@@ -46,9 +47,10 @@ struct gdi_release_wnd_dc_nullptr
 {
   using handle = HDC;
 
-  raii_inline constexpr gdi_release_wnd_dc_nullptr(HWND w = nullptr) noexcept : wnd_{ w } {}
+  raii_inline constexpr gdi_release_wnd_dc_nullptr(HWND w) noexcept 
+  : wnd_{ w } {}
 
-  [[nodiscard]] raii_inline static constexpr handle invalid() noexcept { return nullptr; }
+  [[nodiscard]] raii_inline static constexpr nullptr_t invalid() noexcept { return nullptr; }
 
   raii_inline constexpr void operator()(handle h) const noexcept { ReleaseDC(wnd_, h); }
 
