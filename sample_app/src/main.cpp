@@ -3,8 +3,9 @@
 // the source template at `configured_files/config.hpp.in`.
 #include "internal_use_only/config.hpp"
 
+#include "test_deleter.hpp"
+
 #include "memory_deleter.hpp"
-#include "test_policies.hpp"
 #include "unique_rc.hpp"
 
 #include <memory>
@@ -25,8 +26,8 @@ void measureAndPrintUniquePtrSize() noexcept
 
   //		std::default_delete<int> p;
 
-  //		std::cout << "Sizeof 'std::unique_ptr<int, raii::memory_delete<int*>>' is "sv << sizeof(ptr1) << "
-  //bytes\n"sv; 		std::println("Sizeof 'std::unique_ptr<int, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(ptr1));
+  // std::cout << "Sizeof 'std::unique_ptr<int, raii::memory_delete<int*>>' is "sv << sizeof(ptr1) << "bytes\n"sv;
+  // std::println("Sizeof 'std::unique_ptr<int, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(ptr1));
   fmt::println("Sizeof 'std::unique_ptr<int, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(ptr1));
 
   // std::_Compressed_pair<raii::memory_delete<int*>, int*> cp{ std::_Zero_then_variadic_args_t{} };
@@ -78,6 +79,10 @@ int main([[maybe_unused]] int argc, const char *argv[]) noexcept
 
     // std::cout << "Sizeof unique_rc<int*, memory_delete<int*> of long long is "sv << sizeof(rc1) << " bytes\n"sv;
     fmt::println("Sizeof unique_rc<int*, memory_delete<int*> of long long is {} bytes"sv, sizeof(rc1));
+  }
+
+  {
+    unique_rc<float*, NoStaticInvalidPointerDummy0<float*>> nsrc{new float{4.1f}};
   }
 
   return 0;

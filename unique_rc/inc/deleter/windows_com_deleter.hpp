@@ -8,6 +8,7 @@
 
 #include <concepts>
 #include <shobjidl_core.h>
+#include <cstddef>
 
 RAII_NS_BEGIN
 
@@ -24,7 +25,7 @@ struct com_object_release_nullptr
     requires std::is_convertible_v<U, handle>
   {}
 
-  [[nodiscard]] raii_inline static constexpr handle invalid() noexcept { return nullptr; }
+  [[nodiscard]] raii_inline static constexpr nullptr_t invalid() noexcept { return nullptr; }
 
   raii_inline constexpr void operator()(handle h) const noexcept { h->Release(); }
 };

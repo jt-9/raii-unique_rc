@@ -8,6 +8,7 @@
 
 #include <concepts>
 #include <windows.h>
+#include <cstddef>
 
 RAII_NS_BEGIN
 
@@ -28,7 +29,7 @@ struct close_handle_nullptr
     requires std::is_convertible_v<U, handle>
   {}
 
-  [[nodiscard]] raii_inline static constexpr handle invalid() noexcept { return nullptr; }
+  [[nodiscard]] raii_inline static constexpr nullptr_t invalid() noexcept { return nullptr; }
 
   raii_inline constexpr void operator()(handle h) const noexcept { CloseHandle(h); }
 };
