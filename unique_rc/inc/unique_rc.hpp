@@ -171,6 +171,14 @@ public:
   using element_type = Handle;
   using deleter_type = Deleter;
 
+private:
+  // helper template for detecting a safe conversion from another
+  // unique_ptr
+  template<typename H, typename D>
+	using safe_conversion_from = std::conjunction<
+	  std::is_convertible<typename unique_rc<H, D>::handle, handle>, std::negation<std::is_array<H>>>;
+
+
 public:
   /// Default constructor, creates a unique_rc that owns nothing.
   // template<typename D = Deleter>
@@ -209,6 +217,7 @@ public:
 
   constexpr unique_rc(unique_rc &&) = default;
 
+  // Converting constructor from another type
   template<typename H, typename D>
   //__safe_conversion_up<_Up, _Ep>,
   raii_inline constexpr unique_rc(unique_rc<H, D> &&src) noexcept
@@ -217,13 +226,12 @@ public:
     : uh_{ src.release(), std::forward<D>(src.get_deleter()) }
   {}
 
-
   constexpr unique_rc &operator=(unique_rc &&) = default;
-
+  
+  // Assignment from another type
   template<typename H, typename D>
   raii_inline constexpr unique_rc &operator=(unique_rc<H, D> &&rhs) noexcept
-    requires std::is_convertible_v<typename unique_rc<H, D>::handle, handle>
-             && std::is_assignable_v<deleter_type &, D &&>
+    requires std::conjunction_v<safe_conversion_from<H, D>, std::is_assignable<deleter_type&, D&&>>
   {
     reset(rhs.release());
     get_deleter() = std::forward<Deleter>(rhs.get_deleter());
@@ -233,7 +241,9 @@ public:
 
   unique_rc(const unique_rc &) = delete;
   unique_rc &operator=(const unique_rc &) = delete;
-
+  
+  
+  // Destructor, invokes the deleter if the stored handle is valid
   raii_inline constexpr ~unique_rc() noexcept
   {
     static_assert(std::is_invocable_v<deleter_type &, handle>, "unique_rc's deleter must be invocable with a handle");

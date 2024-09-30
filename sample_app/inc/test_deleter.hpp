@@ -67,7 +67,7 @@ public:
 
   constexpr void operator()(Handle h) const noexcept { delete h; }
 
-  [[nodiscard]] static constexpr auto invalid() noexcept { return nullptr; }
+  //[[nodiscard]] constexpr auto invalid() noexcept { return nullptr; }
 };
 
 
