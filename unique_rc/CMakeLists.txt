@@ -44,7 +44,7 @@ set_target_properties(${lib_full_name}
 endfunction()
 
 add_mylib_statics(urc "d" "Debug")
-add_library(raii::urcd ALIAS urcd)
+add_library(myproject::urcd ALIAS urcd)
 
 
 
