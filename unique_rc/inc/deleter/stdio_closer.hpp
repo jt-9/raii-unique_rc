@@ -1,6 +1,5 @@
-// memory_delete for unique_rc
-#ifndef STDIO_DELETER_HPP
-#define STDIO_DELETER_HPP
+#ifndef STDIO_CLOSER_HPP
+#define STDIO_CLOSER_HPP
 
 #include "defs.hpp"
 
@@ -22,4 +21,4 @@ struct stdio_fclose
 
 RAII_NS_END
 
-#endif// STDIO_DELETER_HPP
+#endif// STDIO_CLOSER_HPP
