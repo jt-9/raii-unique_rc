@@ -16,6 +16,7 @@ set(HEADERS
   ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_com_deleter.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_gdi_deleter.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_handle_deleter.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/stdio_closer.hpp
 )
 
 set(SOURCES
