@@ -8,7 +8,6 @@
 #include <cstddef>
 #include <new>
 
-
 RAII_NS_BEGIN
 
 template<typename Handle>
