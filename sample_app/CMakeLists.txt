@@ -14,8 +14,10 @@ set(EXEC_TARGET unique_rc_sample)
 
 add_executable(${EXEC_TARGET} ${SAMPLE_APP_HEADERS} ${SAMPLE_APP_SOURCES})
 
-target_link_libraries(${EXEC_TARGET} PRIVATE myproject::myproject_options
-                        myproject::myproject_warnings raii::urcd)
+target_link_libraries(${EXEC_TARGET} PRIVATE 
+                  myproject::myproject_options
+                  myproject::myproject_warnings
+                  myproject::urcd)
 
 target_link_system_libraries(${EXEC_TARGET} PRIVATE 
                                                       CLI11::CLI11

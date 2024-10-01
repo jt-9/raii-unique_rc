@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.23)
 
 # Only set the cxx_standard if it is not set by someone else
 if(NOT DEFINED CMAKE_CXX_STANDARD)
@@ -42,3 +42,10 @@ add_subdirectory(configured_files)
 # Adding the src:
 add_subdirectory(unique_rc)
 add_subdirectory(sample_app)
+
+# Adding the tests:
+include(CTest)
+
+if(BUILD_TESTING)
+  add_subdirectory(test)
+endif()
