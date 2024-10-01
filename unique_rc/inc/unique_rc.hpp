@@ -277,12 +277,6 @@ public:
     uh_.swap(other.uh_);
   }
 
-  // How can it be compiled and work?
-  // operator bool_type() const throw()
-  //{
-  //	const auto t = &Bool_t::unused_;
-  //	return (invalid() != handle_) ? &Bool_t::unused_ : nullptr;
-  //}
 private:
   unique_rc_holder<Handle, Deleter> uh_;
 };
