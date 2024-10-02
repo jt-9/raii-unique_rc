@@ -281,18 +281,19 @@ private:
   unique_rc_holder<Handle, Deleter> uh_;
 };
 
-template<typename T, class Del>
-  requires std::equality_comparable<typename unique_rc<T, Del>::Handle>
-[[nodiscard]] raii_inline constexpr bool operator==(const unique_rc<T, Del> &lhs,
-  const unique_rc<T, Del> &rhs) noexcept(noexcept(lhs.get() == rhs.get()))
+template<typename H1, class D1, typename H2, class D2>
+  requires std::equality_comparable_with<H1, H2>
+[[nodiscard]] raii_inline constexpr bool operator==(const unique_rc<H1, D1> &lhs,
+  const unique_rc<H2, D2> &rhs) noexcept(noexcept(lhs.get() == rhs.get()))
 {
   return lhs.get() == rhs.get();
 }
 
-template<typename T, class Del>
-  requires std::three_way_comparable<typename unique_rc<T, Del>::Handle>
-[[nodiscard]] raii_inline constexpr std::compare_three_way_result_t<typename unique_rc<T, Del>::Handle>
-  operator<=>(const unique_rc<T, Del> &lhs, const unique_rc<T, Del> &rhs) noexcept(noexcept(lhs.get() <=> rhs.get()))
+template<typename H1, class D1, typename H2, class D2>
+  requires std::three_way_comparable_with<typename unique_rc<H1, D1>::handle, typename unique_rc<H2, D2>::handle>
+[[nodiscard]] raii_inline constexpr std::compare_three_way_result_t<typename unique_rc<H1, D1>::handle,
+  typename unique_rc<H2, D2>::handle>
+  operator<=>(const unique_rc<H1, D1> &lhs, const unique_rc<H2, D2> &rhs) noexcept(noexcept(lhs.get() <=> rhs.get()))
 {
   return lhs.get() <=> rhs.get();
 }
