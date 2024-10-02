@@ -23,30 +23,30 @@ set(SOURCES
   ${CMAKE_CURRENT_LIST_DIR}/src/unique_rc.cpp
 )
 
-function(add_mylib_statics lib_name_prefix FLAVOUR_SUFFIX REL_OR_DBG)
-  set(lib_full_name ${lib_name_prefix}${FLAVOUR_SUFFIX})
-  add_library(${lib_full_name} STATIC ${HEADERS} ${SOURCES})
-  #target_compile_features(${lib_full_name} PUBLIC cxx_std_20)
-  target_link_libraries(${lib_full_name} PRIVATE myproject::myproject_options 
-                      myproject::myproject_warnings)
+function(add_mylib_statics lib_name)
+  add_library(${lib_name} STATIC ${HEADERS} ${SOURCES})
+  #target_compile_features(${lib_name} PUBLIC cxx_std_20)
+  target_link_libraries(${lib_name} PRIVATE 
+                myproject::myproject_options 
+                myproject::myproject_warnings)
 
   #cmake_print_variables(PROJECT_SOURCE_DIR)
   #cmake_print_variables(CMAKE_CURRENT_LIST_DIR)
 
-  target_include_directories(${lib_full_name} ${WARNING_GUARD} PUBLIC 
+  target_include_directories(${lib_name} ${WARNING_GUARD} PUBLIC 
                                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
                                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/deleter>
                                 $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
 
-set_target_properties(${lib_full_name} 
-    PROPERTIES LINKER_LANGUAGE CXX 
-                VERSION ${PROJECT_VERSION})
+set_target_properties(${lib_name} PROPERTIES
+                LINKER_LANGUAGE CXX 
+                VERSION ${PROJECT_VERSION}
+                DEBUG_POSTFIX "d")
 endfunction()
 
-add_mylib_statics(urc "d" "Debug")
-add_library(myproject::urcd ALIAS urcd)
 
-
+add_mylib_statics(urc)
+add_library(myproject::urc ALIAS urc)
 
 
 #generate_export_header(unique_rc EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/unique_rc/include/unique_rc_export.hpp)
