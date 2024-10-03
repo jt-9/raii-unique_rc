@@ -166,6 +166,7 @@ public:
   using handle = typename unique_rc_holder_impl<Handle, std::remove_reference<Deleter>>::handle;
   using element_type = Handle;
   using deleter_type = Deleter;
+  using invalid_handle_type = std::remove_cvref_t<decltype(Deleter::invalid())>;
 
 private:
   // helper template for detecting a safe conversion from another
@@ -269,7 +270,10 @@ public:
 
   [[nodiscard]] raii_inline constexpr explicit operator bool() const noexcept { return invalid() != get(); }
 
-  raii_inline static constexpr auto invalid() noexcept(noexcept(Deleter::invalid())) { return Deleter::invalid(); }
+  raii_inline static constexpr invalid_handle_type invalid() noexcept(noexcept(Deleter::invalid()))
+  {
+    return Deleter::invalid();
+  }
 
   raii_inline constexpr void swap(unique_rc &other) noexcept(
     std::is_nothrow_swappable_v<unique_rc_holder<Handle, Deleter>>)
@@ -289,6 +293,14 @@ template<typename H1, class D1, typename H2, class D2>
   return lhs.get() == rhs.get();
 }
 
+// unique_ptr comparison with nullptr
+template<typename H, typename D>
+  requires std::same_as<typename unique_rc<H, D>::invalid_handle_type, std::nullptr_t>
+[[nodiscard]] raii_inline constexpr bool operator==(const unique_rc<H, D> &r, std::nullptr_t) noexcept
+{
+  return !r;
+}
+
 template<typename H1, class D1, typename H2, class D2>
   requires std::three_way_comparable_with<typename unique_rc<H1, D1>::handle, typename unique_rc<H2, D2>::handle>
 [[nodiscard]] raii_inline constexpr std::compare_three_way_result_t<typename unique_rc<H1, D1>::handle,
@@ -298,9 +310,19 @@ template<typename H1, class D1, typename H2, class D2>
   return lhs.get() <=> rhs.get();
 }
 
-template<typename T, class Del>
-  requires std::is_swappable_v<typename unique_rc<T, Del>::Handle>
-raii_inline constexpr void swap(unique_rc<T, Del> &lhs, unique_rc<T, Del> &rhs) noexcept(noexcept(lhs.swap(rhs)))
+template<typename H, typename D>
+  requires std::same_as<typename unique_rc<H, D>::invalid_handle_type, std::nullptr_t>
+           && std::three_way_comparable<typename unique_rc<H, D>::handle>
+[[nodiscard]] raii_inline constexpr std::compare_three_way_result_t<typename unique_rc<H, D>::handle>
+  operator<=>(const unique_rc<H, D> &r, std::nullptr_t) noexcept(noexcept(r.get()))
+{
+  using handle = typename unique_rc<H, D>::handle;
+  return r.get() <=> static_cast<handle>(nullptr);
+}
+
+template<typename H, typename D>
+  requires std::is_swappable_v<typename unique_rc<H, D>::Handle>
+raii_inline constexpr void swap(unique_rc<H, D> &lhs, unique_rc<H, D> &rhs) noexcept(noexcept(lhs.swap(rhs)))
 {
   lhs.swap(rhs);
 }
