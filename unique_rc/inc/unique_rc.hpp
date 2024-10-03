@@ -175,7 +175,6 @@ private:
   using safe_conversion_from =
     std::conjunction<std::is_convertible<typename unique_rc<H, D>::handle, handle>, std::negation<std::is_array<H>>>;
 
-
 public:
   /// Default constructor, creates a unique_rc that owns nothing.
   // template<typename D = Deleter>

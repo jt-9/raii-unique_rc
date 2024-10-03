@@ -29,13 +29,23 @@ add_test(NAME cli.has_help COMMAND unique_rc_sample --help)
 # add_test(NAME cli.version_matches COMMAND unique_rc_sample --version)
 # set_tests_properties(cli.version_matches PROPERTIES PASS_REGULAR_EXPRESSION "${PROJECT_VERSION}")
 
-add_executable(tests tests.cpp)
+set(TEST_APP_HEADERS 
+  ${CMAKE_CURRENT_SOURCE_DIR}/inc/memory_mock_deleter.hpp
+)
+
+# set(TEST_APP_SOURCES
+#   ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+# )
+
+add_executable(tests ${TEST_APP_HEADERS} tests.cpp)
 target_link_libraries(
   tests
   PRIVATE myproject::myproject_warnings
           myproject::myproject_options
           myproject::urc
           Catch2::Catch2WithMain)
+
+target_include_directories(tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/inc)
 
 if (WIN32 AND BUILD_SHARED_LIBS)
   add_custom_command(
@@ -62,13 +72,15 @@ catch_discover_tests(
   .xml)
 
   # Add a file containing a set of constexpr tests
-add_executable(constexpr_tests constexpr_tests.cpp)
+add_executable(constexpr_tests ${TEST_APP_HEADERS} constexpr_tests.cpp)
 target_link_libraries(
   constexpr_tests
   PRIVATE myproject::myproject_warnings
           myproject::myproject_options
           myproject::urc
           Catch2::Catch2WithMain)
+
+target_include_directories(constexpr_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/inc)
 
 catch_discover_tests(
   constexpr_tests
@@ -85,7 +97,7 @@ catch_discover_tests(
 
 # Disable the constexpr portion of the test, and build again this allows us to have an executable that we can debug when
 # things go wrong with the constexpr testing
-add_executable(relaxed_constexpr_tests constexpr_tests.cpp)
+add_executable(relaxed_constexpr_tests ${TEST_APP_HEADERS} constexpr_tests.cpp)
 target_link_libraries(
   relaxed_constexpr_tests
   PRIVATE myproject::myproject_warnings
@@ -93,6 +105,7 @@ target_link_libraries(
           myproject::urc
           Catch2::Catch2WithMain)
 target_compile_definitions(relaxed_constexpr_tests PRIVATE -DCATCH_CONFIG_RUNTIME_STATIC_REQUIRE)
+target_include_directories(relaxed_constexpr_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/inc)
 
 catch_discover_tests(
   relaxed_constexpr_tests
