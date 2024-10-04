@@ -197,7 +197,7 @@ public:
 
   template<typename D = Deleter>
   raii_inline constexpr unique_rc(handle h, Deleter &&d) noexcept
-    requires std::conjunction_v<std::negation<std::is_reference<D>>, std::is_constructible<D, D>>
+    requires std::conjunction_v<std::negation<std::is_reference<D>>, std::is_move_constructible<D>>
     : uh_{ h, std::move(d) }
   {}
 
