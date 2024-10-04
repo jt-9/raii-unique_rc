@@ -215,10 +215,9 @@ public:
 
   // Converting constructor from another type
   template<typename H, typename D>
-  //__safe_conversion_up<_Up, _Ep>,
   raii_inline constexpr unique_rc(unique_rc<H, D> &&src) noexcept
-    requires std::is_convertible_v<typename unique_rc<H, D>::handle, handle>
-             && (std::is_same_v<D, Deleter> || std::is_convertible_v<D, Deleter>)
+    requires std::conjunction_v<safe_conversion_from<H, D>,
+      std::conditional_t<std::is_reference_v<Deleter>, std::is_same<D, Deleter>, std::is_convertible<D, Deleter>>>
     : uh_{ src.release(), std::forward<D>(src.get_deleter()) }
   {}
 
