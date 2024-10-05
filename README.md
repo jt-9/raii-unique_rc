@@ -35,7 +35,7 @@ To be added
 #include <stdio.h>
 
 int main() {
-  raii::unique_rc<FILE *, raii::stdio_fclose> streamRC{ std::fopen("/tmp/test.txt", "r+") };
+  raii::unique_rc<FILE *, raii::stdio_fclose> streamRC{ fopen("/tmp/test.txt", "r+") };
   if (streamRC) {
     // Do work here...
     // Use streamRC.get() to get file descriptor
