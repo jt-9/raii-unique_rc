@@ -1,5 +1,5 @@
-#ifndef STDIO_CLOSER_HPP
-#define STDIO_CLOSER_HPP
+#ifndef STDIO_FCLOSE_HPP
+#define STDIO_FCLOSE_HPP
 
 #include "defs.hpp"
 
@@ -21,4 +21,4 @@ struct stdio_fclose
 
 RAII_NS_END
 
-#endif// STDIO_CLOSER_HPP
+#endif// STDIO_FCLOSE_HPP

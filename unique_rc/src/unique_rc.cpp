@@ -1,12 +1,13 @@
 #include "unique_rc.hpp"
 // NOLINTBEGIN(misc-include-cleaner)
-#include "memory_deleter.hpp"
-#include "stdio_closer.hpp"
+#include "memory_delete.hpp"
+#include "stdio_fclose.hpp"
 
 #ifdef _WIN32
-#include "windows_com_deleter.hpp"
+#include "windows_com_release.hpp"
+#include "windows_com_file_dlg_unadvise.hpp"
 #include "windows_gdi_deleter.hpp"
-#include "windows_handle_deleter.hpp"
+#include "windows_close_handle.hpp"
 
 // NOLINTEND(misc-include-cleaner)
 

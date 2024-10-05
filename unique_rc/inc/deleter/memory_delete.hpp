@@ -1,6 +1,6 @@
 // memory_delete for unique_rc
-#ifndef MEMORY_DELETER_HPP
-#define MEMORY_DELETER_HPP
+#ifndef MEMORY_DELETE_HPP
+#define MEMORY_DELETE_HPP
 
 #include "defs.hpp"
 
@@ -58,4 +58,4 @@ template<typename Handle> struct memory_delete<Handle[]>
 
 RAII_NS_END
 
-#endif// MEMORY_DELETER_HPP
+#endif// MEMORY_DELETE_HPP

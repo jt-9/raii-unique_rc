@@ -12,11 +12,12 @@ include(GenerateExportHeader)
 set(HEADERS 
   ${CMAKE_CURRENT_LIST_DIR}/inc/defs.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/unique_rc.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/memory_deleter.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_com_deleter.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/memory_delete.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/stdio_fclose.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_com_release.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_com_file_dlg_unadvise.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_gdi_deleter.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_handle_deleter.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/stdio_closer.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_close_handle.hpp
 )
 
 set(SOURCES

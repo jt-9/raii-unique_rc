@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "memory_deleter.hpp"
+#include "memory_delete.hpp"
 #include "unique_rc.hpp"
 
 #include "memory_mock_deleter.hpp"
@@ -108,6 +108,7 @@ TEST_CASE("Three-way comparison of initialised unique_rc<const char*, memory_moc
   // NOLINTBEGIN(bugprone-suspicious-stringview-data-usage)
   constexpr raii::unique_rc<const char *, mock_raii::memor_mock_delete<const char *>> char_rc1{ str.data() };
   constexpr raii::unique_rc<const char *, mock_raii::memor_mock_delete<const char *>> char_rc2{ str.data() + 4 };
+  constexpr decltype(char_rc1) copy_rc1{ str.data() };
   // NOLINTEND(bugprone-suspicious-stringview-data-usage)
 
   SECTION("unique_rc::operator <=>(unique_rc, unique_rc)")
@@ -116,5 +117,6 @@ TEST_CASE("Three-way comparison of initialised unique_rc<const char*, memory_moc
     STATIC_CHECK(char_rc2);
     STATIC_REQUIRE((char_rc1 <=> char_rc2) == std::strong_ordering::less);
     STATIC_REQUIRE((char_rc2 <=> char_rc1) == std::strong_ordering::greater);
+    STATIC_REQUIRE((char_rc1 <=> copy_rc1) == std::strong_ordering::equal);
   }
 }

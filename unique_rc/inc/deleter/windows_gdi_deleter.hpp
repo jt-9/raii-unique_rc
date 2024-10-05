@@ -1,6 +1,3 @@
-// SmartHandle.h : Defines template class for handles
-//
-
 #ifndef WIN_GDI_HANDLE_DELETER_HPP
 #define WIN_GDI_HANDLE_DELETER_HPP
 
