@@ -1,14 +1,10 @@
-// SmartHandle.h : Defines template class for handles
-//
-
-#ifndef WIN_HANDLE_DELETER_HPP
-#define WIN_HANDLE_DELETER_HPP
+#ifndef WIN_CLOSE_HANDLE_HPP
+#define WIN_CLOSE_HANDLE_HPP
 
 #include "defs.hpp"
 
 #include <concepts>
 #include <windows.h>
-#include <cstddef>
 
 RAII_NS_BEGIN
 
@@ -20,18 +16,16 @@ template<typename Handle>
   requires std::convertible_to<Handle, HANDLE>
 struct close_handle_nullptr
 {
-  using handle = Handle;
-
   constexpr close_handle_nullptr() noexcept = default;
 
   template<typename U>
   raii_inline constexpr close_handle_nullptr(const close_handle_nullptr<U> &) noexcept
-    requires std::is_convertible_v<U, handle>
+    requires std::is_convertible_v<U, Handle>
   {}
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
 
-  raii_inline constexpr void operator()(handle h) const noexcept { CloseHandle(h); }
+  raii_inline constexpr void operator()(Handle h) const noexcept { CloseHandle(h); }
 };
 
 // Use with CreateFile, CreateFileEx
@@ -39,20 +33,18 @@ template<typename Handle>
   requires std::convertible_to<Handle, HANDLE>
 struct close_handle_invalid_handle_value
 {
-  using handle = Handle;
-
   constexpr close_handle_invalid_handle_value() noexcept = default;
 
   template<typename U>
   raii_inline constexpr close_handle_invalid_handle_value(const close_handle_invalid_handle_value<U> &) noexcept
-    requires std::is_convertible_v<U, handle>
+    requires std::is_convertible_v<U, Handle>
   {}
 
-  [[nodiscard]] raii_inline static constexpr handle invalid() noexcept { return INVALID_HANDLE_VALUE; }
+  [[nodiscard]] raii_inline static constexpr Handle invalid() noexcept { return INVALID_HANDLE_VALUE; }
 
-  raii_inline constexpr void operator()(handle h) const noexcept { CloseHandle(h); }
+  raii_inline constexpr void operator()(Handle h) const noexcept { CloseHandle(h); }
 };
 
 RAII_NS_END
 
-#endif// WIN_HANDLE_DELETER_HPP
+#endif// WIN_CLOSE_HANDLE_HPP

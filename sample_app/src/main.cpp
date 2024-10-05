@@ -5,7 +5,7 @@
 
 #include "test_deleter.hpp"
 
-#include "memory_deleter.hpp"
+#include "memory_delete.hpp"
 #include "unique_rc.hpp"
 
 #include <fmt/base.h>
