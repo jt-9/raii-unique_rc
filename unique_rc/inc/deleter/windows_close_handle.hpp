@@ -12,7 +12,7 @@ RAII_NS_BEGIN
 // and CloseHandle to release it, e.g. CreateThread
 // read Raymond Chen - Why are HANDLE return values so inconsistent?
 // https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
-template<typename Handle>
+template<typename Handle = HANDLE>
   requires std::convertible_to<Handle, HANDLE>
 struct close_handle_nullptr
 {
@@ -25,11 +25,11 @@ struct close_handle_nullptr
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
 
-  raii_inline constexpr void operator()(Handle h) const noexcept { CloseHandle(h); }
+  raii_inline /*constexpr*/ void operator()(Handle h) const noexcept { CloseHandle(h); }
 };
 
 // Use with CreateFile, CreateFileEx
-template<typename Handle>
+template<typename Handle = HANDLE>
   requires std::convertible_to<Handle, HANDLE>
 struct close_handle_invalid_handle_value
 {
@@ -42,7 +42,7 @@ struct close_handle_invalid_handle_value
 
   [[nodiscard]] raii_inline static constexpr Handle invalid() noexcept { return INVALID_HANDLE_VALUE; }
 
-  raii_inline constexpr void operator()(Handle h) const noexcept { CloseHandle(h); }
+  raii_inline /*constexpr*/ void operator()(Handle h) const noexcept { CloseHandle(h); }
 };
 
 RAII_NS_END
