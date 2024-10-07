@@ -33,11 +33,10 @@ set(TEST_APP_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/inc/memory_mock_deleter.hpp
 )
 
-# set(TEST_APP_SOURCES
-#   ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-# )
-
 add_executable(tests ${TEST_APP_HEADERS} tests.cpp)
+target_sources(tests PRIVATE 
+	$<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/winapi_tests.cpp>)
+
 target_link_libraries(
   tests
   PRIVATE myproject::myproject_warnings

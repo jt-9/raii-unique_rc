@@ -25,7 +25,7 @@ struct close_handle_nullptr
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
 
-  raii_inline /*constexpr*/ void operator()(Handle h) const noexcept { CloseHandle(h); }
+  raii_inline constexpr void operator()(Handle h) const noexcept { CloseHandle(h); }
 };
 
 // Use with CreateFile, CreateFileEx
@@ -42,7 +42,7 @@ struct close_handle_invalid_handle_value
 
   [[nodiscard]] raii_inline static constexpr Handle invalid() noexcept { return INVALID_HANDLE_VALUE; }
 
-  raii_inline /*constexpr*/ void operator()(Handle h) const noexcept { CloseHandle(h); }
+  raii_inline constexpr void operator()(Handle h) const noexcept { CloseHandle(h); }
 };
 
 RAII_NS_END
