@@ -30,7 +30,7 @@ add_test(NAME cli.has_help COMMAND sample_app --help)
 # set_tests_properties(cli.version_matches PROPERTIES PASS_REGULAR_EXPRESSION "${PROJECT_VERSION}")
 
 set(TEST_APP_HEADERS 
-  ${CMAKE_CURRENT_SOURCE_DIR}/inc/memory_mock_deleter.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/inc/mock_pointer_no_op.hpp
 )
 
 add_executable(tests ${TEST_APP_HEADERS} tests.cpp)
