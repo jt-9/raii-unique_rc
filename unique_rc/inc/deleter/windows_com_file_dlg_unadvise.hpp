@@ -15,7 +15,7 @@ struct com_object_file_dialog_unadvise
 
   [[nodiscard]] raii_inline static constexpr DWORD invalid() noexcept { return 0; }
 
-  raii_inline constexpr void operator()(DWORD h) const noexcept
+  raii_inline void operator()(DWORD h) const noexcept
   {
     if (dlg_) { dlg_->Unadvise(h); }
   }

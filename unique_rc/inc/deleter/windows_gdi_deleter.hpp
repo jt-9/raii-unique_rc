@@ -28,32 +28,6 @@ struct gdi_delete_object_nullptr
   raii_inline constexpr void operator()(Handle h) const noexcept { DeleteObject(h); }
 };
 
-// Deallocates device context (DC) acquired via CreateDC, CreateCompatibleDC, etc.
-// nullptr indicates invalid dc
-struct gdi_delete_dc_nullptr
-{
-  constexpr gdi_delete_dc_nullptr() noexcept = default;
-
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-
-  raii_inline constexpr void operator()(HDC h) const noexcept { DeleteDC(h); }
-};
-
-// Deallocates device context (DC) acquired via GetDC, GetWindowDC, etc.
-// nullptr indicates invalid dc
-struct gdi_release_wnd_dc_nullptr
-{
-  raii_inline constexpr gdi_release_wnd_dc_nullptr(HWND w) noexcept : wnd_{ w } {}
-
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-
-  raii_inline constexpr void operator()(HDC h) const noexcept { ReleaseDC(wnd_, h); }
-
-private:
-  HWND wnd_;
-};
-
-
 RAII_NS_END
 
 #endif// WIN_GDI_HANDLE_DELETER_HPP

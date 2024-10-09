@@ -49,3 +49,25 @@ include(CTest)
 if(BUILD_TESTING)
   add_subdirectory(test)
 endif()
+
+# if(myproject_BUILD_FUZZ_TESTS)
+#   message(AUTHOR_WARNING "Building Fuzz Tests, using fuzzing sanitizer https://www.llvm.org/docs/LibFuzzer.html")
+#   if (NOT myproject_ENABLE_ADDRESS_SANITIZER AND NOT myproject_ENABLE_THREAD_SANITIZER)
+#     message(WARNING "You need asan or tsan enabled for meaningful fuzz testing")
+#   endif()
+#   add_subdirectory(fuzz_test)
+
+# endif()
+
+# If MSVC is being used, and ASAN is enabled, we need to set the debugger environment
+# so that it behaves well with MSVC's debugger, and we can run the target from visual studio
+if(MSVC)
+  get_all_installable_targets(all_targets)
+  message("all_targets=${all_targets}")
+  set_target_properties(${all_targets} PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=$(VC_ExecutablePath_x64);%PATH%")
+endif()
+
+# set the startup project for the "play" button in MSVC
+if (MSVC)
+  set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT sample_app)
+endif()

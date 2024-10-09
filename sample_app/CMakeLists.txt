@@ -10,7 +10,7 @@ set(SAMPLE_APP_SOURCES
 
 #cmake_print_variables(SAMPLE_APP_HEADERS SAMPLE_APP_SOURCES)
 
-set(EXEC_TARGET unique_rc_sample)
+set(EXEC_TARGET sample_app)
 
 add_executable(${EXEC_TARGET} ${SAMPLE_APP_HEADERS} ${SAMPLE_APP_SOURCES})
 
