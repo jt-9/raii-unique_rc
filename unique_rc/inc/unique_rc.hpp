@@ -53,8 +53,7 @@ public:
     "unique_rc's deleter type must be a function object type"
     " or an lvalue reference type");
 
-  constexpr unique_rc_holder_impl() = default;
-
+  // cppcheck-suppress passedByValueCallback - handle is not a heavy type, so pass by value
   raii_inline explicit constexpr unique_rc_holder_impl(handle h) noexcept : hdt_{ h, {} } {}
 
   template<typename D> raii_inline constexpr unique_rc_holder_impl(handle h, D &&d) : hdt_{ h, std::forward<D>(d) } {}
@@ -180,7 +179,7 @@ public:
   // template<typename D = Deleter>
   raii_inline constexpr unique_rc() noexcept
     requires is_not_pointer_default_constructable_v<Deleter>
-    : uh_{}
+    : uh_{ invalid() }
   {}
 
   template<typename D = Deleter>
