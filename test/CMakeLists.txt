@@ -31,6 +31,7 @@ add_test(NAME cli.has_help COMMAND sample_app --help)
 
 set(TEST_APP_HEADERS 
   ${CMAKE_CURRENT_SOURCE_DIR}/inc/mock_pointer_no_op.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/inc/mock_generic_deallocator_no_op.hpp
 )
 
 add_executable(tests ${TEST_APP_HEADERS} tests.cpp)
