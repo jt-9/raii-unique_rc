@@ -7,9 +7,11 @@
 
 #include "memory_delete.hpp"
 #include "unique_rc.hpp"
+#include "unique_ptr.hpp"
 
 #include <fmt/base.h>
 #include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <CLI/CLI.hpp>
 
@@ -117,6 +119,18 @@ int main(int argc, char *argv[]) noexcept
       "After move assignment from unique_rc<int*, raii::memory_delete<int*>> to unique_rc<std::int32_t*, "
       "raii::memory_delete<std::int32_t*>> {}",
       *rc2.get());
+  }
+
+  {
+    const auto kVal1 = -23549;
+    // NOLINTBEGIN(bugprone-unhandled-exception-at-new)
+    raii::unique_ptr<int> ptr1{ new int{ kVal1 } };
+    // NOLINTEND(bugprone-unhandled-exception-at-new)
+
+    fmt::println("Value initialised unique_ptr<int, raii::memory_delete<int *>> ptr1 address: {}, value: {}", fmt::ptr(ptr1.get()), *ptr1.get());
+
+    ptr1.reset();
+
   }
 
   return 0;

@@ -12,6 +12,7 @@ include(GenerateExportHeader)
 set(HEADERS 
   ${CMAKE_CURRENT_LIST_DIR}/inc/defs.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/unique_rc.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/inc/unique_ptr.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/memory_delete.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/stdio_fclose.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_com_release.hpp
@@ -23,6 +24,7 @@ set(HEADERS
 
 set(SOURCES
   ${CMAKE_CURRENT_LIST_DIR}/src/unique_rc.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/unique_ptr.cpp
 )
 
 function(add_mylib_statics lib_name)
