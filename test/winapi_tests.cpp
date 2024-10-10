@@ -109,7 +109,7 @@ TEST_CASE("Three-way value initialised unique_rc<HPEN, gdi_delete_object_nullptr
 
   CHECK(pen_rc);
 
-  SECTION("unique_rc::operator <=> with other value constructed HPEN")
+  SECTION("unique_rc::operator <=> with other value constructed unique_rc")
   {
     const raii::unique_rc<HPEN, raii::gdi_delete_object_nullptr<HPEN>> pen_rc2{ CreatePen(
       PS_DASH, 4, RGB(0xFF, 0xFF, 0xFF)) };
@@ -145,7 +145,7 @@ TEST_CASE("Swap value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN
 
   CHECK(pen_rc);
 
-  SECTION("unique_rc::swap with other value constructed HPEN")
+  SECTION("unique_rc::swap with other value constructed unique_rc")
   {
     raii::unique_rc<HPEN, raii::gdi_delete_object_nullptr<HPEN>> pen_rc2{ CreatePen(
       PS_DASH, 4, RGB(0xFF, 0xFF, 0xFF)) };
@@ -165,16 +165,16 @@ TEST_CASE("Swap value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN
 
   SECTION("unique_rc::swap with default constructed unique_rc")
   {
-    raii::unique_rc<HPEN, raii::gdi_delete_object_nullptr<HPEN>> invalid_pen_rc{};
-    CHECK_FALSE(invalid_pen_rc);
+    raii::unique_rc<HPEN, raii::gdi_delete_object_nullptr<HPEN>> default_init_rc{};
+    CHECK_FALSE(default_init_rc);
 
     const auto p1 = pen_rc.get();
-    const auto p2 = invalid_pen_rc.get();
+    const auto p2 = default_init_rc.get();
 
-    pen_rc.swap(invalid_pen_rc);
+    pen_rc.swap(default_init_rc);
 
     REQUIRE(p2 == pen_rc.get());
-    REQUIRE(p1 == invalid_pen_rc.get());
+    REQUIRE(p1 == default_init_rc.get());
   }
 }
 //****************************************************************
@@ -213,13 +213,13 @@ TEST_CASE("Equality of value initialised unique_rc<HANDLE, close_handle_invalid_
 
   SECTION("unique_rc::operator == to default constructed unique_rc")
   {
-    const raii::unique_rc<HANDLE, raii::close_handle_invalid_handle_value<>> invalid_pipe{};
-    CHECK_FALSE(invalid_pipe);
+    const raii::unique_rc<HANDLE, raii::close_handle_invalid_handle_value<>> default_init_rc{};
+    CHECK_FALSE(default_init_rc);
 
-    REQUIRE(pipe != invalid_pipe);
+    REQUIRE(pipe != default_init_rc);
     // REQUIRE(pipe != nullptr); should not compile, cause invalid is INVALID_HANDLE_VALUE and not nullptr
 
-    REQUIRE(invalid_pipe != pipe);
+    REQUIRE(default_init_rc != pipe);
     REQUIRE(pipe.invalid() != pipe.get());
   }
 }
