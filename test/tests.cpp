@@ -2,6 +2,7 @@
 
 
 #include "memory_delete.hpp"
+#include "mock_pointer_no_op.hpp"
 #include "unique_rc.hpp"
 
 #include <cstdint>
@@ -45,42 +46,55 @@ TEST_CASE("Converting constructor of unique_rc<std::int8_t*, memory_delete<std::
 
 TEST_CASE("Release empty initialised unique_rc<float*, memory_delete<float*>>", "[unique_rc::release()]")
 {
-  raii::unique_rc<float *, raii::memory_delete<float *>> float_rc{};
+  raii::unique_rc<float *, raii::memory_delete<float *>> default_init_rc{};
 
-  CHECK_FALSE(float_rc);
-  CHECK(float_rc.get() == nullptr);
+  CHECK_FALSE(default_init_rc);
+  CHECK(default_init_rc.get() == nullptr);
 
-  REQUIRE(float_rc.release() == nullptr);
-  REQUIRE_FALSE(float_rc);
+  REQUIRE(default_init_rc.release() == nullptr);
+  REQUIRE_FALSE(default_init_rc);
 }
 
 TEST_CASE("Release initialised unique_rc<float*, memory_delete<float*>>", "[unique_rc::release()]")
 {
   constexpr auto test_number = 496;
-  raii::unique_rc<float *, raii::memory_delete<float *>> float_rc{ new float{ test_number } };
+  raii::unique_rc<float *, raii::memory_delete<float *>> rc1{ new float{ test_number } };
 
-  CHECK(float_rc);
-  CHECK(float_rc.get() != nullptr);
+  CHECK(rc1);
+  CHECK(rc1.get() != nullptr);
 
-  decltype(float_rc) init_from_release{ float_rc.release() };
+  decltype(rc1) init_from_release{ rc1.release() };
   REQUIRE(init_from_release);
 
-  REQUIRE(float_rc.get() == nullptr);
-  REQUIRE_FALSE(float_rc);
+  REQUIRE(rc1.get() == nullptr);
+  REQUIRE_FALSE(rc1);
 }
 
 TEST_CASE("Reset initialised unique_rc<float*, memory_delete<float*>>", "[unique_rc::reset()]")
 {
   constexpr auto test_number = 496;
-  raii::unique_rc<float *, raii::memory_delete<float *>> float_rc{ new float{ test_number } };
+  raii::unique_rc<float *, raii::memory_delete<float *>> rc1{ new float{ test_number } };
 
-  REQUIRE(float_rc);
-  REQUIRE(float_rc.get() != nullptr);
+  REQUIRE(rc1);
+  REQUIRE(rc1.get() != nullptr);
 
-  REQUIRE_NOTHROW(float_rc.reset());
+  SECTION("Reset with invalid value (nullptr)")
+  {
+    REQUIRE_NOTHROW(rc1.reset());
 
-  REQUIRE(float_rc.get() == nullptr);
-  REQUIRE_FALSE(float_rc);
+    REQUIRE(rc1.get() == nullptr);
+    REQUIRE_FALSE(rc1);
+  }
+
+  SECTION("Reset with other constructed float")
+  {
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+    auto *const non_owner_ptr = new float{ test_number };
+    rc1.reset(non_owner_ptr);
+
+    REQUIRE(rc1.get() == non_owner_ptr);
+    REQUIRE(rc1);
+  }
 }
 
 TEST_CASE("Reset empty unique_rc<float*, memory_delete<float*>> default", "[unique_rc::reset()]")
@@ -94,4 +108,117 @@ TEST_CASE("Reset empty unique_rc<float*, memory_delete<float*>> default", "[uniq
 
   REQUIRE(float_rc.get() == nullptr);
   REQUIRE_FALSE(float_rc);
+}
+
+TEST_CASE("Equality of value initialised unique_rc<double*, memory_delete<double*>>", "[unique_rc::operator ==]")
+{
+  const auto test_number = 13.11;
+  const raii::unique_rc<double *, raii::memory_delete<double *>> rc1{ new double{ test_number } };
+
+  CHECK(rc1);
+
+  SECTION("unique_rc::operator == to other value constructed double*")
+  {
+    const raii::unique_rc<double *, raii::memory_delete<double *>> rc2{ new double{ 1 - test_number } };
+    CHECK(rc2);
+
+    REQUIRE_FALSE(rc1 == rc2);
+  }
+
+  SECTION("unique_rc::operator == to same, but non-owning unique_rc")
+  {
+    const raii::unique_rc<double *, mock_raii::mock_pointer_no_op<double *>> noop_rc{ rc1.get() };
+
+    REQUIRE(rc1 == noop_rc);
+    REQUIRE_FALSE(rc1 != noop_rc);
+  }
+
+  SECTION("unique_rc::operator == to default constructed unique_rc")
+  {
+    constexpr raii::unique_rc<double *, raii::memory_delete<double *>> default_init_rc{};
+    CHECK_FALSE(default_init_rc);
+
+    REQUIRE(rc1 != default_init_rc);
+    REQUIRE(rc1 != nullptr);
+
+    REQUIRE(default_init_rc != rc1);
+    REQUIRE(nullptr != rc1);
+  }
+}
+
+TEST_CASE("Three-way value initialised unique_rc<int*, memory_delete<int*>>", "[unique_rc::operator <=>]")
+{
+  const raii::unique_rc<int *, raii::memory_delete<int *>> rc1{ new int{ 73 } };
+
+  CHECK(rc1);
+
+  SECTION("unique_rc::operator <=> with other value constructed unique_rc")
+  {
+    const raii::unique_rc<int *, raii::memory_delete<int *>> rc2{ new int{ 37 } };
+    CHECK(rc2);
+
+    REQUIRE((rc1 <=> rc2) != std::strong_ordering::equal);
+  }
+
+  SECTION("unique_rc::operator <=> with same, but non-owning unique_rc")
+  {
+    const raii::unique_rc<int *, mock_raii::mock_pointer_no_op<int *>> noop_rc{ rc1.get() };
+
+    REQUIRE((rc1 <=> noop_rc) == std::strong_ordering::equal);
+    // REQUIRE((pen_rc <=> noop_pen_rc) == 0); Catch2 generates error
+  }
+
+  SECTION("unique_rc::operator <=> to default constructed unique_rc")
+  {
+    constexpr raii::unique_rc<int *, raii::memory_delete<int *>> default_init_rc{};
+    CHECK_FALSE(default_init_rc);
+
+    REQUIRE((rc1 <=> default_init_rc) == std::strong_ordering::greater);
+    REQUIRE((rc1 <=> nullptr) == std::strong_ordering::greater);
+
+    REQUIRE((default_init_rc <=> rc1) == std::strong_ordering::less);
+    REQUIRE((nullptr <=> rc1) == std::strong_ordering::less);
+  }
+}
+
+TEST_CASE("Swap value initialised unique_rc<int*, memory_delete<int*>>", "[unique_rc::swap]")
+{
+  const auto rc1_init_number = 24;
+  raii::unique_rc<int *, raii::memory_delete<int *>> rc1{ new int{ rc1_init_number } };
+
+  CHECK(rc1);
+
+  SECTION("unique_rc::swap with other value constructed unique_rc")
+  {
+    const auto rc2_init_number = -36;
+    using handle = decltype(rc1)::handle;
+    raii::unique_rc<handle, raii::memory_delete<handle>> rc2{ new int{ rc2_init_number } };
+    CHECK(rc2);
+
+    auto *const ptr1 = rc1.get();
+    auto *const ptr2 = rc2.get();
+
+    rc1.swap(rc2);
+
+    CHECK(rc1);
+    CHECK(rc2);
+
+    REQUIRE(ptr2 == rc1.get());
+    REQUIRE(ptr1 == rc2.get());
+  }
+
+  SECTION("unique_rc::swap with default constructed unique_rc")
+  {
+    using handle = decltype(rc1)::handle;
+    raii::unique_rc<handle, raii::memory_delete<handle>> default_init_rc{};
+    CHECK_FALSE(default_init_rc);
+
+    auto *const ptr1 = rc1.get();
+    auto *const ptr2 = default_init_rc.get();
+
+    rc1.swap(default_init_rc);
+
+    REQUIRE(ptr2 == rc1.get());
+    REQUIRE(ptr1 == default_init_rc.get());
+  }
 }
