@@ -131,6 +131,20 @@ int main(int argc, char *argv[]) noexcept
 
     ptr1.reset();
 
+    if (nullptr == ptr1) {
+      fmt::println("ptr1 is empty");
+    }
+
+  }
+
+  {
+    // NOLINTBEGIN
+    raii::unique_ptr<int[]> array_ptr{ new int[8] };
+    array_ptr[1] = -4;
+
+    array_ptr.reset(new int[2]);
+
+    // NOLINTEND
   }
 
   return 0;

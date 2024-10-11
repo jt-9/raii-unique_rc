@@ -19,8 +19,11 @@
 RAII_NS_BEGIN
 
 template<typename T>
-concept is_not_pointer_default_constructable_v =
-  std::conjunction_v<std::negation<std::is_pointer<T>>, std::is_default_constructible<T>>;
+using is_not_pointer_default_constructable =
+  std::conjunction<std::negation<std::is_pointer<T>>, std::is_default_constructible<T>>;
+
+template<typename T>
+concept is_not_pointer_default_constructable_v = is_not_pointer_default_constructable<T>::value;
 
 template<typename T, typename U>
 concept has_static_invalid_convertible_and_comparable = requires {
@@ -176,33 +179,28 @@ private:
 
 public:
   /// Default constructor, creates a unique_rc that owns nothing.
-  // template<typename D = Deleter>
-  raii_inline constexpr unique_rc() noexcept
+  template<typename D = Deleter>
     requires is_not_pointer_default_constructable_v<Deleter>
-    : uh_{ invalid() }
+  raii_inline constexpr unique_rc() noexcept : uh_{ invalid() }
   {}
 
   template<typename D = Deleter>
-  raii_inline explicit constexpr unique_rc(handle h) noexcept
     requires is_not_pointer_default_constructable_v<D>
-    : uh_{ h }
+  raii_inline explicit constexpr unique_rc(handle h) noexcept : uh_{ h }
   {}
 
   template<typename D = Deleter>
-  raii_inline constexpr unique_rc(handle h, const Deleter &d) noexcept
     requires std::is_copy_constructible_v<D>
-    : uh_{ h, d }
+  raii_inline constexpr unique_rc(handle h, const Deleter &d) noexcept : uh_{ h, d }
   {}
 
   template<typename D = Deleter>
-  raii_inline constexpr unique_rc(handle h, Deleter &&d) noexcept
     requires std::conjunction_v<std::negation<std::is_reference<D>>, std::is_move_constructible<D>>
-    : uh_{ h, std::move(d) }
+  raii_inline constexpr unique_rc(handle h, Deleter &&d) noexcept : uh_{ h, std::move(d) }
   {}
 
-  template<typename D = Deleter,
-    std::enable_if_t<std::conjunction_v<std::is_reference<D>, std::is_constructible<D, std::remove_reference_t<D>>>,
-      int> = 0>
+  template<typename D = Deleter>
+    requires std::conjunction_v<std::is_reference<D>, std::is_constructible<D, std::remove_reference_t<D>>>
   unique_rc(handle, std::remove_reference_t<Deleter> &&) = delete;
 
   // template<typename D>
@@ -214,9 +212,10 @@ public:
 
   // Converting constructor from another type
   template<typename H, typename D>
-  raii_inline constexpr unique_rc(unique_rc<H, D> &&src) noexcept
     requires std::conjunction_v<safe_conversion_from<H, D>,
       std::conditional_t<std::is_reference_v<Deleter>, std::is_same<D, Deleter>, std::is_convertible<D, Deleter>>>
+  // cppcheck-suppress noExplicitConstructor intended converting constructor
+  raii_inline constexpr unique_rc(unique_rc<H, D> &&src) noexcept
     : uh_{ src.release(), std::forward<D>(src.get_deleter()) }
   {}
 
@@ -224,8 +223,8 @@ public:
 
   // Assignment from another type
   template<typename H, typename D>
-  raii_inline constexpr unique_rc &operator=(unique_rc<H, D> &&rhs) noexcept
     requires std::conjunction_v<safe_conversion_from<H, D>, std::is_assignable<deleter_type &, D &&>>
+  raii_inline constexpr unique_rc &operator=(unique_rc<H, D> &&rhs) noexcept
   {
     reset(rhs.release());
     get_deleter() = std::forward<Deleter>(rhs.get_deleter());
@@ -274,6 +273,7 @@ public:
 
   raii_inline constexpr void swap(unique_rc &other) noexcept(
     std::is_nothrow_swappable_v<unique_rc_holder<Handle, Deleter>>)
+    requires std::is_swappable_v<Deleter>
   {
     uh_.swap(other.uh_);
   }
