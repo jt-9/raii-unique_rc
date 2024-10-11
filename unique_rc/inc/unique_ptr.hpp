@@ -11,57 +11,59 @@
 RAII_NS_BEGIN
 
 
-template<typename Tp> struct default_delete
+template<typename T> struct default_delete
 {
   constexpr default_delete() noexcept = default;
 
   template<typename U>
+    requires std::is_convertible_v<U *, T *>
+  // cppcheck-suppress noExplicitConstructor intended converting constructor
   raii_inline constexpr default_delete(const default_delete<U> &) noexcept
-    requires std::is_convertible_v<U *, Tp *>
   {}
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
 
-  raii_inline constexpr void operator()(Tp *p) const noexcept
+  raii_inline constexpr void operator()(T *p) const noexcept
   {
-    static_assert(!std::is_void_v<Tp>, "can't delete pointer to incomplete type");
-    static_assert(sizeof(Tp) > 0, "can't delete pointer to incomplete type");
+    static_assert(!std::is_void_v<T>, "can't delete pointer to incomplete type");
+    static_assert(sizeof(T) > 0, "can't delete pointer to incomplete type");
 
     delete p;
   }
 };
 
 // Specialization of default_delete for arrays, used by `unique_ptr<T[]>`
-template<typename Tp> struct default_delete<Tp[]>
+template<typename T> struct default_delete<T[]>
 {
   constexpr default_delete() noexcept = default;
 
   template<typename U>
+    requires std::is_convertible_v<U (*)[], T (*)[]>
+  // cppcheck-suppress noExplicitConstructor intended converting constructor
   raii_inline constexpr default_delete(const default_delete<U[]> &) noexcept
-    requires std::is_convertible_v<U (*)[], Tp (*)[]>
   {}
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
 
   template<typename U>
+    requires std::is_convertible_v<U (*)[], T (*)[]>
   raii_inline constexpr void operator()(U *p) const noexcept
-    requires std::is_convertible_v<U (*)[], Tp (*)[]>
   {
-    static_assert(sizeof(Tp) > 0, "can't delete pointer to incomplete type");
+    static_assert(sizeof(T) > 0, "can't delete pointer to incomplete type");
 
     delete[] p;
   }
 };
 
 
-template<typename Tp, typename Deleter = raii::default_delete<Tp>> class unique_ptr : private unique_rc<Tp *, Deleter>
+template<typename T, typename Deleter = raii::default_delete<T>> class unique_ptr : private unique_rc<T *, Deleter>
 {
 private:
-  using Base = unique_rc<Tp *, Deleter>;
+  using Base = unique_rc<T *, Deleter>;
 
 public:
   using pointer = typename Base::handle;
-  using element_type = Tp;
+  using element_type = T;
   using typename Base::deleter_type;
   using invalid_pointer_type = Base::invalid_handle_type;
 
@@ -70,34 +72,34 @@ public:
 private:
   // helper template for detecting a safe conversion from another
   // unique_ptr
-  template<typename H, typename D>
+  template<typename U, typename D>
   using safe_conversion_from =
-    std::conjunction<std::is_convertible<typename unique_ptr<H, D>::pointer, pointer>, std::negation<std::is_array<H>>>;
+    std::conjunction<std::is_convertible<typename unique_ptr<U, D>::pointer, pointer>, std::negation<std::is_array<U>>>;
 
 public:
-  raii_inline constexpr unique_ptr() noexcept : Base() {}
+  raii_inline constexpr unique_ptr() noexcept
+    requires is_not_pointer_default_constructable_v<Deleter>
+    : Base()
+  {}
 
   template<typename D = Deleter>
-  raii_inline explicit constexpr unique_ptr(pointer h) noexcept
+  raii_inline explicit constexpr unique_ptr(pointer p) noexcept
     requires is_not_pointer_default_constructable_v<D>
-    : Base{ h }
+    : Base(p)
   {}
 
   template<typename D = Deleter>
-  raii_inline constexpr unique_ptr(pointer h, const Deleter &d) noexcept
     requires std::is_copy_constructible_v<D>
-    : Base{ h, d }
+  raii_inline constexpr unique_ptr(pointer p, const Deleter &d) noexcept : Base(p, d)
   {}
 
   template<typename D = Deleter>
-  raii_inline constexpr unique_ptr(pointer h, Deleter &&d) noexcept
     requires std::conjunction_v<std::negation<std::is_reference<D>>, std::is_move_constructible<D>>
-    : Base{ h, std::move(d) }
+  raii_inline constexpr unique_ptr(pointer p, Deleter &&d) noexcept : Base(p, std::move(d))
   {}
 
-  template<typename D = Deleter,
-    std::enable_if_t<std::conjunction_v<std::is_reference<D>, std::is_constructible<D, std::remove_reference_t<D>>>,
-      int> = 0>
+  template<typename D = Deleter>
+    requires std::conjunction_v<std::is_reference<D>, std::is_constructible<D, std::remove_reference_t<D>>>
   unique_ptr(pointer, std::remove_reference_t<Deleter> &&) = delete;
 
   // template<typename D>
@@ -108,29 +110,37 @@ public:
   constexpr unique_ptr(unique_ptr &&) = default;
 
   // Converting constructor from another type
-  template<typename H, typename D>
-  raii_inline constexpr unique_ptr(unique_ptr<H, D> &&src) noexcept
-    requires std::conjunction_v<safe_conversion_from<H, D>,
+  template<typename U, typename D>
+    requires std::conjunction_v<safe_conversion_from<U, D>,
       std::conditional_t<std::is_reference_v<Deleter>, std::is_same<D, Deleter>, std::is_convertible<D, Deleter>>>
-    : Base{ src.release(), std::forward<D>(src.get_deleter()) }
+  // cppcheck-suppress noExplicitConstructor intended converting constructor
+  raii_inline constexpr unique_ptr(unique_ptr<U, D> &&src) noexcept
+    : Base(src.release(), std::forward<D>(src.get_deleter()))
   {}
 
   constexpr unique_ptr &operator=(unique_ptr &&) = default;
 
   // Assignment from another type
-  template<typename H, typename D>
-  raii_inline constexpr unique_ptr &operator=(unique_ptr<H, D> &&rhs) noexcept
-    requires std::conjunction_v<safe_conversion_from<H, D>, std::is_assignable<deleter_type &, D &&>>
+  template<typename U, typename D>
+    requires std::conjunction_v<safe_conversion_from<U, D>, std::is_assignable<deleter_type &, D &&>>
+  raii_inline constexpr unique_ptr &operator=(unique_ptr<U, D> &&rhs) noexcept
   {
     Base::operator=(std::move(rhs));
 
     return *this;
   }
 
+  raii_inline constexpr unique_ptr &operator=(std::nullptr_t) noexcept
+    requires std::is_same_v<invalid_pointer_type, std::nullptr_t>
+  {
+    reset();
+    return *this;
+  }
+
   unique_ptr(const unique_ptr &) = delete;
   unique_ptr &operator=(const unique_ptr &) = delete;
 
-  raii_inline constexpr ~unique_ptr() noexcept = default;
+  constexpr ~unique_ptr() noexcept = default;
 
   using Base::get;
   using Base::operator->;
@@ -142,14 +152,157 @@ public:
     return *get();
   }
 
+  using Base::get_deleter;
+  using Base::operator bool;
+
   using Base::reset;
   using Base::release;
+
+  using Base::swap;
+};
+
+
+/// A move-only smart pointer that manages unique ownership of an array.
+template<typename T, typename Deleter> class unique_ptr<T[], Deleter> : private unique_rc<T *, Deleter>
+{
+private:
+  using Base = unique_rc<T *, Deleter>;
+
+  // template<typename _Up> using _DeleterConstraint = typename __uniq_ptr_impl<_T, _Up>::_DeleterConstraint::type;
+  //  like is_base_of<_T, _Up> but false if unqualified types are the same
+
+  template<typename U>
+  using is_derived_T =
+    std::conjunction<std::is_base_of<T, U>, std::negation<std::is_same<std::remove_cv_t<T>, std::remove_cv_t<U>>>>;
+
+public:
+  using pointer = typename Base::handle;
+  using element_type = T;
+  using typename Base::deleter_type;
+  using invalid_pointer_type = Base::invalid_handle_type;
+
+  using Base::invalid;
+
+  // helper template for detecting a safe conversion from a raw pointer
+  template<typename U>
+  using safe_conversion_raw =
+    std::conjunction<std::disjunction<std::disjunction<std::is_same<U, pointer>, std::is_same<U, std::nullptr_t>>,
+      std::conjunction<std::is_pointer<U>,
+        std::is_same<pointer, element_type *>,
+        std::is_convertible<typename std::remove_pointer<U>::type (*)[], element_type (*)[]>>>>;
+
+  // helper template for detecting a safe conversion from another
+  // unique_ptr
+  template<typename U,
+    typename D,
+    typename UP = unique_ptr<U, D>,
+    typename UP_pointer = typename UP::pointer,
+    typename UP_element_type = typename UP::element_type>
+  using safe_conversion_from = std::conjunction<std::is_array<U>,
+    std::is_same<pointer, element_type *>,
+    std::is_same<UP_pointer, UP_element_type *>,
+    std::is_convertible<UP_element_type (*)[], element_type (*)[]>>;
+
+  // Constructors
+  raii_inline constexpr unique_ptr() noexcept
+    requires is_not_pointer_default_constructable_v<Deleter>
+    : Base()
+  {}
+
+  template<typename U, typename D = deleter_type>
+  raii_inline constexpr explicit unique_ptr(U p) noexcept
+    requires std::conjunction_v<is_not_pointer_default_constructable<D>, safe_conversion_raw<U>>
+    : Base(p)
+  {}
+
+  template<typename U, typename D = deleter_type>
+  raii_inline constexpr unique_ptr(U p, const deleter_type &d) noexcept
+    requires std::conjunction_v<safe_conversion_raw<U>, std::is_copy_constructible<D>>
+    : Base(p, d)
+  {}
+
+  template<typename U, typename D = deleter_type>
+  raii_inline constexpr unique_ptr(U p, std::enable_if_t<!std::is_lvalue_reference_v<D>, D &&> d) noexcept
+    requires std::conjunction_v<safe_conversion_raw<U>, std::is_move_constructible<D>>
+    : Base(std::move(p), std::move(d))
+  {}
+
+  template<typename U, typename D = deleter_type>
+    requires std::conjunction_v<safe_conversion_raw<U>, std::is_lvalue_reference<D>>
+  unique_ptr(U, std::remove_reference_t<D> &&) = delete;
+
+  /// Move constructor.
+  constexpr unique_ptr(unique_ptr &&) = default;
+
+  /// Creates a unique_ptr that owns nothing.
+  template<typename D = Deleter>
+    requires is_not_pointer_default_constructable_v<D>
+  raii_inline explicit constexpr unique_ptr(std::nullptr_t) noexcept : Base()
+  {}
+
+  // Converting constructor from another type
+  template<typename U, typename D>
+    requires std::conjunction_v<safe_conversion_from<U, D>,
+      std::conditional_t<std::is_reference_v<Deleter>, std::is_same<D, Deleter>, std::is_convertible<D, Deleter>>>
+  // cppcheck-suppress noExplicitConstructor intended converting constructor
+  raii_inline constexpr unique_ptr(unique_ptr<U, D> &&src) noexcept
+    : Base(src.release(), std::forward<D>(src.get_deleter()))
+  {}
+
+  /// Destructor, invokes the deleter if the stored pointer is not null.
+  constexpr ~unique_ptr() noexcept = default;
+
+  constexpr unique_ptr &operator=(unique_ptr &&) = default;
+
+  template<typename U, typename D>
+    requires std::conjunction_v<safe_conversion_from<U, D>, std::is_assignable<deleter_type &, D &&>>
+  raii_inline constexpr unique_ptr &operator=(unique_ptr<U, D> &&u) noexcept
+  {
+    Base::operator=(std::move(u));
+    return *this;
+  }
+
+  raii_inline constexpr unique_ptr &operator=(std::nullptr_t) noexcept
+    requires std::is_same_v<invalid_pointer_type, std::nullptr_t>
+  {
+    reset();
+    return *this;
+  }
+
+  using Base::get;
+  using Base::operator->;
+
+  /// Access an element of owned array.
+  raii_inline constexpr typename std::add_lvalue_reference_t<element_type> operator[](std::size_t i) const
+  {
+    assert(get() != invalid() && "Error subscript operator on nullptr");
+    return get()[i];
+  }
 
   using Base::get_deleter;
   using Base::operator bool;
 
+  using Base::release;
+
+// Cannot default p to invalid(), cause U need to be deducable
+  template<typename U>
+    requires std::disjunction_v<std::is_same<U, pointer>,
+      std::conjunction<std::is_same<pointer, element_type *>,
+        std::is_pointer<U>,
+        std::is_convertible<typename std::remove_pointer_t<U> (*)[], element_type (*)[]>>>
+  raii_inline constexpr void reset(U p) noexcept
+  {
+    Base::reset(std::move(p));
+  }
+
+  raii_inline constexpr void reset(std::nullptr_t = nullptr) noexcept
+    requires std::is_same_v<invalid_pointer_type, std::nullptr_t>
+  {
+    Base::reset(invalid());
+  }
+
   using Base::swap;
-};
+};// unique_ptr<T[], Deleter>
 
 
 template<typename T1, class D1, typename T2, class D2>
