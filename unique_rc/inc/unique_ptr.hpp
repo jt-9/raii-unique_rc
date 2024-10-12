@@ -284,7 +284,7 @@ public:
 
   using Base::release;
 
-// Cannot default p to invalid(), cause U need to be deducable
+  // Cannot default p to invalid(), cause U need to be deducable
   template<typename U>
     requires std::disjunction_v<std::is_same<U, pointer>,
       std::conjunction<std::is_same<pointer, element_type *>,
@@ -344,6 +344,48 @@ raii_inline constexpr void swap(unique_ptr<H, D> &lhs, unique_ptr<H, D> &rhs) no
 {
   lhs.swap(rhs);
 }
+
+
+template<class T, class... Types>
+  requires(!std::is_array_v<T>)
+[[nodiscard]] raii_inline constexpr raii::unique_ptr<T> make_unique(Types &&...Args)
+{// make a unique_ptr
+  return raii::unique_ptr<T>(new T(std::forward<Types>(Args)...));
+}
+
+template<class T>
+// requires std::is_array_v<T> && (std::extent_v<T> == 0)
+  requires std::is_unbounded_array_v<T>
+[[nodiscard]] raii_inline constexpr raii::unique_ptr<T> make_unique(const std::size_t size)
+{// make a unique_ptr
+  using Elem = std::remove_extent_t<T>;
+  return raii::unique_ptr<T>(new Elem[size]());
+}
+
+template<class T, class... Types>
+  requires std::is_bounded_array_v<T>
+void make_unique(Types &&...) = delete;
+
+template<typename T>
+  requires(!std::is_array_v<T>)
+[[nodiscard]] raii_inline constexpr raii::unique_ptr<T> make_unique_for_overwrite()
+{
+  // make a unique_ptr with default initialization
+  return raii::unique_ptr<T>(new T);
+}
+
+template<typename T>
+  requires std::is_unbounded_array_v<T>
+[[nodiscard]] raii_inline constexpr raii::unique_ptr<T> make_unique_for_overwrite(const std::size_t size)
+{
+  // make a unique_ptr with default initialization
+  using Elem = std::remove_extent_t<T>;
+  return raii::unique_ptr<T>(new Elem[size]);
+}
+
+template<typename T, class... Types>
+  requires std::is_bounded_array_v<T>
+void make_unique_for_overwrite(Types &&...) = delete;
 
 RAII_NS_END
 

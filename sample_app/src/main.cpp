@@ -6,8 +6,8 @@
 #include "test_deleter.hpp"
 
 #include "memory_delete.hpp"
-#include "unique_rc.hpp"
 #include "unique_ptr.hpp"
+#include "unique_rc.hpp"
 
 #include <fmt/base.h>
 #include <fmt/core.h>
@@ -127,20 +127,22 @@ int main(int argc, char *argv[]) noexcept
     raii::unique_ptr<int> ptr1{ new int{ kVal1 } };
     // NOLINTEND(bugprone-unhandled-exception-at-new)
 
-    fmt::println("Value initialised unique_ptr<int, raii::memory_delete<int *>> ptr1 address: {}, value: {}", fmt::ptr(ptr1.get()), *ptr1.get());
+    fmt::println("Value initialised unique_ptr<int, raii::memory_delete<int *>> ptr1 address: {}, value: {}",
+      fmt::ptr(ptr1.get()),
+      *ptr1.get());
 
     ptr1.reset();
 
-    if (nullptr == ptr1) {
-      fmt::println("ptr1 is empty");
-    }
-
+    if (nullptr == ptr1) { fmt::println("ptr1 is empty"); }
   }
 
   {
+    const auto kArraySize = 4;
     // NOLINTBEGIN
-    raii::unique_ptr<int[]> array_ptr{ new int[8] };
-    array_ptr[1] = -4;
+    raii::unique_ptr<int[]> array_ptr = raii::make_unique_for_overwrite<int[]>(kArraySize);
+    array_ptr[0] = -1;
+    array_ptr[1] = 4;
+    array_ptr[2] = 7;
 
     array_ptr.reset(new int[2]);
 
