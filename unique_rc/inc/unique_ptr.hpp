@@ -303,6 +303,7 @@ public:
   using Base::swap;
 
 private:
+  // Not applicable for an array, equivalent to *p[0]
   using Base::operator->;
 };// unique_ptr<T[], Deleter>
 
@@ -348,10 +349,12 @@ raii_inline constexpr void swap(unique_ptr<H, D> &lhs, unique_ptr<H, D> &rhs) no
 }
 
 
+// make_unique and make_unique_for_overwrite
+
 template<class T, class... Types>
   requires(!std::is_array_v<T>)
 [[nodiscard]] raii_inline constexpr raii::unique_ptr<T> make_unique(Types &&...Args)
-{// make a unique_ptr
+{
   return raii::unique_ptr<T>(new T(std::forward<Types>(Args)...));
 }
 
@@ -359,7 +362,7 @@ template<class T>
 // requires std::is_array_v<T> && (std::extent_v<T> == 0)
   requires std::is_unbounded_array_v<T>
 [[nodiscard]] raii_inline constexpr raii::unique_ptr<T> make_unique(const std::size_t size)
-{// make a unique_ptr
+{
   using Elem = std::remove_extent_t<T>;
   return raii::unique_ptr<T>(new Elem[size]());
 }
@@ -372,7 +375,7 @@ template<typename T>
   requires(!std::is_array_v<T>)
 [[nodiscard]] raii_inline constexpr raii::unique_ptr<T> make_unique_for_overwrite()
 {
-  // make a unique_ptr with default initialization
+  // with default initialization
   return raii::unique_ptr<T>(new T);
 }
 
@@ -380,7 +383,7 @@ template<typename T>
   requires std::is_unbounded_array_v<T>
 [[nodiscard]] raii_inline constexpr raii::unique_ptr<T> make_unique_for_overwrite(const std::size_t size)
 {
-  // make a unique_ptr with default initialization
+  // only memory allocation
   using Elem = std::remove_extent_t<T>;
   return raii::unique_ptr<T>(new Elem[size]);
 }
