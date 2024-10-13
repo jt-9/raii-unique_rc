@@ -270,7 +270,6 @@ public:
   }
 
   using Base::get;
-  using Base::operator->;
 
   /// Access an element of owned array.
   raii_inline constexpr typename std::add_lvalue_reference_t<element_type> operator[](std::size_t i) const
@@ -302,6 +301,9 @@ public:
   }
 
   using Base::swap;
+
+private:
+  using Base::operator->;
 };// unique_ptr<T[], Deleter>
 
 
