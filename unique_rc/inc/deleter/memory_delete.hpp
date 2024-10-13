@@ -17,8 +17,9 @@ struct memory_delete
   constexpr memory_delete() noexcept = default;
 
   template<typename U>
-  raii_inline constexpr memory_delete(const memory_delete<U> &) noexcept
     requires std::is_convertible_v<U, Handle>
+  // cppcheck-suppress noExplicitConstructor intended converting constructor
+  raii_inline constexpr memory_delete(const memory_delete<U> &) noexcept
   {}
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
@@ -29,6 +30,51 @@ struct memory_delete
     static_assert(sizeof(Handle) > 0, "can't delete pointer to incomplete type");
 
     delete h;
+  }
+};
+
+template<typename T> struct default_delete : private memory_delete<T *>
+{
+private:
+  using Base = memory_delete<T *>;
+
+public:
+  constexpr default_delete() noexcept = default;
+
+  template<typename U>
+    requires std::is_convertible_v<U *, T *>
+  // cppcheck-suppress noExplicitConstructor intended converting constructor
+  raii_inline constexpr default_delete(const default_delete<U> &) noexcept
+  {}
+
+  using Base::invalid;
+  using Base::operator();
+};
+
+// Specialization of default_delete for arrays, used by `unique_ptr<T[]>`
+template<typename T> struct default_delete<T[]> : private memory_delete<T *>
+{
+private:
+  using Base = memory_delete<T *>;
+
+public:
+  constexpr default_delete() noexcept = default;
+
+  template<typename U>
+    requires std::is_convertible_v<U (*)[], T (*)[]>
+  // cppcheck-suppress noExplicitConstructor intended converting constructor
+  raii_inline constexpr default_delete(const default_delete<U[]> &) noexcept
+  {}
+
+  using Base::invalid;
+
+  template<typename U>
+    requires std::is_convertible_v<U (*)[], T (*)[]>
+  raii_inline constexpr void operator()(U *p) const noexcept
+  {
+    static_assert(sizeof(U) > 0, "can't delete pointer to incomplete type");
+
+    delete[] p;
   }
 };
 
