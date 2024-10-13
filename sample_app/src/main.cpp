@@ -151,7 +151,6 @@ int main(int argc, char *argv[]) noexcept
     arrayUniquePtr[2] = 7;
 
     arrayUniquePtr.reset(new int[2]);
-
     // NOLINTEND
   }
 

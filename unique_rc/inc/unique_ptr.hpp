@@ -2,6 +2,7 @@
 #define UNIQUE_PTR_HPP
 
 #include "unique_rc.hpp"
+#include "memory_delete.hpp"
 
 #include "defs.hpp"
 
@@ -9,51 +10,6 @@
 #include <concepts>
 
 RAII_NS_BEGIN
-
-
-template<typename T> struct default_delete
-{
-  constexpr default_delete() noexcept = default;
-
-  template<typename U>
-    requires std::is_convertible_v<U *, T *>
-  // cppcheck-suppress noExplicitConstructor intended converting constructor
-  raii_inline constexpr default_delete(const default_delete<U> &) noexcept
-  {}
-
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-
-  raii_inline constexpr void operator()(T *p) const noexcept
-  {
-    static_assert(!std::is_void_v<T>, "can't delete pointer to incomplete type");
-    static_assert(sizeof(T) > 0, "can't delete pointer to incomplete type");
-
-    delete p;
-  }
-};
-
-// Specialization of default_delete for arrays, used by `unique_ptr<T[]>`
-template<typename T> struct default_delete<T[]>
-{
-  constexpr default_delete() noexcept = default;
-
-  template<typename U>
-    requires std::is_convertible_v<U (*)[], T (*)[]>
-  // cppcheck-suppress noExplicitConstructor intended converting constructor
-  raii_inline constexpr default_delete(const default_delete<U[]> &) noexcept
-  {}
-
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-
-  template<typename U>
-    requires std::is_convertible_v<U (*)[], T (*)[]>
-  raii_inline constexpr void operator()(U *p) const noexcept
-  {
-    static_assert(sizeof(T) > 0, "can't delete pointer to incomplete type");
-
-    delete[] p;
-  }
-};
 
 
 template<typename T, typename Deleter = raii::default_delete<T>> class unique_ptr : private unique_rc<T *, Deleter>

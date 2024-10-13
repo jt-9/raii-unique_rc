@@ -10,6 +10,6 @@
 #include "windows_com_release.hpp"
 #include "windows_dc_deleter.hpp"
 #include "windows_gdi_deleter.hpp"
-// NOLINTEND(misc-include-cleaner)
 
 #endif
+// NOLINTEND(misc-include-cleaner)
