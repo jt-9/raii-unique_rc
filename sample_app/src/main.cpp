@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) noexcept
     raii::unique_ptr<int> ptr1{ new int{ kVal1 } };
     // NOLINTEND(bugprone-unhandled-exception-at-new)
 
-    fmt::println("Value initialised unique_ptr<int, raii::memory_delete<int *>> ptr1 address: {}, value: {}",
+    fmt::println("Value initialised unique_ptr<int, raii::memory_delete<int *>> address: {}, value: {}",
       fmt::ptr(ptr1.get()),
       *ptr1.get());
 
@@ -137,14 +137,20 @@ int main(int argc, char *argv[]) noexcept
   }
 
   {
+    const auto kSampleFloat = 3.864F;
+    raii::unique_ptr<float> dynamicVal = raii::make_unique<float>(kSampleFloat);
+    fmt::println("Value initialised unique_ptr<float> address: {}, value: {}", fmt::ptr(dynamicVal.get()), *dynamicVal);
+  }
+
+  {
     const auto kArraySize = 4;
     // NOLINTBEGIN
-    raii::unique_ptr<int[]> array_ptr = raii::make_unique_for_overwrite<int[]>(kArraySize);
-    array_ptr[0] = -1;
-    array_ptr[1] = 4;
-    array_ptr[2] = 7;
+    raii::unique_ptr<int[]> arrayUniquePtr = raii::make_unique_for_overwrite<int[]>(kArraySize);
+    arrayUniquePtr[0] = -1;
+    arrayUniquePtr[1] = 4;
+    arrayUniquePtr[2] = 7;
 
-    array_ptr.reset(new int[2]);
+    arrayUniquePtr.reset(new int[2]);
 
     // NOLINTEND
   }
