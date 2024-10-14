@@ -122,6 +122,18 @@ int main(int argc, char *argv[]) noexcept
   }
 
   {
+    fmt::println("unique_rc with default_delete");
+    const auto kVal1 = 11;
+    // NOLINTBEGIN(bugprone-unhandled-exception-at-new)
+    unique_rc<std::int32_t *, raii::default_delete<std::int32_t>> rc1{ new std::int32_t{ kVal1 } };
+    // NOLINTEND(bugprone-unhandled-exception-at-new)
+    fmt::println("Stored value {}", *rc1.get());
+
+    auto *temp = rc1.release();
+    rc1.reset(temp);
+  }
+
+  {
     const auto kVal1 = -23549;
     // NOLINTBEGIN(bugprone-unhandled-exception-at-new)
     raii::unique_ptr<int> ptr1{ new int{ kVal1 } };
@@ -154,5 +166,18 @@ int main(int argc, char *argv[]) noexcept
     // NOLINTEND
   }
 
+  {
+    const auto kArraySize = 4;
+    // NOLINTBEGIN
+    raii::unique_ptr<int[], raii::deleter_wrapper<std::default_delete<int[]>>> arrayWithStdDeleter{
+      new int[kArraySize]
+    };
+    arrayWithStdDeleter[0] = -1;
+    arrayWithStdDeleter[1] = 4;
+    arrayWithStdDeleter[2] = 7;
+
+    arrayWithStdDeleter.reset(new int[2]);
+    // NOLINTEND
+  }
   return 0;
 }
