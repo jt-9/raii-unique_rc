@@ -78,6 +78,16 @@ public:
   }
 };
 
+template<typename Deleter>
+  requires(!std::is_final_v<Deleter>)
+struct deleter_wrapper : public Deleter
+{
+  using Deleter::Deleter;
+  using Deleter::operator();
+
+  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
+};
+
 RAII_NS_END
 
 #endif// MEMORY_DELETE_HPP

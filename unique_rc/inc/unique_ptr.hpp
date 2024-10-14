@@ -1,8 +1,8 @@
 #ifndef UNIQUE_PTR_HPP
 #define UNIQUE_PTR_HPP
 
-#include "unique_rc.hpp"
 #include "memory_delete.hpp"
+#include "unique_rc.hpp"
 
 #include "defs.hpp"
 
