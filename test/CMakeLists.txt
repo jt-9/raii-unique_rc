@@ -34,9 +34,14 @@ set(TEST_APP_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/inc/mock_generic_deallocator_no_op.hpp
 )
 
-add_executable(tests ${TEST_APP_HEADERS} tests.cpp)
-target_sources(tests PRIVATE 
-	$<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/winapi_tests.cpp>)
+set(TEST_APP_SOURCES
+  ${CMAKE_CURRENT_SOURCE_DIR}/tests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/unique_ptr_tests.cpp
+  $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/winapi_tests.cpp>
+)
+
+add_executable(tests ${TEST_APP_HEADERS} ${TEST_APP_SOURCES})
+#target_sources(tests PRIVATE $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/winapi_tests.cpp>)
 
 target_link_libraries(
   tests

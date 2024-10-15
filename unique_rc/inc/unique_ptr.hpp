@@ -12,10 +12,13 @@
 RAII_NS_BEGIN
 
 
-template<typename T, typename Deleter = raii::default_delete<T>> class unique_ptr : private unique_rc<T *, Deleter>
+template<typename T, typename Deleter = raii::default_delete<T>> class unique_ptr : public unique_rc<T *, Deleter>
 {
 private:
   using Base = unique_rc<T *, Deleter>;
+  using typename Base::handle;
+  using Base::Base;
+  using Base::operator=;
 
 public:
   using pointer = typename Base::handle;
@@ -119,10 +122,14 @@ public:
 
 
 /// A move-only smart pointer that manages unique ownership of an array.
-template<typename T, typename Deleter> class unique_ptr<T[], Deleter> : private unique_rc<T *, Deleter>
+template<typename T, typename Deleter> class unique_ptr<T[], Deleter> : public unique_rc<T *, Deleter>
 {
 private:
   using Base = unique_rc<T *, Deleter>;
+
+  using typename Base::handle;
+  using Base::Base;
+  using Base::operator=;
 
   // template<typename _Up> using _DeleterConstraint = typename __uniq_ptr_impl<_T, _Up>::_DeleterConstraint::type;
   //  like is_base_of<_T, _Up> but false if unqualified types are the same
