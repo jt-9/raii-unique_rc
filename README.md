@@ -11,7 +11,7 @@ that help victims of the war in Ukraine: <https://www.stopputin.net/>.
 
 The idea behind **raii::unique_rc** is similar to [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr) in providing automatic and exception-safe deallocation of dynamically allocated resource be it a memory, file descriptors, file handles, events, sockets, COM objects, GDI objects, etc.
 
-The key difference is a requirement for 'deallocator', a [functional object](https://en.cppreference.com/w/cpp/named_req/FunctionObject) which deallocates resource, to provide what is viewed as invalid value. This approach is described in Kenny Kerr's artcle [Windows with C++ - C++ and the Windows API](https://learn.microsoft.com/en-us/archive/msdn-magazine/2011/july/msdn-magazine-windows-with-c-c-and-the-windows-api). **raii::unique_rc** provides *similar interface* to std::unique_ptr, but unlike latter, which compares against `nullptr`, **raii::unique_rc** allows deallocator to specify a different invalid value e.g. `INVALID_HANDLE_VALUE, INVALID_SOCKET, etc`. 
+The key difference is a requirement for 'deallocator', a [functional object](https://en.cppreference.com/w/cpp/named_req/FunctionObject) which deallocates resource, to provide what is viewed as invalid value. This approach is described in Kenny Kerr's artcle [Windows with C++ - C++ and the Windows API](https://learn.microsoft.com/en-us/archive/msdn-magazine/2011/july/msdn-magazine-windows-with-c-c-and-the-windows-api). **raii::unique_rc** provides *similar interface* to std::unique_ptr, but unlike latter, which compares against `pointer()`, **raii::unique_rc** requires deallocator to specify an invalid type and value e.g. `INVALID_HANDLE_VALUE, INVALID_SOCKET, etc`. 
 
 ## Documentation:
 
@@ -20,8 +20,8 @@ To be added
 
 ## Features:
 
-- Interface similar to std::unique_ptr, with extra `invalid_value_type` defined in deallocator.
-- Small code size consisting of just several files `unique_rc.hpp`, `defs.hpp` and deallocators.
+- Interface similar to std::unique_ptr, with **invalid type** and **invalid value** defined in deallocator. This simplifies work with handles typically allocated via API function such as [fopen](https://en.cppreference.com/w/cpp/io/c/fopen), CreateFile, etc.
+- Small code size consisting of just several files `unique_rc.hpp`, `unique_ptr.hpp`, `defs.hpp` and deallocators.
 - Clean warning-free codebase even on high warning levels such as `-Wall` `-Wextra` `-pedantic`.
 - Specialised **raii::unique_ptr** - equivalent to std::unique_ptr, derived from raii::unique_rc.
 
