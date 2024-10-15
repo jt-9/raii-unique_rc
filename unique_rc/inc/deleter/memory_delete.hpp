@@ -33,7 +33,7 @@ struct memory_delete
   }
 };
 
-template<typename T> struct default_delete : private memory_delete<T *>
+template<typename T> struct default_delete : public memory_delete<T *>
 {
 private:
   using Base = memory_delete<T *>;
@@ -52,7 +52,7 @@ public:
 };
 
 // Specialization of default_delete for arrays, used by `unique_ptr<T[]>`
-template<typename T> struct default_delete<T[]> : private memory_delete<T *>
+template<typename T> struct default_delete<T[]> : public memory_delete<T *>
 {
 private:
   using Base = memory_delete<T *>;

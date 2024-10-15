@@ -20,7 +20,8 @@ TEST_CASE("Default initialised unique_rc<char*, memory_delete<char*>>", "[unique
 
 TEST_CASE("Move constructor from initialised unique_rc<char*, memory_delete<char*>>", "[unique_rc::unique_rc]")
 {
-  raii::unique_rc<char *, raii::memory_delete<char *>> char_rc{ new char{ 'A' } };
+  constexpr auto kChar = 'C';
+  raii::unique_rc<char *, raii::memory_delete<char *>> char_rc{ new char{ kChar } };
 
   CHECK(char_rc.get() != nullptr);
   CHECK(char_rc);
@@ -29,6 +30,7 @@ TEST_CASE("Move constructor from initialised unique_rc<char*, memory_delete<char
 
   REQUIRE(char_rc2);
   REQUIRE(char_rc2.get() != nullptr);
+  REQUIRE(*char_rc2.get() == kChar);
 }
 
 TEST_CASE("Converting constructor of unique_rc<std::int8_t*, memory_delete<std::int8_t*>>", "[unique_rc::unique_rc]")
@@ -44,6 +46,23 @@ TEST_CASE("Converting constructor of unique_rc<std::int8_t*, memory_delete<std::
   REQUIRE(*int8_rc.get() == kChar);
 }
 
+TEST_CASE("Access handle to get/set value unique_rc<float*, memory_delete<float*>>", "[unique_rc::get()]")
+{
+  constexpr auto test_number = 28.0F;
+  const raii::unique_rc<float *, raii::memory_delete<float *>> rc1{ new float{ test_number } };
+
+  REQUIRE(rc1.get() != nullptr);
+
+  SECTION("Read stored value") { REQUIRE(*rc1.get() == test_number); }
+
+  SECTION("Write new value")
+  {
+    constexpr auto new_number = 8128.0F;
+    REQUIRE_NOTHROW(*rc1.get() = new_number);
+    REQUIRE(*rc1.get() == new_number);
+  }
+}
+
 TEST_CASE("Release empty initialised unique_rc<float*, memory_delete<float*>>", "[unique_rc::release()]")
 {
   raii::unique_rc<float *, raii::memory_delete<float *>> default_init_rc{};
@@ -57,7 +76,7 @@ TEST_CASE("Release empty initialised unique_rc<float*, memory_delete<float*>>", 
 
 TEST_CASE("Release initialised unique_rc<float*, memory_delete<float*>>", "[unique_rc::release()]")
 {
-  constexpr auto test_number = 496;
+  constexpr auto test_number = 496.0F;
   raii::unique_rc<float *, raii::memory_delete<float *>> rc1{ new float{ test_number } };
 
   CHECK(rc1);
@@ -72,7 +91,7 @@ TEST_CASE("Release initialised unique_rc<float*, memory_delete<float*>>", "[uniq
 
 TEST_CASE("Reset initialised unique_rc<float*, memory_delete<float*>>", "[unique_rc::reset()]")
 {
-  constexpr auto test_number = 496;
+  constexpr auto test_number = 496.0F;
   raii::unique_rc<float *, raii::memory_delete<float *>> rc1{ new float{ test_number } };
 
   REQUIRE(rc1);
@@ -80,6 +99,7 @@ TEST_CASE("Reset initialised unique_rc<float*, memory_delete<float*>>", "[unique
 
   SECTION("Reset with invalid value (nullptr)")
   {
+    CHECK(*rc1.get() == test_number);
     REQUIRE_NOTHROW(rc1.reset());
 
     REQUIRE(rc1.get() == nullptr);
@@ -123,6 +143,7 @@ TEST_CASE("Equality of value initialised unique_rc<double*, memory_delete<double
     CHECK(rc2);
 
     REQUIRE_FALSE(rc1 == rc2);
+    REQUIRE(rc1 != rc2);
   }
 
   SECTION("unique_rc::operator == to same, but non-owning unique_rc")
@@ -165,7 +186,9 @@ TEST_CASE("Three-way value initialised unique_rc<int*, memory_delete<int*>>", "[
     const raii::unique_rc<int *, mock_raii::mock_pointer_no_op<int *>> noop_rc{ rc1.get() };
 
     REQUIRE((rc1 <=> noop_rc) == std::strong_ordering::equal);
-    // REQUIRE((pen_rc <=> noop_pen_rc) == 0); Catch2 generates error
+
+    const auto equal_to_zero = (rc1 <=> noop_rc) == 0;
+    REQUIRE(equal_to_zero);
   }
 
   SECTION("unique_rc::operator <=> to default constructed unique_rc")
