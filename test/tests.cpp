@@ -9,7 +9,7 @@
 #include <utility>
 
 
-TEST_CASE("Default initialised unique_rc<char*, memory_delete<char*>>", "[unique_rc::unique_rc]")
+TEST_CASE("Default initialised unique_rc<char*, memory_delete<char*>>", "[unique_rc]")
 {
   const raii::unique_rc<char *, raii::memory_delete<char *>> char_rc{};
 
@@ -18,7 +18,7 @@ TEST_CASE("Default initialised unique_rc<char*, memory_delete<char*>>", "[unique
   // REQUIRE(factorial(10) == 3628800);
 }
 
-TEST_CASE("Move constructor from initialised unique_rc<char*, memory_delete<char*>>", "[unique_rc::unique_rc]")
+TEST_CASE("Move constructor from initialised unique_rc<char*, memory_delete<char*>>", "[unique_rc]")
 {
   constexpr auto kChar = 'C';
   raii::unique_rc<char *, raii::memory_delete<char *>> char_rc{ new char{ kChar } };
@@ -33,7 +33,7 @@ TEST_CASE("Move constructor from initialised unique_rc<char*, memory_delete<char
   REQUIRE(*char_rc2.get() == kChar);
 }
 
-TEST_CASE("Converting constructor of unique_rc<std::int8_t*, memory_delete<std::int8_t*>>", "[unique_rc::unique_rc]")
+TEST_CASE("Converting constructor of unique_rc<std::int8_t*, memory_delete<std::int8_t*>>", "[unique_rc]")
 {
   constexpr auto kChar = 'A';
   raii::unique_rc<signed char *, raii::memory_delete<signed char *>> char_rc{ new signed char{ kChar } };
@@ -46,7 +46,7 @@ TEST_CASE("Converting constructor of unique_rc<std::int8_t*, memory_delete<std::
   REQUIRE(*int8_rc.get() == kChar);
 }
 
-TEST_CASE("Access handle to get/set value unique_rc<float*, memory_delete<float*>>", "[unique_rc::get()]")
+TEST_CASE("Access handle to get/set value unique_rc<float*, memory_delete<float*>>", "[unique_rc]")
 {
   constexpr auto test_number = 28.0F;
   const raii::unique_rc<float *, raii::memory_delete<float *>> rc1{ new float{ test_number } };
@@ -63,7 +63,7 @@ TEST_CASE("Access handle to get/set value unique_rc<float*, memory_delete<float*
   }
 }
 
-TEST_CASE("Release empty initialised unique_rc<float*, memory_delete<float*>>", "[unique_rc::release()]")
+TEST_CASE("Release empty initialised unique_rc<float*, memory_delete<float*>>", "[unique_rc]")
 {
   raii::unique_rc<float *, raii::memory_delete<float *>> default_init_rc{};
 
@@ -74,7 +74,7 @@ TEST_CASE("Release empty initialised unique_rc<float*, memory_delete<float*>>", 
   REQUIRE_FALSE(default_init_rc);
 }
 
-TEST_CASE("Release initialised unique_rc<float*, memory_delete<float*>>", "[unique_rc::release()]")
+TEST_CASE("Release initialised unique_rc<float*, memory_delete<float*>>", "[unique_rc]")
 {
   constexpr auto test_number = 496.0F;
   raii::unique_rc<float *, raii::memory_delete<float *>> rc1{ new float{ test_number } };
@@ -89,7 +89,7 @@ TEST_CASE("Release initialised unique_rc<float*, memory_delete<float*>>", "[uniq
   REQUIRE_FALSE(rc1);
 }
 
-TEST_CASE("Reset initialised unique_rc<float*, memory_delete<float*>>", "[unique_rc::reset()]")
+TEST_CASE("Reset initialised unique_rc<float*, memory_delete<float*>>", "[unique_rc]")
 {
   constexpr auto test_number = 496.0F;
   raii::unique_rc<float *, raii::memory_delete<float *>> rc1{ new float{ test_number } };
@@ -117,7 +117,7 @@ TEST_CASE("Reset initialised unique_rc<float*, memory_delete<float*>>", "[unique
   }
 }
 
-TEST_CASE("Reset empty unique_rc<float*, memory_delete<float*>> default", "[unique_rc::reset()]")
+TEST_CASE("Reset empty unique_rc<float*, memory_delete<float*>> default", "[unique_rc]")
 {
   raii::unique_rc<float *, raii::memory_delete<float *>> float_rc{};
 
@@ -130,7 +130,7 @@ TEST_CASE("Reset empty unique_rc<float*, memory_delete<float*>> default", "[uniq
   REQUIRE_FALSE(float_rc);
 }
 
-TEST_CASE("Equality of value initialised unique_rc<double*, memory_delete<double*>>", "[unique_rc::operator ==]")
+TEST_CASE("Equality of value initialised unique_rc<double*, memory_delete<double*>>", "[unique_rc]")
 {
   const auto test_number = 13.11;
   const raii::unique_rc<double *, raii::memory_delete<double *>> rc1{ new double{ test_number } };
@@ -167,7 +167,7 @@ TEST_CASE("Equality of value initialised unique_rc<double*, memory_delete<double
   }
 }
 
-TEST_CASE("Three-way value initialised unique_rc<int*, memory_delete<int*>>", "[unique_rc::operator <=>]")
+TEST_CASE("Three-way value initialised unique_rc<int*, memory_delete<int*>>", "[unique_rc]")
 {
   const raii::unique_rc<int *, raii::memory_delete<int *>> rc1{ new int{ 73 } };
 
@@ -204,7 +204,7 @@ TEST_CASE("Three-way value initialised unique_rc<int*, memory_delete<int*>>", "[
   }
 }
 
-TEST_CASE("Swap value initialised unique_rc<int*, memory_delete<int*>>", "[unique_rc::swap]")
+TEST_CASE("Swap value initialised unique_rc<int*, memory_delete<int*>>", "[unique_rc]")
 {
   const auto rc1_init_number = 24;
   raii::unique_rc<int *, raii::memory_delete<int *>> rc1{ new int{ rc1_init_number } };

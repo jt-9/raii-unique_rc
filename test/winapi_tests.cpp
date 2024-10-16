@@ -14,7 +14,7 @@
 //----------------------------------------------------------------
 // GDI pen, type HPEN, invalid nullptr
 //----------------------------------------------------------------
-TEST_CASE("Default initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>", "[unique_rc::unique_rc]")
+TEST_CASE("Default initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>", "[unique_rc]")
 {
   constexpr raii::unique_rc<HPEN, raii::gdi_delete_object_nullptr<HPEN>> pen_rc{};
 
@@ -22,7 +22,7 @@ TEST_CASE("Default initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>"
   REQUIRE_FALSE(pen_rc);
 }
 
-TEST_CASE("Value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>", "[unique_rc::unique_rc]")
+TEST_CASE("Value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>", "[unique_rc]")
 {
   raii::unique_rc<HPEN, raii::gdi_delete_object_nullptr<HPEN>> pen_rc{ CreatePen(PS_SOLID, 1, RGB(0, 0, 0)) };
 
@@ -30,7 +30,7 @@ TEST_CASE("Value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>", 
   REQUIRE(pen_rc);
 }
 
-TEST_CASE("Release value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>", "[unique_rc::release]")
+TEST_CASE("Release value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>", "[unique_rc]")
 {
   raii::unique_rc<HPEN, raii::gdi_delete_object_nullptr<HPEN>> pen_rc{ CreatePen(PS_SOLID, 1, RGB(0, 0, 0)) };
 
@@ -41,7 +41,7 @@ TEST_CASE("Release value initialised unique_rc<HPEN, gdi_delete_object_nullptr<H
   REQUIRE(new_pen_rc.get() != nullptr);
 }
 
-TEST_CASE("Reset value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>", "[unique_rc::reset]")
+TEST_CASE("Reset value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>", "[unique_rc]")
 {
   raii::unique_rc<HPEN, raii::gdi_delete_object_nullptr<HPEN>> pen_rc{ CreatePen(PS_SOLID, 1, RGB(0, 0, 0)) };
 
@@ -66,7 +66,7 @@ TEST_CASE("Reset value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPE
   }
 }
 
-TEST_CASE("Equality of value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>", "[unique_rc::operator ==]")
+TEST_CASE("Equality of value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>", "[unique_rc]")
 {
   const raii::unique_rc<HPEN, raii::gdi_delete_object_nullptr<HPEN>> pen_rc{ CreatePen(PS_SOLID, 1, RGB(0, 0, 0)) };
 
@@ -103,7 +103,7 @@ TEST_CASE("Equality of value initialised unique_rc<HPEN, gdi_delete_object_nullp
   }
 }
 
-TEST_CASE("Three-way value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>", "[unique_rc::operator <=>]")
+TEST_CASE("Three-way value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>", "[unique_rc]")
 {
   const raii::unique_rc<HPEN, raii::gdi_delete_object_nullptr<HPEN>> pen_rc{ CreatePen(PS_SOLID, 1, RGB(0, 0, 0)) };
 
@@ -139,7 +139,7 @@ TEST_CASE("Three-way value initialised unique_rc<HPEN, gdi_delete_object_nullptr
   }
 }
 
-TEST_CASE("Swap value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>", "[unique_rc::swap]")
+TEST_CASE("Swap value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>", "[unique_rc]")
 {
   raii::unique_rc<HPEN, raii::gdi_delete_object_nullptr<HPEN>> pen_rc{ CreatePen(PS_SOLID, 1, RGB(0, 0, 0)) };
 
@@ -184,8 +184,7 @@ TEST_CASE("Swap value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN
 // Mock CreateFile, type HANDLE, invalid INVALID_HANDLE_VALUE
 //----------------------------------------------------------------
 
-TEST_CASE("Equality of value initialised unique_rc<HANDLE, close_handle_invalid_handle_value<>>",
-  "[unique_rc::operator ==]")
+TEST_CASE("Equality of value initialised unique_rc<HANDLE, close_handle_invalid_handle_value<>>", "[unique_rc]")
 {
   const auto pipeName = TEXT("\\\\.\\pipe\\mytestpipe");
   const auto bufferSize = 8;
