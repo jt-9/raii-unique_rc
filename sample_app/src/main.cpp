@@ -46,6 +46,15 @@ void measureAndPrintUniquePtrSize() noexcept
   //		std::println("Sizeof 'std::tuple<int*, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(tp));
   fmt::println("Sizeof 'std::tuple<int*, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(tp_ptr_to_deleter));
 }
+
+void printLibVersion(std::string_view lib_name) noexcept
+{
+  fmt::println("{0} {1}.{2}.{3}",
+    lib_name,
+    raii::cmake::project_version_major,
+    raii::cmake::project_version_minor,
+    raii::cmake::project_version_patch);
+}
 }// namespace
 
 
@@ -57,14 +66,14 @@ int main(int argc, char *argv[]) noexcept
   CLI::App app{};
 
   argv = app.ensure_utf8(argv);
+  auto *version_flag = app.add_flag("-v,--version", "print raii::unique_rc library version and exit")->ignore_case();
 
   CLI11_PARSE(app, argc, argv);
 
-  fmt::println("{0} Version {1}.{2}.{3}",
-    std::string_view{ argv[0] },// NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    raii::cmake::project_version_major,
-    raii::cmake::project_version_minor,
-    raii::cmake::project_version_patch);
+  if (*version_flag) {
+    printLibVersion("raii::unique_rc"sv);
+    return 0;
+  }
 
   measureAndPrintUniquePtrSize();
 
