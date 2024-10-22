@@ -1,7 +1,7 @@
 #ifndef WIN_CLOSE_HANDLE_HPP
 #define WIN_CLOSE_HANDLE_HPP
 
-#include "defs.hpp"
+#include "raii_defs.hpp"
 
 #include <concepts>
 #include <windows.h>

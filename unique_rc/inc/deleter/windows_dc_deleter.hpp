@@ -1,7 +1,7 @@
 #ifndef WIN_GDI_DC_DELETER_HPP
 #define WIN_GDI_DC_DELETER_HPP
 
-#include "defs.hpp"
+#include "raii_defs.hpp"
 
 #include <concepts>
 #include <cstddef>
