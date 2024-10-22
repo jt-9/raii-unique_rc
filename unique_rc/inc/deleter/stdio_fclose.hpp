@@ -1,7 +1,7 @@
 #ifndef STDIO_FCLOSE_HPP
 #define STDIO_FCLOSE_HPP
 
-#include "defs.hpp"
+#include "raii_defs.hpp"
 
 #include <concepts>
 #include <stdio.h>

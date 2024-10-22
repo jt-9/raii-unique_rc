@@ -1,7 +1,7 @@
 #ifndef MOCK_GENERIC_DEALLOCATOR_NO_OP_HPP
 #define MOCK_GENERIC_DEALLOCATOR_NO_OP_HPP
 
-#include "defs.hpp"
+#include "raii_defs.hpp"
 
 #include <concepts>
 

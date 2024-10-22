@@ -2,7 +2,7 @@
 #ifndef MEMORY_DELETE_HPP
 #define MEMORY_DELETE_HPP
 
-#include "defs.hpp"
+#include "raii_defs.hpp"
 
 #include <concepts>
 #include <cstddef>

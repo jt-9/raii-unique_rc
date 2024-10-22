@@ -4,7 +4,7 @@
 #ifndef UNIQUE_RC_HPP
 #define UNIQUE_RC_HPP
 
-#include "defs.hpp"
+#include "raii_defs.hpp"
 
 #include <cassert>
 #include <concepts>
