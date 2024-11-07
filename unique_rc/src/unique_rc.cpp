@@ -9,7 +9,9 @@
 #include "windows_com_file_dlg_unadvise.hpp"
 #include "windows_com_release.hpp"
 #include "windows_dc_deleter.hpp"
+#include "windows_dc_restore.hpp"
 #include "windows_gdi_deleter.hpp"
+#include "windows_gdi_select_object.hpp"
 
 #endif
 // NOLINTEND(misc-include-cleaner)

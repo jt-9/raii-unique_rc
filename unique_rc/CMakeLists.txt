@@ -18,7 +18,9 @@ set(HEADERS
   ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_com_release.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_com_file_dlg_unadvise.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_gdi_deleter.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_gdi_select_object.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_dc_deleter.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_dc_restore.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_close_handle.hpp
 )
 
