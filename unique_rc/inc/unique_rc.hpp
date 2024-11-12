@@ -56,8 +56,8 @@ public:
     "unique_rc's deleter type must be a function object type"
     " or an lvalue reference type");
 
-  // cppcheck-suppress passedByValueCallback - handle is not a heavy type, so pass by value
-  raii_inline explicit constexpr unique_rc_holder_impl(handle h) noexcept : hdt_{ h, {} } {}
+  // cppcheck-suppress passedByValueCallback - handle is not a heavy type, it is okay to pass by value
+  raii_inline explicit constexpr unique_rc_holder_impl(handle h) noexcept : hdt_{ h, Deleter{} } {}
 
   template<typename D> raii_inline constexpr unique_rc_holder_impl(handle h, D &&d) : hdt_{ h, std::forward<D>(d) } {}
 
