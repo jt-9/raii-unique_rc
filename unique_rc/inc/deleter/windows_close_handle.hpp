@@ -4,7 +4,8 @@
 #include "raii_defs.hpp"
 
 #include <concepts>
-#include <windows.h>
+
+#include <Windows.h>
 
 RAII_NS_BEGIN
 
