@@ -5,7 +5,8 @@
 
 #include <concepts>
 #include <cstddef>
-#include <windows.h>
+
+#include <Windows.h>
 
 
 RAII_NS_BEGIN
@@ -15,7 +16,7 @@ RAII_NS_BEGIN
 // nullptr indicates invalid dc
 struct gdi_restore_dc_nullptr
 {
-  raii_inline constexpr gdi_restore_dc_nullptr(int state) noexcept : state_{ state } {}
+  raii_inline explicit constexpr gdi_restore_dc_nullptr(int state) noexcept : state_{ state } {}
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
 
