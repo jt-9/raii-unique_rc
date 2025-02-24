@@ -9,7 +9,7 @@ function(myproject_setup_dependencies)
   # already been provided to us by a parent project
 
   if(NOT TARGET fmtlib::fmtlib)
-    cpmaddpackage("gh:fmtlib/fmt#11.0.2")
+    cpmaddpackage("gh:fmtlib/fmt#11.1.3")
   endif()
 
   if(NOT TARGET spdlog::spdlog)
@@ -17,7 +17,7 @@ function(myproject_setup_dependencies)
       NAME
       spdlog
       VERSION
-      1.14.1
+      1.15.1
       GITHUB_REPOSITORY
       "gabime/spdlog"
       OPTIONS
@@ -25,7 +25,7 @@ function(myproject_setup_dependencies)
   endif()
 
   if(NOT TARGET Catch2::Catch2WithMain)
-    cpmaddpackage("gh:catchorg/Catch2@3.7.1")
+    cpmaddpackage("gh:catchorg/Catch2@3.8.0")
   endif()
 
   if(NOT TARGET CLI11::CLI11)
