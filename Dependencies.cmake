@@ -12,17 +12,17 @@ function(myproject_setup_dependencies)
     cpmaddpackage("gh:fmtlib/fmt#11.1.3")
   endif()
 
-  if(NOT TARGET spdlog::spdlog)
-    cpmaddpackage(
-      NAME
-      spdlog
-      VERSION
-      1.15.1
-      GITHUB_REPOSITORY
-      "gabime/spdlog"
-      OPTIONS
-      "SPDLOG_FMT_EXTERNAL ON")
-  endif()
+  # if(NOT TARGET spdlog::spdlog)
+  #   cpmaddpackage(
+  #     NAME
+  #     spdlog
+  #     VERSION
+  #     1.15.1
+  #     GITHUB_REPOSITORY
+  #     "gabime/spdlog"
+  #     OPTIONS
+  #     "SPDLOG_FMT_EXTERNAL ON")
+  # endif()
 
   if(NOT TARGET Catch2::Catch2WithMain)
     cpmaddpackage("gh:catchorg/Catch2@3.8.0")
