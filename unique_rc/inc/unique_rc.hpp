@@ -181,24 +181,32 @@ private:
 
 public:
   /// Default constructor, creates a unique_rc that owns nothing.
-  template<typename D = Deleter>
+  // template<typename D = Deleter>
+  //   requires is_not_pointer_default_constructable_v<Deleter>
+  raii_inline constexpr unique_rc() noexcept
     requires is_not_pointer_default_constructable_v<Deleter>
-  raii_inline constexpr unique_rc() noexcept : uh_{ invalid() }
+    : uh_{ invalid() }
   {}
 
-  template<typename D = Deleter>
-    requires is_not_pointer_default_constructable_v<D>
-  raii_inline explicit constexpr unique_rc(handle h) noexcept : uh_{ h }
+  // template<typename D = Deleter>
+  //   requires is_not_pointer_default_constructable_v<D>
+  raii_inline explicit constexpr unique_rc(handle h) noexcept
+    requires is_not_pointer_default_constructable_v<Deleter>
+    : uh_{ h }
   {}
 
-  template<typename D = Deleter>
-    requires std::is_copy_constructible_v<D>
-  raii_inline constexpr unique_rc(handle h, const Deleter &d) noexcept : uh_{ h, d }
+  // template<typename D = Deleter>
+  //   requires std::is_copy_constructible_v<D>
+  raii_inline constexpr unique_rc(handle h, const Deleter &d) noexcept
+    requires std::is_copy_constructible_v<Deleter>
+    : uh_{ h, d }
   {}
 
-  template<typename D = Deleter>
-    requires std::conjunction_v<std::negation<std::is_reference<D>>, std::is_move_constructible<D>>
-  raii_inline constexpr unique_rc(handle h, Deleter &&d) noexcept : uh_{ h, std::move(d) }
+  // template<typename D = Deleter>
+  //   requires std::conjunction_v<std::negation<std::is_reference<D>>, std::is_move_constructible<D>>
+  raii_inline constexpr unique_rc(handle h, Deleter &&d) noexcept
+    requires std::conjunction_v<std::negation<std::is_reference<Deleter>>, std::is_move_constructible<Deleter>>
+    : uh_{ h, std::move(d) }
   {}
 
   template<typename D = Deleter>
@@ -268,7 +276,7 @@ public:
 
   [[nodiscard]] raii_inline constexpr explicit operator bool() const noexcept { return invalid() != get(); }
 
-  raii_inline static constexpr invalid_handle_type invalid() noexcept(noexcept(Deleter::invalid()))
+  [[nodiscard]] raii_inline static constexpr invalid_handle_type invalid() noexcept(noexcept(Deleter::invalid()))
   {
     return Deleter::invalid();
   }

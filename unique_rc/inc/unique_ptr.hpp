@@ -41,20 +41,24 @@ public:
     : Base()
   {}
 
-  template<typename D = Deleter>
+  // template<typename D = Deleter>
   raii_inline explicit constexpr unique_ptr(pointer p) noexcept
-    requires is_not_pointer_default_constructable_v<D>
+    requires is_not_pointer_default_constructable_v<Deleter>
     : Base(p)
   {}
 
-  template<typename D = Deleter>
-    requires std::is_copy_constructible_v<D>
-  raii_inline constexpr unique_ptr(pointer p, const Deleter &d) noexcept : Base(p, d)
+  // template<typename D = Deleter>
+  //   requires std::is_copy_constructible_v<D>
+  raii_inline constexpr unique_ptr(pointer p, const Deleter &d) noexcept
+    requires std::is_copy_constructible_v<Deleter>
+    : Base(p, d)
   {}
 
-  template<typename D = Deleter>
-    requires std::conjunction_v<std::negation<std::is_reference<D>>, std::is_move_constructible<D>>
-  raii_inline constexpr unique_ptr(pointer p, Deleter &&d) noexcept : Base(p, std::move(d))
+  // template<typename D = Deleter>
+  //   requires std::conjunction_v<std::negation<std::is_reference<D>>, std::is_move_constructible<D>>
+  raii_inline constexpr unique_ptr(pointer p, Deleter &&d) noexcept
+    requires std::conjunction_v<std::negation<std::is_reference<Deleter>>, std::is_move_constructible<Deleter>>
+    : Base(p, std::move(d))
   {}
 
   template<typename D = Deleter>
