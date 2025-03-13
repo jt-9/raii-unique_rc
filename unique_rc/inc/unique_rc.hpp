@@ -25,11 +25,12 @@ using is_not_pointer_default_constructable =
 template<typename T>
 concept is_not_pointer_default_constructable_v = is_not_pointer_default_constructable<T>::value;
 
-template<typename T, typename U>
+template<typename D, typename H>
 concept has_static_invalid_convertible_and_comparable = requires {
-  { T::invalid() } noexcept -> std::convertible_to<U>;
-  { T::invalid() } noexcept -> std::equality_comparable_with<U>;
+  { D::invalid() } noexcept -> std::convertible_to<H>;
+  { D::invalid() } noexcept -> std::equality_comparable_with<H>;
 };
+
 
 template<typename Handle, typename Deleter> class unique_rc_holder_impl
 {
