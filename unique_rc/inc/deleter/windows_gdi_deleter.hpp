@@ -24,6 +24,7 @@ struct gdi_delete_object_nullptr
   {}
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
+  [[nodiscard]] raii_inline static constexpr bool is_valid(Handle h) noexcept { return h; }
 
   raii_inline constexpr void operator()(Handle h) const noexcept { DeleteObject(h); }
 };

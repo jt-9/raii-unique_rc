@@ -88,7 +88,8 @@ public:
   raii_inline constexpr void reset(handle h) noexcept
   {
     const handle old_h = std::exchange(get_handle(), h);
-    if (old_h != Deleter::invalid()) {
+    // if (old_h != Deleter::invalid()) {
+    if (Deleter::is_valid(old_h)) {
       assert(old_h != h && "Failed self-reset check, like p.reset(p.get())");
       get_deleter()(old_h);
     }
@@ -253,7 +254,8 @@ public:
     static_assert(std::is_invocable_v<deleter_type &, handle>, "unique_rc's deleter must be invocable with a handle");
 
     auto &h = uh_.get_handle();
-    if (h != invalid()) {
+    // if (h != invalid()) {
+    if (Deleter::is_valid(h)) {
       get_deleter()(std::move(h));
       h = invalid();
     }
@@ -275,7 +277,7 @@ public:
     uh_.reset(std::move(new_h));
   }
 
-  [[nodiscard]] raii_inline constexpr explicit operator bool() const noexcept { return invalid() != get(); }
+  [[nodiscard]] raii_inline constexpr explicit operator bool() const noexcept { return Deleter::is_valid(get()); }
 
   [[nodiscard]] raii_inline static constexpr invalid_handle_type invalid() noexcept(noexcept(Deleter::invalid()))
   {

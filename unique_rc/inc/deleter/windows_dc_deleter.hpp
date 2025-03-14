@@ -30,7 +30,12 @@ struct gdi_release_wnd_dc_nullptr
 {
   raii_inline explicit constexpr gdi_release_wnd_dc_nullptr(HWND w) noexcept : wnd_{ w } {}
 
+  raii_inline constexpr gdi_release_wnd_dc_nullptr(gdi_release_wnd_dc_nullptr &&src) noexcept
+    : wnd_{ std::exchange(src.wnd_, nullptr) }
+  {}
+
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
+  [[nodiscard]] raii_inline static constexpr bool is_valid(HDC h) noexcept { return h; }
 
   // constexpr generates error - constexpr function doesn't evaluate at compile time
   raii_inline void operator()(HDC h) const noexcept { ReleaseDC(wnd_, h); }
