@@ -34,6 +34,7 @@ public:
   constexpr void operator()(Handle h) const noexcept { delete h; }
 
   [[nodiscard]] static constexpr auto invalid() noexcept { return nullptr; }
+  [[nodiscard]] static constexpr bool is_valid(Handle h) noexcept { return h != invalid(); }
 
 protected:
   Dummy1 d1;
@@ -52,6 +53,7 @@ public:
   constexpr void operator()(Handle h) const noexcept { delete h; }
 
   [[nodiscard]] static constexpr auto invalid() noexcept { return nullptr; }
+  [[nodiscard]] static constexpr bool is_valid(Handle h) noexcept { return h; }
 
 protected:
   Dummy1 d1;

@@ -24,6 +24,8 @@ struct memory_delete
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
 
+  [[nodiscard]] raii_inline static constexpr bool is_valid(Handle h) noexcept { return h; }
+
   raii_inline constexpr void operator()(Handle h) const noexcept
   {
     static_assert(!std::is_void_v<Handle>, "can't delete pointer to incomplete type");
@@ -48,6 +50,7 @@ public:
   {}
 
   using Base::invalid;
+  using Base::is_valid;
   using Base::operator();
 };
 
@@ -67,6 +70,7 @@ public:
   {}
 
   using Base::invalid;
+  using Base::is_valid;
 
   template<typename U>
     requires std::is_convertible_v<U (*)[], T (*)[]>
@@ -86,6 +90,13 @@ struct deleter_wrapper : public Deleter
   using Deleter::operator();
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
+
+  template<typename Handle>
+    requires std::is_pointer_v<Handle>
+  [[nodiscard]] raii_inline static constexpr bool is_valid(Handle h) noexcept
+  {
+    return h;
+  }
 };
 
 RAII_NS_END
