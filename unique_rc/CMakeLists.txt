@@ -13,6 +13,7 @@ set(HEADERS
   ${CMAKE_CURRENT_LIST_DIR}/inc/raii_defs.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/unique_rc.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/unique_ptr.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/coroutine_destroy.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/memory_delete.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/stdio_fclose.hpp
   ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_com_release.hpp

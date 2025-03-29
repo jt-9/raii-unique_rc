@@ -24,7 +24,7 @@ struct memory_delete
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
 
-  [[nodiscard]] raii_inline static constexpr bool is_valid(Handle h) noexcept { return h; }
+  [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept { return h; }
 
   raii_inline constexpr void operator()(Handle h) const noexcept
   {
@@ -50,7 +50,7 @@ public:
   {}
 
   using Base::invalid;
-  using Base::is_valid;
+  using Base::is_owned;
   using Base::operator();
 };
 
@@ -70,7 +70,7 @@ public:
   {}
 
   using Base::invalid;
-  using Base::is_valid;
+  using Base::is_owned;
 
   template<typename U>
     requires std::is_convertible_v<U (*)[], T (*)[]>
@@ -93,7 +93,7 @@ struct deleter_wrapper : public Deleter
 
   template<typename Handle>
     requires std::is_pointer_v<Handle>
-  [[nodiscard]] raii_inline static constexpr bool is_valid(Handle h) noexcept
+  [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept
   {
     return h;
   }

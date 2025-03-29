@@ -22,7 +22,7 @@ struct com_object_release_nullptr
   {}
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-  [[nodiscard]] raii_inline static constexpr bool is_valid(Handle h) noexcept { return h; }
+  [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept { return h; }
 
   raii_inline void operator()(Handle h) const noexcept { h->Release(); }
 };

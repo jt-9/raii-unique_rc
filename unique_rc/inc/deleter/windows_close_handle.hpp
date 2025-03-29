@@ -25,7 +25,7 @@ struct close_handle_nullptr
   {}
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-  [[nodiscard]] raii_inline static constexpr bool is_valid(Handle h) noexcept { return h; }
+  [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept { return h; }
 
   raii_inline constexpr void operator()(Handle h) const noexcept { CloseHandle(h); }
 };
@@ -43,7 +43,7 @@ struct close_handle_invalid_handle_value
   {}
 
   [[nodiscard]] raii_inline static constexpr Handle invalid() noexcept { return INVALID_HANDLE_VALUE; }
-  [[nodiscard]] raii_inline static constexpr bool is_valid(Handle h) noexcept { return h != invalid(); }
+  [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept { return h != invalid(); }
 
   raii_inline constexpr void operator()(Handle h) const noexcept { CloseHandle(h); }
 };

@@ -19,7 +19,7 @@ struct mock_deallocator_no_op
   {}
 
   [[nodiscard]] raii_inline static constexpr InvalidHandle invalid() noexcept { return invalid_value; }
-  [[nodiscard]] raii_inline static constexpr bool is_valid(Handle h) noexcept { return h != invalid(); }
+  [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept { return h != invalid(); }
 
   raii_inline constexpr void operator()(Handle) const noexcept { /* No op */ }
 };
