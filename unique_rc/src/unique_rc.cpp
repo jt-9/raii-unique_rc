@@ -1,6 +1,7 @@
 #include "unique_rc.hpp"
 
 // NOLINTBEGIN(misc-include-cleaner)
+#include "coroutine_destroy.hpp"
 #include "memory_delete.hpp"
 #include "stdio_fclose.hpp"
 

@@ -18,7 +18,7 @@ struct com_object_file_dialog_unadvise
   {}
 
   [[nodiscard]] raii_inline static constexpr DWORD invalid() noexcept { return 0; }
-  [[nodiscard]] raii_inline static constexpr bool is_valid(DWORD h) noexcept { return h != invalid(); }
+  [[nodiscard]] raii_inline static constexpr bool is_owned(DWORD h) noexcept { return h != invalid(); }
 
   raii_inline void operator()(DWORD h) const noexcept
   {

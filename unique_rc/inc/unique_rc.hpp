@@ -89,7 +89,7 @@ public:
   {
     const handle old_h = std::exchange(get_handle(), h);
     // if (old_h != Deleter::invalid()) {
-    if (Deleter::is_valid(old_h)) {
+    if (Deleter::is_owned(old_h)) {
       assert(old_h != h && "Failed self-reset check, like p.reset(p.get())");
       get_deleter()(old_h);
     }
@@ -255,7 +255,7 @@ public:
 
     auto &h = uh_.get_handle();
     // if (h != invalid()) {
-    if (Deleter::is_valid(h)) {
+    if (Deleter::is_owned(h)) {
       get_deleter()(std::move(h));
       h = invalid();
     }
@@ -277,7 +277,7 @@ public:
     uh_.reset(std::move(new_h));
   }
 
-  [[nodiscard]] raii_inline constexpr explicit operator bool() const noexcept { return Deleter::is_valid(get()); }
+  [[nodiscard]] raii_inline constexpr explicit operator bool() const noexcept { return Deleter::is_owned(get()); }
 
   [[nodiscard]] raii_inline static constexpr invalid_handle_type invalid() noexcept(noexcept(Deleter::invalid()))
   {

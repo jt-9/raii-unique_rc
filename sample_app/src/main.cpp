@@ -5,6 +5,7 @@
 
 #include "test_deleter.hpp"
 
+#include "coroutine_example.hpp"
 #include "memory_delete.hpp"
 #include "unique_ptr.hpp"
 #include "unique_rc.hpp"
@@ -72,6 +73,7 @@ int main(int argc, char *argv[]) noexcept
 
   if (*version_flag) {
     printLibVersion("raii::unique_rc"sv);
+
     return 0;
   }
 
@@ -188,5 +190,16 @@ int main(int argc, char *argv[]) noexcept
     arrayWithStdDeleter.reset(new int[2]);
     // NOLINTEND
   }
+
+  {
+    fmt::println("Demonstrating simple coroutine generator...");
+    for (const auto rangeElem : raii_sample::range(65, 123)) {
+      fmt::print("{:c} ", rangeElem);
+      // std::cout << i << ' ';
+    }
+    // std::cout << '\n';
+    fmt::println("");
+  }
+
   return 0;
 }

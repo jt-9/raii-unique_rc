@@ -14,7 +14,7 @@ struct stdio_fclose
   constexpr stdio_fclose() noexcept = default;
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-  [[nodiscard]] raii_inline static constexpr bool is_valid(FILE *h) noexcept { return h; }
+  [[nodiscard]] raii_inline static constexpr bool is_owned(FILE *h) noexcept { return h; }
 
   raii_inline void operator()(FILE *h) const noexcept { fclose(h); }
 };
