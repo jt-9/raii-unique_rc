@@ -1,11 +1,13 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "memory_delete.hpp"
+#include "unique_ptr.hpp"
 #include "unique_rc.hpp"
 
 #include "mock_pointer_no_op.hpp"
 
 #include <string_view>
+#include <utility>
 
 TEST_CASE("Default initialised unique_rc<char*, memory_delete<char*>>", "[unique_rc]")
 {
@@ -120,4 +122,38 @@ TEST_CASE("Three-way comparison of initialised unique_rc<const char*, memory_moc
     STATIC_REQUIRE((char_rc2 <=> char_rc1) == std::strong_ordering::greater);
     STATIC_REQUIRE((char_rc1 <=> copy_rc1) == std::strong_ordering::equal);
   }
+}
+
+template<bool B> struct TestDeleter
+{
+  struct pointer
+  {
+    int &operator*() && noexcept(B);// this is used by unique_ptr
+    int &operator*() const & = delete;// this should not be
+
+    int *operator->() noexcept(false);// noexcept here doesn't affect anything
+
+    // Needed for NullablePointer requirements
+    explicit pointer(int * = nullptr);
+    bool operator==(const pointer &) const noexcept;
+    bool operator!=(const pointer &) const noexcept;
+  };
+
+  void operator()([[maybe_unused]] pointer ptr) const noexcept {}
+};
+
+template<typename T, bool Nothrow> using UPtr = raii::unique_ptr<T, raii::deleter_wrapper<TestDeleter<Nothrow>>>;
+
+TEST_CASE("LWG  2762 unique_ptr operator*() should be noexcept", "raii::unique_ptr LWG 2762")
+{
+  // 2762. unique_ptr operator*() should be noexcept
+  STATIC_CHECK(noexcept(*std::declval<raii::unique_ptr<long>>()));
+
+  // noexcept-specifier depends on the pointer type
+  STATIC_CHECK(noexcept(*std::declval<UPtr<int, true> &>()));
+  STATIC_CHECK_FALSE(noexcept(*std::declval<UPtr<int, false> &>()));
+
+  // This has always been required, even in C++11.
+  STATIC_REQUIRE(noexcept(std::declval<raii::unique_ptr<long>>().operator->()));
+  STATIC_REQUIRE(noexcept(std::declval<UPtr<int, false> &>().operator->()));
 }
