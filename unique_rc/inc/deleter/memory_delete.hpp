@@ -7,6 +7,7 @@
 #include <concepts>
 #include <cstddef>
 #include <new>
+#include <type_traits>
 
 RAII_NS_BEGIN
 
@@ -82,10 +83,29 @@ public:
   }
 };
 
-template<typename Deleter>
+template<typename Deleter, typename = void>
   requires(!std::is_final_v<Deleter>)
 struct deleter_wrapper : public Deleter
 {
+  using Deleter::Deleter;
+  using Deleter::operator();
+
+  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
+
+  template<typename Handle>
+    requires std::is_pointer_v<Handle>
+  [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept
+  {
+    return h;
+  }
+};
+
+template<typename Deleter>
+  requires(!std::is_final_v<Deleter>)
+struct deleter_wrapper<Deleter, std::void_t<typename std::remove_reference_t<Deleter>::pointer>> : public Deleter
+{
+  using handle = typename std::remove_reference_t<Deleter>::pointer;
+
   using Deleter::Deleter;
   using Deleter::operator();
 

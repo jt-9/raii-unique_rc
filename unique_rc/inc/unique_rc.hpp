@@ -169,7 +169,7 @@ class unique_rc
   static_assert(!std::is_array_v<Handle>, "unique_rc does not work with array, use raii::unique_ptr");
 
 public:
-  using handle = typename unique_rc_holder_impl<Handle, std::remove_reference<Deleter>>::handle;
+  using handle = typename unique_rc_holder_impl<Handle, Deleter>::handle;
   using element_type = Handle;
   using deleter_type = Deleter;
   using invalid_handle_type = std::remove_cvref_t<decltype(Deleter::invalid())>;
@@ -254,7 +254,6 @@ public:
     static_assert(std::is_invocable_v<deleter_type &, handle>, "unique_rc's deleter must be invocable with a handle");
 
     auto &h = uh_.get_handle();
-    // if (h != invalid()) {
     if (Deleter::is_owned(h)) {
       get_deleter()(std::move(h));
       h = invalid();
