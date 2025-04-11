@@ -6,8 +6,11 @@
 
 #include "mock_pointer_no_op.hpp"
 
+#include <cstddef>
 #include <string_view>
+#include <type_traits>
 #include <utility>
+
 
 TEST_CASE("Default initialised unique_rc<char*, memory_delete<char*>>", "[unique_rc]")
 {
@@ -144,7 +147,7 @@ template<bool B> struct TestDeleter
 
 template<typename T, bool Nothrow> using UPtr = raii::unique_ptr<T, raii::deleter_wrapper<TestDeleter<Nothrow>>>;
 
-TEST_CASE("LWG  2762 unique_ptr operator*() should be noexcept", "raii::unique_ptr LWG 2762")
+TEST_CASE("LWG 2762 unique_ptr operator*() should be noexcept", "[unique_ptr::operator *]")
 {
   // 2762. unique_ptr operator*() should be noexcept
   STATIC_CHECK(noexcept(*std::declval<raii::unique_ptr<long>>()));
@@ -156,4 +159,85 @@ TEST_CASE("LWG  2762 unique_ptr operator*() should be noexcept", "raii::unique_p
   // This has always been required, even in C++11.
   STATIC_REQUIRE(noexcept(std::declval<raii::unique_ptr<long>>().operator->()));
   STATIC_REQUIRE(noexcept(std::declval<UPtr<int, false> &>().operator->()));
+}
+
+
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
+TEST_CASE("DR 2899 is_(nothrow_)move_constructible unique_rc", "[unique_rc::unique_rc]")
+{
+  SECTION("is_(nothrow_)move_constructible unique_rc")
+  {
+    // NOLINTBEGIN(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
+    struct Del
+    {
+      static constexpr std::nullptr_t invalid() noexcept;
+      static constexpr bool is_owned(int *) noexcept;
+
+      Del() = default;
+      ~Del() = default;
+
+      Del(Del &&) = delete;
+
+      void operator()(int *) const;
+    };
+    // NOLINTEND(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
+
+    STATIC_REQUIRE_FALSE(std::is_move_constructible_v<raii::unique_rc<int *, Del>>);
+    STATIC_REQUIRE(std::is_move_constructible_v<raii::unique_rc<int *, Del &>>);
+  }
+
+  SECTION("is_(nothrow_)move_assignable unique_rc p2")
+  {
+    // NOLINTBEGIN(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
+    struct Del2
+    {
+      static constexpr std::nullptr_t invalid() noexcept;
+      static constexpr bool is_owned(int *) noexcept;
+
+      Del2() = default;
+      ~Del2() = default;
+
+      Del2(Del2 &&) = default;
+      Del2 &operator=(Del2 &&) = delete;
+      Del2 &operator=(const Del2 &) = default;
+
+      void operator()(int *) const;
+    };
+    // NOLINTEND(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
+
+    STATIC_REQUIRE_FALSE(std::is_move_assignable_v<raii::unique_rc<int*, Del2>>);
+    STATIC_REQUIRE_FALSE(std::is_move_assignable_v<raii::unique_ptr<int, Del2>>);
+
+    STATIC_REQUIRE(std::is_move_assignable_v<raii::unique_rc<int*, Del2 &>>);
+    STATIC_REQUIRE(std::is_move_assignable_v<raii::unique_ptr<int, Del2 &>>);
+    // STATIC_REQUIRE_FALSE(std::is_move_assignable_v<raii::deleter_wrapper<Del2>>);
+    //  STATIC_REQUIRE_FALSE(std::is_move_assignable_v<raii::unique_ptr<int, raii::deleter_wrapper<Del2>>>);
+    // STATIC_REQUIRE(std::is_move_assignable_v<raii::unique_ptr<int, raii::deleter_wrapper<Del2> &>>);
+  }
+
+  SECTION("is_(nothrow_)move_assignable unique_rc p3")
+  {
+    // NOLINTBEGIN(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
+    struct Del3
+    {
+      static constexpr std::nullptr_t invalid() noexcept;
+      static constexpr bool is_owned(int *) noexcept;
+
+      Del3() = default;
+      ~Del3() = default;
+
+      Del3(Del3 &&) = default;
+      Del3 &operator=(Del3 &&) = default;
+      Del3 &operator=(const Del3 &) = delete;
+
+      void operator()(int *) const;
+    };
+    // NOLINTEND(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
+
+    STATIC_REQUIRE(std::is_move_assignable_v<raii::unique_rc<int*, Del3>>);
+    STATIC_REQUIRE(std::is_move_assignable_v<raii::unique_ptr<int, Del3>>);
+
+    STATIC_REQUIRE_FALSE(std::is_move_assignable_v<raii::unique_rc<int*, Del3 &>>);
+    STATIC_REQUIRE_FALSE(std::is_move_assignable_v<raii::unique_ptr<int, Del3 &>>);
+  }
 }

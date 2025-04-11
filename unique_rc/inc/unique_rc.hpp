@@ -163,7 +163,7 @@ struct unique_rc_holder<Handle, Deleter, false, false> : unique_rc_holder_impl<H
 // There is no class template argument deduction from pointer type
 // because it is impossible to distinguish a pointer obtained from array and non - array forms of new.
 template<typename Handle, typename Deleter>
-  requires has_static_invalid_convertible_and_comparable<Deleter, std::decay_t<Handle>>
+  requires has_static_invalid_convertible_and_comparable<std::remove_reference_t<Deleter>, std::decay_t<Handle>>
 class unique_rc
 {
   static_assert(!std::is_array_v<Handle>, "unique_rc does not work with array, use raii::unique_ptr");
@@ -172,7 +172,7 @@ public:
   using handle = typename unique_rc_holder_impl<Handle, Deleter>::handle;
   using element_type = Handle;
   using deleter_type = Deleter;
-  using invalid_handle_type = std::remove_cvref_t<decltype(Deleter::invalid())>;
+  using invalid_handle_type = std::remove_cvref_t<decltype(std::remove_reference_t<Deleter>::invalid())>;
 
 private:
   // helper template for detecting a safe conversion from another
