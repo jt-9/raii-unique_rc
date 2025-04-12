@@ -38,6 +38,8 @@ set(TEST_APP_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/tests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/unique_ptr_tests.cpp
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/reset.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/requirements/dr2228.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/requirements/dr2899.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/requirements/lwg2762.cpp
 
