@@ -37,6 +37,10 @@ set(TEST_APP_HEADERS
 set(TEST_APP_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/tests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/unique_ptr_tests.cpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/requirements/dr2899.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/requirements/lwg2762.cpp
+
   $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/winapi_tests.cpp>
 )
 
