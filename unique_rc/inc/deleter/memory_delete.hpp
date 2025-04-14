@@ -88,6 +88,7 @@ template<typename Deleter, typename = void>
 struct deleter_wrapper : public Deleter
 {
   using Deleter::Deleter;
+  using Deleter::operator=;
   using Deleter::operator();
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
@@ -107,6 +108,7 @@ struct deleter_wrapper<Deleter, std::void_t<typename std::remove_reference_t<Del
   using handle = typename std::remove_reference_t<Deleter>::pointer;
 
   using Deleter::Deleter;
+  using Deleter::operator=;
   using Deleter::operator();
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
@@ -118,6 +120,10 @@ struct deleter_wrapper<Deleter, std::void_t<typename std::remove_reference_t<Del
     return h;
   }
 };
+
+template<typename Deleter>
+  requires(!std::is_swappable_v<Deleter>)
+void swap(deleter_wrapper<Deleter> &lhs, deleter_wrapper<Deleter> &rhs) = delete;
 
 RAII_NS_END
 
