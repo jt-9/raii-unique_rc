@@ -19,7 +19,9 @@
 #include <memory>
 #include <utility>
 
+#include <concepts>
 #include <cstdint>
+#include <cstdio>
 // #include <string>
 #include <string_view>
 #include <tuple>
@@ -56,8 +58,48 @@ void printLibVersion(std::string_view lib_name) noexcept
     raii::cmake::project_version_minor,
     raii::cmake::project_version_patch);
 }
+
 }// namespace
 
+
+// NOLINTBEGIN(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
+struct SwapTestDel
+{
+  int m_tag;
+
+  explicit constexpr SwapTestDel(int tag) : m_tag{ tag } {}
+  constexpr SwapTestDel(const SwapTestDel &) = delete;
+  constexpr SwapTestDel(const SwapTestDel &&src) noexcept : m_tag{ src.m_tag } {};
+
+  constexpr SwapTestDel &operator=(const SwapTestDel &) = delete;
+  constexpr SwapTestDel &operator=(SwapTestDel &&rhs) noexcept
+  {
+    m_tag = rhs.m_tag;
+
+    return *this;
+  }
+
+  // static constexpr auto invalid() noexcept { return nullptr; }
+  // static constexpr bool is_owned(void const *ptr) noexcept { return ptr != invalid(); }
+
+  void operator()([[maybe_unused]] void *ptr) const {}
+
+  void swap(SwapTestDel &rhs) noexcept
+  {
+    fmt::println("Member SwapTestDel::swap(this: {}, SwapTestDel &rhs: {}) called", fmt::ptr(this), fmt::ptr(&rhs));
+
+    std::ranges::swap(m_tag, rhs.m_tag);
+  }
+};
+// NOLINTEND(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
+
+// NOLINTNEXTLINE(misc-use-internal-linkage)
+void swap(SwapTestDel &lhs, SwapTestDel &rhs) noexcept
+{
+  fmt::println("Function swap(SwapTestDel &lhs: {}, SwapTestDel &rhs: {}) called", fmt::ptr(&lhs), fmt::ptr(&rhs));
+
+  lhs.swap(rhs);
+}
 
 // NOLINTNEXTLINE(bugprone-exception-escape)
 int main(int argc, char *argv[]) noexcept
@@ -82,6 +124,7 @@ int main(int argc, char *argv[]) noexcept
   using namespace raii;
 
   {
+    std::puts("=======================================================");
     const auto kTiedArg1 = -24;
     const char kTiedArg2 = 'A';
 
@@ -100,6 +143,7 @@ int main(int argc, char *argv[]) noexcept
   }
 
   {
+    std::puts("=======================================================");
     const auto kTiedArg1 = 64;
     const auto kTiedArg2 = 1331;
     // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new, readability-isolate-declaration)
@@ -117,6 +161,7 @@ int main(int argc, char *argv[]) noexcept
   }
 
   {
+    std::puts("=======================================================");
     const auto kVal1 = -23549;
     const auto kVal2 = 41;
     // NOLINTBEGIN(bugprone-unhandled-exception-at-new)
@@ -133,6 +178,7 @@ int main(int argc, char *argv[]) noexcept
   }
 
   {
+    std::puts("=======================================================");
     fmt::println("unique_rc with default_delete");
     const auto kVal1 = 11;
     // NOLINTBEGIN(bugprone-unhandled-exception-at-new)
@@ -145,6 +191,7 @@ int main(int argc, char *argv[]) noexcept
   }
 
   {
+    std::puts("=======================================================");
     const auto kVal1 = -23549;
     // NOLINTBEGIN(bugprone-unhandled-exception-at-new)
     raii::unique_ptr<int> ptr1{ new int{ kVal1 } };
@@ -160,12 +207,14 @@ int main(int argc, char *argv[]) noexcept
   }
 
   {
+    std::puts("=======================================================");
     const auto kSampleFloat = 3.864F;
     raii::unique_ptr<float> dynamicVal = raii::make_unique<float>(kSampleFloat);
     fmt::println("Value initialised unique_ptr<float> address: {}, value: {}", fmt::ptr(dynamicVal.get()), *dynamicVal);
   }
 
   {
+    std::puts("=======================================================");
     const auto kArraySize = 4;
     // NOLINTBEGIN
     raii::unique_ptr<int[]> arrayUniquePtr = raii::make_unique_for_overwrite<int[]>(kArraySize);
@@ -178,6 +227,7 @@ int main(int argc, char *argv[]) noexcept
   }
 
   {
+    std::puts("=======================================================");
     const auto kArraySize = 4;
     // NOLINTBEGIN
     raii::unique_ptr<int[], raii::deleter_wrapper<std::default_delete<int[]>>> arrayWithStdDeleter{
@@ -192,6 +242,28 @@ int main(int argc, char *argv[]) noexcept
   }
 
   {
+    std::puts("=======================================================");
+    // NOLINTNEXTLINE
+    int initA = 2, initB = -7;
+
+    raii::unique_ptr<int, raii::deleter_wrapper<SwapTestDel>> ptrA{ &initA,
+      raii::deleter_wrapper<SwapTestDel>{ initA } };
+    raii::unique_ptr<int, raii::deleter_wrapper<SwapTestDel>> ptrB{ &initB,
+      raii::deleter_wrapper<SwapTestDel>{ initB } };
+
+    fmt::println("Before swap ptrA {{v:{}, tag:{}}}, ptrB {{v:{}, tag:{}}}", *ptrA, ptrA.get_deleter().m_tag, *ptrB, ptrB.get_deleter().m_tag);
+
+    using namespace std;
+    swap(ptrA, ptrB);
+
+    //constexpr auto isDeleterSwappable = std::is_swappable_v<SwapTestDel>;
+
+    fmt::println("After swap ptrA {{v:{}, tag:{}}}, ptrB {{v:{}, tag:{}}}", *ptrA, ptrA.get_deleter().m_tag, *ptrB, ptrB.get_deleter().m_tag);
+  }
+
+  //*/
+  {
+    std::puts("=======================================================");
     fmt::println("Demonstrating simple coroutine generator...");
     for (const auto rangeElem : raii_sample::range(65, 123)) {
       fmt::print("{:c} ", rangeElem);
@@ -200,6 +272,6 @@ int main(int argc, char *argv[]) noexcept
     // std::cout << '\n';
     fmt::println("");
   }
-
+  //*/
   return 0;
 }

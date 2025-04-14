@@ -26,7 +26,7 @@ template<typename T>
 concept is_not_pointer_default_constructable_v = is_not_pointer_default_constructable<T>::value;
 
 template<typename D, typename H>
-concept has_static_invalid_convertible_and_comparable = requires {
+concept has_static_invalid_convertible_and_comparable_handle = requires {
   { D::invalid() } noexcept -> std::convertible_to<H>;
   { D::invalid() } noexcept -> std::equality_comparable_with<H>;
 };
@@ -34,7 +34,6 @@ concept has_static_invalid_convertible_and_comparable = requires {
 
 template<typename Handle, typename Deleter> class unique_rc_holder_impl
 {
-
   template<typename H1, typename D1, typename = void> struct HandleResolver
   {
     using type = H1;
@@ -105,11 +104,8 @@ public:
 
   raii_inline constexpr void swap(unique_rc_holder_impl &rhs) noexcept
   {
-    using std::swap;
-
-    // ADL
-    swap(this->get_handle(), rhs.get_handle());
-    swap(this->get_deleter(), rhs.get_deleter());
+    std::ranges::swap(this->get_handle(), rhs.get_handle());
+    std::ranges::swap(this->get_deleter(), rhs.get_deleter());
   }
 
 private:
@@ -163,7 +159,7 @@ struct unique_rc_holder<Handle, Deleter, false, false> : unique_rc_holder_impl<H
 // There is no class template argument deduction from pointer type
 // because it is impossible to distinguish a pointer obtained from array and non - array forms of new.
 template<typename Handle, typename Deleter>
-  requires has_static_invalid_convertible_and_comparable<std::remove_reference_t<Deleter>, std::decay_t<Handle>>
+  requires has_static_invalid_convertible_and_comparable_handle<std::remove_reference_t<Deleter>, std::decay_t<Handle>>
 class unique_rc
 {
   static_assert(!std::is_array_v<Handle>, "unique_rc does not work with array, use raii::unique_ptr");
