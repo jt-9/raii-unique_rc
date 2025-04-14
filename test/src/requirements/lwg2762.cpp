@@ -6,6 +6,7 @@
 
 #include <utility>//std::declval
 
+namespace {
 template<bool B> struct TestDeleter
 {
   struct pointer
@@ -25,6 +26,7 @@ template<bool B> struct TestDeleter
 };
 
 template<typename T, bool Nothrow> using UPtr = raii::unique_ptr<T, raii::deleter_wrapper<TestDeleter<Nothrow>>>;
+}// namespace
 
 TEST_CASE("LWG 2762 unique_ptr operator*() should be noexcept", "[unique_ptr::operator *]")
 {

@@ -280,6 +280,7 @@ template<typename T1, class D1, typename T2, class D2>
 [[nodiscard]] raii_inline constexpr bool operator==(const unique_ptr<T1, D1> &lhs,
   const unique_ptr<T2, D2> &rhs) noexcept(noexcept(lhs.get() == rhs.get()))
 {
+  // cppcheck-suppress mismatchingContainers - false positive guarded by concept std::equality_comparable_with
   return lhs.get() == rhs.get();
 }
 
@@ -296,6 +297,7 @@ template<typename T1, class D1, typename T2, class D2>
   typename unique_ptr<T2, D2>::pointer>
   operator<=>(const unique_ptr<T1, D1> &lhs, const unique_ptr<T2, D2> &rhs) noexcept(noexcept(lhs.get() <=> rhs.get()))
 {
+  // cppcheck-suppress mismatchingContainers - false positive guarded by concept std::three_way_comparable_with
   return lhs.get() <=> rhs.get();
 }
 
@@ -309,11 +311,15 @@ template<typename T, typename D>
 }
 
 template<typename H, typename D>
-  requires std::is_swappable_v<typename unique_ptr<H, D>::pointer>
-raii_inline constexpr void swap(unique_ptr<H, D> &lhs, unique_ptr<H, D> &rhs) noexcept(noexcept(lhs.swap(rhs)))
+  requires std::is_swappable_v<D>
+raii_inline constexpr void swap(unique_ptr<H, D> &lhs, unique_ptr<H, D> &rhs) noexcept(noexcept(std::is_nothrow_swappable_v<D>))
 {
   lhs.swap(rhs);
 }
+
+template<typename H, typename D>
+  requires(!std::is_swappable_v<D>)
+void swap(unique_ptr<H, D> &lhs, unique_ptr<H, D> &rhs) = delete;
 
 
 // make_unique and make_unique_for_overwrite

@@ -284,8 +284,8 @@ public:
   }
 
   raii_inline constexpr void swap(unique_rc &other) noexcept(
-    std::is_nothrow_swappable_v<unique_rc_holder<Handle, Deleter>>)
-    requires std::is_swappable_v<Deleter>
+    std::is_nothrow_swappable_v<Handle> && std::is_nothrow_swappable_v<Deleter>)
+    requires std::is_swappable_v<Handle> && std::is_swappable_v<Deleter>
   {
     uh_.swap(other.uh_);
   }
@@ -330,11 +330,16 @@ template<typename H, typename D>
 }
 
 template<typename H, typename D>
-  requires std::is_swappable_v<typename unique_rc<H, D>::Handle>
-raii_inline constexpr void swap(unique_rc<H, D> &lhs, unique_rc<H, D> &rhs) noexcept(noexcept(lhs.swap(rhs)))
+  requires std::is_swappable_v<H> && std::is_swappable_v<D>
+raii_inline constexpr void swap(unique_rc<H, D> &lhs, unique_rc<H, D> &rhs) noexcept(
+  noexcept(std::is_nothrow_swappable_v<H> && std::is_nothrow_swappable_v<D>))
 {
   lhs.swap(rhs);
 }
+
+template<typename H, typename D>
+  requires(!std::is_swappable_v<H> || !std::is_swappable_v<D>)
+void swap(unique_rc<H, D> &lhs, unique_rc<H, D> &rhs) = delete;
 
 RAII_NS_END
 

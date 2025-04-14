@@ -47,7 +47,7 @@ TEST_CASE("Reset empty unique_rc<float*, memory_delete<float*>> default", "[uniq
   REQUIRE_FALSE(float_rc);
 }
 
-
+namespace {
 struct A;
 
 struct B
@@ -88,6 +88,7 @@ struct C
 
   ~C() { REQUIRE(d->c != nullptr); }
 };
+}// namespace
 
 TEST_CASE("Reset unique_ptr<C[]> to new C[1]", "[unique_ptr::reset]")
 {

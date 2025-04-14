@@ -42,6 +42,7 @@ set(TEST_APP_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/requirements/dr2228.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/requirements/dr2899.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/requirements/lwg2762.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/specialised_algorithms/swap.cpp
 
   $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/winapi_tests.cpp>
 )
