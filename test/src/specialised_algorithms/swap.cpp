@@ -8,6 +8,7 @@
 #include <cstddef>//std::nullptr_t
 #include <type_traits>//std::is_swappable_v
 #include <utility>
+// #include <memory>
 
 
 TEST_CASE("Swap value initialised unique_rc<int*, memory_delete<int*>>", "[unique_rc::swap]")
@@ -104,17 +105,58 @@ struct D
 
   void operator()([[maybe_unused]] void *ptr) const {}
 };
+
+struct NoSwapPtr
+{
+  // NOLINTNEXTLINE(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
+  struct pointer
+  {
+    int &operator*() && noexcept;// this is used by unique_ptr
+    int &operator*() const & = delete;// this should not be
+
+    int *operator->() noexcept(false);// noexcept here doesn't affect anything
+
+    // Needed for NullablePointer requirements
+    explicit pointer(int * = nullptr);
+    pointer(pointer &&) = delete;
+
+    bool operator==(const pointer &) const noexcept;
+    bool operator!=(const pointer &) const noexcept;
+  };
+
+  static constexpr pointer invalid() noexcept;
+  static constexpr bool is_owned(pointer) noexcept;
+
+  void operator()([[maybe_unused]] pointer ptr) const noexcept {}
+};
+
 }// namespace
 
-TEST_CASE("raii::unique_ptr not swappable via the generic std::swap", "[unique_ptr std::swap]")
+TEST_CASE("Swap static test raii::unique_ptr not swappable via the generic std::swap", "[unique_ptr std::swap]")
 {
   // Not swappable, and unique_ptr not swappable via the generic std::swap.
   STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, B>>);
   STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, raii::deleter_wrapper<C>>>);
   STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, raii::deleter_wrapper<D>>>);
+}
 
+TEST_CASE("Swap static test raii::unique_rc not swappable via the generic std::swap", "[unique_rc std::swap]")
+{
   // Not swappable, and unique_ptr not swappable via the generic std::swap.
-  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int*, B>>);
-  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int*, raii::deleter_wrapper<C>>>);
-  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int*, raii::deleter_wrapper<D>>>);
+  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int *, B>>);
+  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int *, raii::deleter_wrapper<C>>>);
+  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int *, raii::deleter_wrapper<D>>>);
+
+  /* The following code doesn't even compile
+
+  using PtrNoSwapURC = raii::unique_rc<NoSwapPtr::pointer, NoSwapPtr>;
+  STATIC_REQUIRE_FALSE(std::is_swappable_v<PtrNoSwapURC>);
+
+  compile error: constraint (has_static_invalid_convertible_and_comparable_handle) not satisfied for class template 'unique_rc'
+  because 'has_static_invalid_convertible_and_comparable_handle<std::remove_reference_t<NoSwapPtr>, std::decay_t<pointer> >' evaluated to false
+  because type constraint 'std::convertible_to<(anonymous namespace)::NoSwapPtr::pointer, (anonymous namespace)::NoSwapPtr::pointer>' was not satisfied
+  */
+
+  // constexpr auto isSwappable = std::is_swappable_v<std::unique_ptr<NoSwapPtr::pointer, NoSwapPtr>>; // returns true,
+  // but should be false
 }

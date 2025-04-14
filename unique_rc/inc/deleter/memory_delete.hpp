@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <new>
 #include <type_traits>
+#include <utility>//std::forward
 
 RAII_NS_BEGIN
 
@@ -120,6 +121,15 @@ struct deleter_wrapper<Deleter, std::void_t<typename std::remove_reference_t<Del
     return h;
   }
 };
+
+
+template<typename Deleter>
+  requires std::is_swappable_v<Deleter> && std::swappable<Deleter>
+raii_inline constexpr void swap(deleter_wrapper<Deleter> &lhs, deleter_wrapper<Deleter> &rhs) noexcept(
+  noexcept(std::is_nothrow_swappable_v<Deleter>))
+{
+  std::ranges::swap(static_cast<Deleter &>(lhs), static_cast<Deleter &>(rhs));
+}
 
 template<typename Deleter>
   requires(!std::is_swappable_v<Deleter>)
