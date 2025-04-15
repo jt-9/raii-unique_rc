@@ -5,8 +5,62 @@
 #include "unique_ptr.hpp"
 #include "unique_rc.hpp"
 
+namespace {
 
-TEST_CASE("Reset initialised unique_rc<float*, memory_delete<float*>>", "[unique_rc]")
+struct A;
+
+struct B
+{
+  raii::unique_ptr<A> a;
+};
+
+// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
+struct A
+{
+  B *b = nullptr;
+
+  ~A() { REQUIRE(b->a != nullptr); }
+};
+
+struct C;
+
+struct D
+{
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
+  raii::unique_ptr<C[]> c;
+};
+
+// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
+struct C
+{
+  D *d = nullptr;
+
+  ~C() { REQUIRE(d->c != nullptr); }
+};
+
+}// namespace
+
+TEST_CASE("Reset unique_ptr<A> to new A", "[unique_ptr][reset]")
+{
+  // NOLINTNEXTLINE(readability-identifier-length)
+  B b;
+
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+  b.a.reset(new A);
+  b.a->b = &b;
+}
+
+TEST_CASE("Reset unique_ptr<C[]> to new C[1]", "[unique_ptr][reset]")
+{
+  // NOLINTNEXTLINE(readability-identifier-length)
+  D d;
+
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+  d.c.reset(new C[1]);
+  d.c[0].d = &d;
+}
+
+TEST_CASE("Reset initialised unique_rc<float*, memory_delete<float*>>", "[unique_rc][reset]")
 {
   constexpr auto test_number = 496.0F;
   raii::unique_rc<float *, raii::memory_delete<float *>> rc1{ new float{ test_number } };
@@ -34,7 +88,7 @@ TEST_CASE("Reset initialised unique_rc<float*, memory_delete<float*>>", "[unique
   }
 }
 
-TEST_CASE("Reset empty unique_rc<float*, memory_delete<float*>> default", "[unique_rc]")
+TEST_CASE("Reset empty unique_rc<float*, memory_delete<float*>> default", "[unique_rc][reset]")
 {
   raii::unique_rc<float *, raii::memory_delete<float *>> float_rc{};
 
@@ -47,55 +101,31 @@ TEST_CASE("Reset empty unique_rc<float*, memory_delete<float*>> default", "[uniq
   REQUIRE_FALSE(float_rc);
 }
 
-namespace {
-struct A;
-
-struct B
+TEST_CASE("Reset initialised unique_ptr<float>", "[unique_ptr][reset]")
 {
-  raii::unique_ptr<A> a;
-};
+  constexpr auto test_number = 8128.0F;
+  raii::unique_ptr<float> ptr1{ new float{ test_number } };
 
-// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
-struct A
-{
-  B *b = nullptr;
+  REQUIRE(ptr1);
+  REQUIRE(ptr1.get() != nullptr);
+  CHECK(*ptr1 == test_number);
 
-  ~A() { REQUIRE(b->a != nullptr); }
-};
+  SECTION("Reset with invalid value (nullptr)")
+  {
+    REQUIRE_NOTHROW(ptr1.reset());
 
-TEST_CASE("Reset unique_ptr<A> to new A", "[unique_ptr::reset]")
-{
-  // NOLINTNEXTLINE(readability-identifier-length)
-  B b;
+    REQUIRE(ptr1.get() == nullptr);
+    REQUIRE_FALSE(ptr1);
+  }
 
-  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-  b.a.reset(new A);
-  b.a->b = &b;
-}
+  SECTION("Reset with other constructed float")
+  {
+    constexpr auto test_number2 = -6.0F;
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+    auto *const non_owner_ptr = new float{ test_number2 };
+    ptr1.reset(non_owner_ptr);
 
-struct C;
-
-struct D
-{
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
-  raii::unique_ptr<C[]> c;
-};
-
-// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
-struct C
-{
-  D *d = nullptr;
-
-  ~C() { REQUIRE(d->c != nullptr); }
-};
-}// namespace
-
-TEST_CASE("Reset unique_ptr<C[]> to new C[1]", "[unique_ptr::reset]")
-{
-  // NOLINTNEXTLINE(readability-identifier-length)
-  D d;
-
-  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-  d.c.reset(new C[1]);
-  d.c[0].d = &d;
+    REQUIRE(ptr1.get() == non_owner_ptr);
+    REQUIRE(ptr1);
+  }
 }
