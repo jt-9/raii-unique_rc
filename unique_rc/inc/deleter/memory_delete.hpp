@@ -56,7 +56,7 @@ public:
   using Base::operator();
 };
 
-// Specialization of default_delete for arrays, used by `unique_ptr<T[]>`
+// Specialization of default_delete for arrays, used by 'unique_ptr<T[]>'
 template<typename T> struct default_delete<T[]> : public memory_delete<T *>
 {
 private:
