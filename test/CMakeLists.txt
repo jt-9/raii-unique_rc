@@ -29,25 +29,29 @@ add_test(NAME cli.has_help COMMAND sample_app --help)
 # add_test(NAME cli.version_matches COMMAND sample_app --version)
 # set_tests_properties(cli.version_matches PROPERTIES PASS_REGULAR_EXPRESSION "${PROJECT_VERSION}")
 
-set(TEST_APP_HEADERS 
-  ${CMAKE_CURRENT_SOURCE_DIR}/inc/mock_pointer_no_op.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/inc/mock_generic_deallocator_no_op.hpp
+set(TEST_HEADER_PREFIX inc)
+set(TEST_SOURCE_PREFIX src)
+
+set(TESTS_HEADERS 
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_HEADER_PREFIX}/mock_pointer_no_op.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_HEADER_PREFIX}/mock_generic_deallocator_no_op.hpp
 )
 
-set(TEST_APP_SOURCES
+set(TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/tests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/unique_ptr_tests.cpp
 
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/reset.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/requirements/dr2228.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/requirements/dr2899.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/requirements/lwg2762.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/specialised_algorithms/swap.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/reset.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/dr2228.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/dr2899.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/lwg2762.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/specialised_algorithms/comparisons.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/specialised_algorithms/swap.cpp
 
   $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/winapi_tests.cpp>
 )
 
-add_executable(tests ${TEST_APP_HEADERS} ${TEST_APP_SOURCES})
+add_executable(tests ${TESTS_HEADERS} ${TESTS_SOURCES})
 #target_sources(tests PRIVATE $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/winapi_tests.cpp>)
 
 target_link_libraries(
@@ -84,7 +88,7 @@ catch_discover_tests(
   .xml)
 
   # Add a file containing a set of constexpr tests
-add_executable(constexpr_tests ${TEST_APP_HEADERS} constexpr_tests.cpp)
+add_executable(constexpr_tests ${TESTS_HEADERS} constexpr_tests.cpp)
 target_link_libraries(
   constexpr_tests
   PRIVATE myproject::myproject_warnings
@@ -109,7 +113,7 @@ catch_discover_tests(
 
 # Disable the constexpr portion of the test, and build again this allows us to have an executable that we can debug when
 # things go wrong with the constexpr testing
-add_executable(relaxed_constexpr_tests ${TEST_APP_HEADERS} constexpr_tests.cpp)
+add_executable(relaxed_constexpr_tests ${TESTS_HEADERS} constexpr_tests.cpp)
 target_link_libraries(
   relaxed_constexpr_tests
   PRIVATE myproject::myproject_warnings
