@@ -12,7 +12,7 @@
 // #include <memory>
 
 
-TEST_CASE("Swap value initialised unique_rc<int*, memory_delete<int*>>", "[unique_rc::swap]")
+TEST_CASE("Member swap value initialised unique_rc<int*, memory_delete<int*>>", "[unique_rc][unique_rc::swap][swap]")
 {
   const auto rc1_init_number = 24;
   raii::unique_rc<int *, raii::memory_delete<int *>> rc1{ new int{ rc1_init_number } };
@@ -54,7 +54,7 @@ TEST_CASE("Swap value initialised unique_rc<int*, memory_delete<int*>>", "[uniqu
   }
 }
 
-TEST_CASE("Swap unique_ptr with other unique_ptr", "[unique_ptr std::swap]")
+TEST_CASE("Swap unique_ptr with other unique_ptr", "[unique_ptr][std::swap][swap]")
 {
   struct A
   {
@@ -133,7 +133,8 @@ struct NoSwapPtr
 
 }// namespace
 
-TEST_CASE("Swap static test raii::unique_ptr not swappable via the generic std::swap", "[unique_ptr std::is_swappable]")
+TEST_CASE("Swap static test raii::unique_ptr not swappable via the generic std::swap",
+  "[unique_ptr][std::is_swappable][swap]")
 {
   // Not swappable, and unique_ptr not swappable via the generic std::swap.
   STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, B>>);
@@ -141,7 +142,8 @@ TEST_CASE("Swap static test raii::unique_ptr not swappable via the generic std::
   STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, raii::deleter_wrapper<D>>>);
 }
 
-TEST_CASE("Swap static test raii::unique_rc not swappable via the generic std::swap", "[unique_rc std::is_swappable]")
+TEST_CASE("Swap static test raii::unique_rc not swappable via the generic std::swap",
+  "[unique_rc][std::is_swappable][swap]")
 {
   // Not swappable, and unique_ptr not swappable via the generic std::swap.
   STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int *, B>>);
@@ -164,7 +166,7 @@ TEST_CASE("Swap static test raii::unique_rc not swappable via the generic std::s
 }
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
-TEST_CASE("Swap single value constructed unique_ptr", "[unique_ptr swap]")
+TEST_CASE("Swap single value constructed unique_ptr", "[unique_ptr][swap]")
 {
   using raii::swap;
 
@@ -197,7 +199,7 @@ TEST_CASE("Swap single value constructed unique_ptr", "[unique_ptr swap]")
 // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
-TEST_CASE("Swap array constructed unique_ptr", "[unique_ptr swap]")
+TEST_CASE("Swap array constructed unique_ptr", "[unique_ptr][std::ranges::swap][swap]")
 {
   using raii::swap;
 
@@ -221,3 +223,45 @@ TEST_CASE("Swap array constructed unique_ptr", "[unique_ptr swap]")
   REQUIRE(ptr_a1[1] == 5);
 }
 // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
+
+TEST_CASE("Swap value initialised unique_ptr", "[unique_ptr][unique_ptr::swap][swap]")
+{
+  const auto test_number = 289;
+  raii::unique_ptr<int> ptr1 = raii::make_unique<int>(test_number);
+
+  CHECK(ptr1);
+
+  SECTION("unique_ptr::swap with other value constructed unique_ptr")
+  {
+    const auto test_number2 = -36;
+    using element_type = decltype(ptr1)::element_type;
+    raii::unique_ptr<element_type, decltype(ptr1)::deleter_type> ptr2{ new int{ test_number2 } };
+    REQUIRE(ptr2);
+
+    auto *const raw_ptr1 = ptr1.get();
+    auto *const raw_ptr2 = ptr2.get();
+
+    ptr1.swap(ptr2);
+
+    CHECK(ptr1);
+    CHECK(ptr2);
+
+    REQUIRE(raw_ptr2 == ptr1.get());
+    REQUIRE(raw_ptr1 == ptr2.get());
+  }
+
+  SECTION("unique_ptr::swap with default constructed unique_ptr")
+  {
+    using element_type = decltype(ptr1)::element_type;
+    raii::unique_ptr<element_type, decltype(ptr1)::deleter_type> ptr2{};
+    CHECK_FALSE(ptr2);
+
+    auto *const raw_ptr1 = ptr1.get();
+    auto *const raw_ptr2 = ptr2.get();
+
+    ptr1.swap(ptr2);
+
+    REQUIRE(raw_ptr2 == ptr1.get());
+    REQUIRE(raw_ptr1 == ptr2.get());
+  }
+}
