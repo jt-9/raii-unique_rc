@@ -5,6 +5,7 @@
 #include "unique_ptr.hpp"
 #include "unique_rc.hpp"
 
+#include <concepts>
 #include <cstddef>//std::nullptr_t
 #include <type_traits>//std::is_swappable_v
 #include <utility>
@@ -132,7 +133,7 @@ struct NoSwapPtr
 
 }// namespace
 
-TEST_CASE("Swap static test raii::unique_ptr not swappable via the generic std::swap", "[unique_ptr std::swap]")
+TEST_CASE("Swap static test raii::unique_ptr not swappable via the generic std::swap", "[unique_ptr std::is_swappable]")
 {
   // Not swappable, and unique_ptr not swappable via the generic std::swap.
   STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, B>>);
@@ -140,7 +141,7 @@ TEST_CASE("Swap static test raii::unique_ptr not swappable via the generic std::
   STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, raii::deleter_wrapper<D>>>);
 }
 
-TEST_CASE("Swap static test raii::unique_rc not swappable via the generic std::swap", "[unique_rc std::swap]")
+TEST_CASE("Swap static test raii::unique_rc not swappable via the generic std::swap", "[unique_rc std::is_swappable]")
 {
   // Not swappable, and unique_ptr not swappable via the generic std::swap.
   STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int *, B>>);
@@ -152,11 +153,71 @@ TEST_CASE("Swap static test raii::unique_rc not swappable via the generic std::s
   using PtrNoSwapURC = raii::unique_rc<NoSwapPtr::pointer, NoSwapPtr>;
   STATIC_REQUIRE_FALSE(std::is_swappable_v<PtrNoSwapURC>);
 
-  compile error: constraint (has_static_invalid_convertible_and_comparable_handle) not satisfied for class template 'unique_rc'
-  because 'has_static_invalid_convertible_and_comparable_handle<std::remove_reference_t<NoSwapPtr>, std::decay_t<pointer> >' evaluated to false
-  because type constraint 'std::convertible_to<(anonymous namespace)::NoSwapPtr::pointer, (anonymous namespace)::NoSwapPtr::pointer>' was not satisfied
+  compile error: constraint (has_static_invalid_convertible_and_comparable_handle) not satisfied for class template
+  'unique_rc' because 'has_static_invalid_convertible_and_comparable_handle<std::remove_reference_t<NoSwapPtr>,
+  std::decay_t<pointer> >' evaluated to false because type constraint 'std::convertible_to<(anonymous
+  namespace)::NoSwapPtr::pointer, (anonymous namespace)::NoSwapPtr::pointer>' was not satisfied
   */
 
   // constexpr auto isSwappable = std::is_swappable_v<std::unique_ptr<NoSwapPtr::pointer, NoSwapPtr>>; // returns true,
   // but should be false
 }
+
+// NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
+TEST_CASE("Swap single value constructed unique_ptr", "[unique_ptr swap]")
+{
+  using raii::swap;
+
+  raii::unique_ptr<int> ptr1;
+
+  swap(ptr1, ptr1);
+  REQUIRE_FALSE(ptr1);
+
+  raii::unique_ptr<int> ptr2;
+
+  swap(ptr1, ptr2);
+  REQUIRE_FALSE(ptr1);
+  REQUIRE_FALSE(ptr2);
+
+  raii::unique_ptr<int> ptr3{ new int{ 3 } };
+
+  std::ranges::swap(ptr3, ptr3);
+  REQUIRE(*ptr3 == 3);
+
+  std::ranges::swap(ptr1, ptr3);
+  REQUIRE(*ptr1 == 3);
+
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+  raii::unique_ptr<int> ptr4{ new int{ 4 } };
+
+  std::ranges::swap(ptr4, ptr1);
+  REQUIRE(*ptr4 == 3);
+  REQUIRE(*ptr1 == 4);
+}
+// NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
+
+// NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
+TEST_CASE("Swap array constructed unique_ptr", "[unique_ptr swap]")
+{
+  using raii::swap;
+
+  // NOLINTNEXTLINE
+  raii::unique_ptr<int[]> ptr_a1, ptr_a2;
+
+  swap(ptr_a1, ptr_a2);
+  REQUIRE_FALSE(ptr_a1);
+  REQUIRE_FALSE(ptr_a2);
+
+  // NOLINTNEXTLINE
+  raii::unique_ptr<int[]> ptr_a3{ new int[]{ 3 } };
+
+  std::ranges::swap(ptr_a1, ptr_a3);
+  REQUIRE(ptr_a1[0] == 3);
+
+  // NOLINTNEXTLINE
+  raii::unique_ptr<int[]> ptr_a4(new int[]{ 4, 5 });
+
+  std::ranges::swap(ptr_a1, ptr_a4);
+  REQUIRE(ptr_a1[1] == 5);
+}
+// NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
