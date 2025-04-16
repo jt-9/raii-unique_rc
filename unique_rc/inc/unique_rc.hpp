@@ -301,9 +301,9 @@ template<typename H1, class D1, typename H2, class D2>
 // unique_ptr comparison with nullptr
 template<typename H, typename D>
   requires std::same_as<typename unique_rc<H, D>::invalid_handle_type, std::nullptr_t>
-[[nodiscard]] raii_inline constexpr bool operator==(const unique_rc<H, D> &r, std::nullptr_t) noexcept
+[[nodiscard]] raii_inline constexpr bool operator==(const unique_rc<H, D> &lhs, std::nullptr_t) noexcept
 {
-  return !r;
+  return !lhs;
 }
 
 template<typename H1, class D1, typename H2, class D2>
@@ -319,10 +319,10 @@ template<typename H, typename D>
   requires std::same_as<typename unique_rc<H, D>::invalid_handle_type, std::nullptr_t>
            && std::three_way_comparable<typename unique_rc<H, D>::handle>
 [[nodiscard]] raii_inline constexpr std::compare_three_way_result_t<typename unique_rc<H, D>::handle>
-  operator<=>(const unique_rc<H, D> &r, std::nullptr_t) noexcept(noexcept(r.get()))
+  operator<=>(const unique_rc<H, D> &lhs, std::nullptr_t) noexcept(noexcept(lhs.get()))
 {
   using handle = typename unique_rc<H, D>::handle;
-  return r.get() <=> static_cast<handle>(nullptr);
+  return lhs.get() <=> static_cast<handle>(nullptr);
 }
 
 template<typename H, typename D>

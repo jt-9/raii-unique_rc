@@ -286,9 +286,9 @@ template<typename T1, class D1, typename T2, class D2>
 
 // unique_ptr comparison with nullptr
 template<typename T, typename D>
-[[nodiscard]] raii_inline constexpr bool operator==(const unique_ptr<T, D> &r, std::nullptr_t) noexcept
+[[nodiscard]] raii_inline constexpr bool operator==(const unique_ptr<T, D> &lhs, std::nullptr_t) noexcept
 {
-  return !r;
+  return !lhs;
 }
 
 template<typename T1, class D1, typename T2, class D2>
@@ -304,15 +304,16 @@ template<typename T1, class D1, typename T2, class D2>
 template<typename T, typename D>
   requires std::three_way_comparable<typename unique_ptr<T, D>::pointer>
 [[nodiscard]] raii_inline constexpr std::compare_three_way_result_t<typename unique_ptr<T, D>::pointer>
-  operator<=>(const unique_ptr<T, D> &r, std::nullptr_t) noexcept(noexcept(r.get()))
+  operator<=>(const unique_ptr<T, D> &lhs, std::nullptr_t) noexcept(noexcept(lhs.get()))
 {
   using pointer = typename unique_ptr<T, D>::pointer;
-  return r.get() <=> static_cast<pointer>(nullptr);
+  return lhs.get() <=> static_cast<pointer>(nullptr);
 }
 
 template<typename H, typename D>
   requires std::is_swappable_v<D>
-raii_inline constexpr void swap(unique_ptr<H, D> &lhs, unique_ptr<H, D> &rhs) noexcept(noexcept(std::is_nothrow_swappable_v<D>))
+raii_inline constexpr void swap(unique_ptr<H, D> &lhs, unique_ptr<H, D> &rhs) noexcept(
+  noexcept(std::is_nothrow_swappable_v<D>))
 {
   lhs.swap(rhs);
 }
