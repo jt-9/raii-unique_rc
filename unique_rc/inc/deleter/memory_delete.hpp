@@ -86,7 +86,7 @@ public:
 
 template<typename Deleter, typename = void>
   requires(!std::is_final_v<Deleter>)
-struct deleter_wrapper : public Deleter
+struct pointer_deleter_wrapper : public Deleter
 {
   using Deleter::Deleter;
   using Deleter::operator=;
@@ -104,7 +104,7 @@ struct deleter_wrapper : public Deleter
 
 template<typename Deleter>
   requires(!std::is_final_v<Deleter>)
-struct deleter_wrapper<Deleter, std::void_t<typename std::remove_reference_t<Deleter>::pointer>> : public Deleter
+struct pointer_deleter_wrapper<Deleter, std::void_t<typename std::remove_reference_t<Deleter>::pointer>> : public Deleter
 {
   using handle = typename std::remove_reference_t<Deleter>::pointer;
 
@@ -125,7 +125,7 @@ struct deleter_wrapper<Deleter, std::void_t<typename std::remove_reference_t<Del
 
 template<typename Deleter>
   requires std::is_swappable_v<Deleter> && std::swappable<Deleter>
-raii_inline constexpr void swap(deleter_wrapper<Deleter> &lhs, deleter_wrapper<Deleter> &rhs) noexcept(
+raii_inline constexpr void swap(pointer_deleter_wrapper<Deleter> &lhs, pointer_deleter_wrapper<Deleter> &rhs) noexcept(
   noexcept(std::is_nothrow_swappable_v<Deleter>))
 {
   std::ranges::swap(static_cast<Deleter &>(lhs), static_cast<Deleter &>(rhs));
@@ -133,7 +133,7 @@ raii_inline constexpr void swap(deleter_wrapper<Deleter> &lhs, deleter_wrapper<D
 
 template<typename Deleter>
   requires(!std::is_swappable_v<Deleter>)
-void swap(deleter_wrapper<Deleter> &lhs, deleter_wrapper<Deleter> &rhs) = delete;
+void swap(pointer_deleter_wrapper<Deleter> &lhs, pointer_deleter_wrapper<Deleter> &rhs) = delete;
 
 RAII_NS_END
 

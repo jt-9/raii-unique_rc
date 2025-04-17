@@ -368,4 +368,15 @@ void make_unique_for_overwrite(Types &&...) = delete;
 
 RAII_NS_END
 
+namespace std {
+
+// std::hash specialization for unique_rc.
+template<typename H, typename D>
+struct hash<raii::unique_ptr<H, D>>
+  : public raii::detail::unique_rc_hash_base<raii::unique_ptr<H, D>, typename raii::unique_ptr<H, D>::pointer>
+{
+};
+
+}// namespace std
+
 #endif// UNIQUE_PTR_HPP

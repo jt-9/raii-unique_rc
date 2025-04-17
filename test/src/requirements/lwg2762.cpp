@@ -4,6 +4,7 @@
 #include "unique_ptr.hpp"
 #include "unique_rc.hpp"
 
+#include <cstddef>//std::nullptr_t
 #include <utility>//std::declval
 
 namespace {
@@ -18,6 +19,11 @@ template<bool B> struct TestDeleter
 
     // Needed for NullablePointer requirements
     explicit pointer(int * = nullptr);
+
+    // cppcheck-suppress noExplicitConstructor intended behaviour
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
+    pointer(std::nullptr_t);
+
     bool operator==(const pointer &) const noexcept;
     bool operator!=(const pointer &) const noexcept;
   };
@@ -25,7 +31,8 @@ template<bool B> struct TestDeleter
   void operator()([[maybe_unused]] pointer ptr) const noexcept {}
 };
 
-template<typename T, bool Nothrow> using UPtr = raii::unique_ptr<T, raii::deleter_wrapper<TestDeleter<Nothrow>>>;
+template<typename T, bool Nothrow>
+using UPtr = raii::unique_ptr<T, raii::pointer_deleter_wrapper<TestDeleter<Nothrow>>>;
 }// namespace
 
 TEST_CASE("LWG 2762 unique_ptr operator*() should be noexcept", "[unique_ptr::operator *]")
@@ -46,5 +53,5 @@ TEST_CASE("LWG 2762 unique_rc operator->() should be noexcept", "[unique_rc::ope
 {
   STATIC_REQUIRE(noexcept(std::declval<raii::unique_rc<long *, raii::default_delete<long>>>().operator->()));
   STATIC_REQUIRE(
-    noexcept(std::declval<raii::unique_rc<int *, raii::deleter_wrapper<TestDeleter<false>>> &>().operator->()));
+    noexcept(std::declval<raii::unique_rc<int *, raii::pointer_deleter_wrapper<TestDeleter<false>>> &>().operator->()));
 }

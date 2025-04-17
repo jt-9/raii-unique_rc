@@ -52,9 +52,9 @@ TEST_CASE("DR 2899 is_(nothrow_)move_assignable unique_rc", "[unique_rc::operato
 
   STATIC_REQUIRE(std::is_move_assignable_v<raii::unique_rc<int *, Del2 &>>);
   STATIC_REQUIRE(std::is_move_assignable_v<raii::unique_ptr<int, Del2 &>>);
-  // STATIC_REQUIRE_FALSE(std::is_move_assignable_v<raii::deleter_wrapper<Del2>>);
-  // STATIC_REQUIRE_FALSE(std::is_move_assignable_v<raii::unique_ptr<int, raii::deleter_wrapper<Del2>>>);
-  // STATIC_REQUIRE(std::is_move_assignable_v<raii::unique_ptr<int, raii::deleter_wrapper<Del2> &>>);
+  // STATIC_REQUIRE_FALSE(std::is_move_assignable_v<raii::pointer_deleter_wrapper<Del2>>);
+  // STATIC_REQUIRE_FALSE(std::is_move_assignable_v<raii::unique_ptr<int, raii::pointer_deleter_wrapper<Del2>>>);
+  // STATIC_REQUIRE(std::is_move_assignable_v<raii::unique_ptr<int, raii::pointer_deleter_wrapper<Del2> &>>);
 
   // NOLINTBEGIN(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
   struct Del3
