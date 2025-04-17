@@ -222,6 +222,7 @@ int main(int argc, char *argv[]) noexcept
     arrayUniquePtr[1] = 4;
     arrayUniquePtr[2] = 7;
 
+    // cppcheck-suppress leakNoVarFunctionCall false positive
     arrayUniquePtr.reset(new int[2]);
     // NOLINTEND
   }
@@ -230,13 +231,14 @@ int main(int argc, char *argv[]) noexcept
     std::puts("=======================================================");
     const auto kArraySize = 4;
     // NOLINTBEGIN
-    raii::unique_ptr<int[], raii::deleter_wrapper<std::default_delete<int[]>>> arrayWithStdDeleter{
+    raii::unique_ptr<int[], raii::pointer_deleter_wrapper<std::default_delete<int[]>>> arrayWithStdDeleter{
       new int[kArraySize]
     };
     arrayWithStdDeleter[0] = -1;
     arrayWithStdDeleter[1] = 4;
     arrayWithStdDeleter[2] = 7;
 
+    // cppcheck-suppress leakNoVarFunctionCall false positive
     arrayWithStdDeleter.reset(new int[2]);
     // NOLINTEND
   }
@@ -246,10 +248,10 @@ int main(int argc, char *argv[]) noexcept
     // NOLINTNEXTLINE
     int initA = 2, initB = -7;
 
-    raii::unique_ptr<int, raii::deleter_wrapper<SwapTestDel>> ptrA{ &initA,
-      raii::deleter_wrapper<SwapTestDel>{ initA } };
-    raii::unique_ptr<int, raii::deleter_wrapper<SwapTestDel>> ptrB{ &initB,
-      raii::deleter_wrapper<SwapTestDel>{ initB } };
+    raii::unique_ptr<int, raii::pointer_deleter_wrapper<SwapTestDel>> ptrA{ &initA,
+      raii::pointer_deleter_wrapper<SwapTestDel>{ initA } };
+    raii::unique_ptr<int, raii::pointer_deleter_wrapper<SwapTestDel>> ptrB{ &initB,
+      raii::pointer_deleter_wrapper<SwapTestDel>{ initB } };
 
     fmt::println("Before swap ptrA {{v:{}, tag:{}}}, ptrB {{v:{}, tag:{}}}", *ptrA, ptrA.get_deleter().m_tag, *ptrB, ptrB.get_deleter().m_tag);
 

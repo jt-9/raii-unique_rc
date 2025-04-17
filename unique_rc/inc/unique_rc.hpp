@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <concepts>
+#include <functional>
 #include <tuple>
 #include <utility>
 
@@ -18,6 +19,53 @@
 
 RAII_NS_BEGIN
 
+namespace detail {
+
+template<typename Handle, typename Del_noref, typename = void> struct resolve_handle_type
+{
+  using type = Handle;
+};
+
+template<typename Handle, typename Del_noref>
+struct resolve_handle_type<Handle, Del_noref, std::void_t<typename Del_noref::handle>>
+{
+  using type = typename Del_noref::handle;
+};
+
+
+// hash helper classes
+template<typename Urc, typename Handle> struct unique_rc_hash
+{
+  raii_inline constexpr std::size_t operator()(const Urc &r) const
+    noexcept(noexcept(std::declval<std::hash<Handle>>()(std::declval<Handle>())))
+  {
+    return std::hash<Handle>{}(r.get());
+  }
+};
+
+template<typename T, typename = void> constexpr bool is_hash_enabled_for = false;
+
+template<typename T>
+constexpr bool is_hash_enabled_for<T, std::void_t<decltype(std::hash<T>{}(std::declval<T>()))>> = true;
+
+// Helper struct for defining disabled specializations of std::hash.
+template<typename T> struct hash_not_enabled
+{
+  hash_not_enabled() = delete;
+  hash_not_enabled(hash_not_enabled &) = delete;
+  hash_not_enabled(hash_not_enabled &&) = delete;
+
+  hash_not_enabled &operator=(hash_not_enabled &) = delete;
+  hash_not_enabled &operator=(hash_not_enabled &&) = delete;
+  ~hash_not_enabled() = delete;
+};
+
+template<typename Urc, typename Handle>
+using unique_rc_hash_base =
+  std::conditional_t<is_hash_enabled_for<Handle>, unique_rc_hash<Urc, Handle>, hash_not_enabled<Handle>>;
+}// namespace detail
+
+// deleter requirements
 template<typename T>
 using is_not_pointer_default_constructable =
   std::conjunction<std::negation<std::is_pointer<T>>, std::is_default_constructible<T>>;
@@ -25,32 +73,23 @@ using is_not_pointer_default_constructable =
 template<typename T>
 concept is_not_pointer_default_constructable_v = is_not_pointer_default_constructable<T>::value;
 
-template<typename D, typename H>
-concept has_static_invalid_convertible_and_comparable_handle = requires {
-  { D::invalid() } noexcept -> std::convertible_to<H>;
-  { D::invalid() } noexcept -> std::equality_comparable_with<H>;
+template<typename D, typename Hr>
+concept has_static_invalid_convertible_handle = requires {
+  { D::invalid() } noexcept -> std::convertible_to<Hr>;
+  //{ D::invalid() } noexcept -> std::equality_comparable_with<typename detail::resolve_handle_type<H, D>::type>;
+} || requires {
+  { D::invalid() } noexcept -> std::same_as<Hr>;
 };
 
 
 template<typename Handle, typename Deleter> class unique_rc_holder_impl
 {
-  template<typename H1, typename D1, typename = void> struct HandleResolver
-  {
-    using type = H1;
-  };
-
-  template<typename H1, typename D1>
-  struct HandleResolver<H1, D1, std::void_t<typename std::remove_reference_t<D1>::handle>>
-  {
-    using type = typename std::remove_reference_t<D1>::handle;
-  };
-
 public:
   // using _DeleterConstraint = enable_if<
   // __and_<__not_<is_pointer<Deleter>>,
   // 	is_default_constructible<Deleter>>::value>;
 
-  using handle = typename HandleResolver<Handle, Deleter>::type;
+  using handle = typename detail::resolve_handle_type<Handle, std::remove_reference_t<Deleter>>::type;
 
   static_assert(!std::is_rvalue_reference_v<Deleter>,
     "unique_rc's deleter type must be a function object type"
@@ -159,7 +198,8 @@ struct unique_rc_holder<Handle, Deleter, false, false> : unique_rc_holder_impl<H
 // There is no class template argument deduction from pointer type
 // because it is impossible to distinguish a pointer obtained from array and non - array forms of new.
 template<typename Handle, typename Deleter>
-  requires has_static_invalid_convertible_and_comparable_handle<std::remove_reference_t<Deleter>, std::decay_t<Handle>>
+  requires has_static_invalid_convertible_handle<std::remove_reference_t<Deleter>,
+    typename detail::resolve_handle_type<std::decay_t<Handle>, std::remove_reference_t<Deleter>>::type>
 class unique_rc
 {
   static_assert(!std::is_array_v<Handle>, "unique_rc does not work with array, use raii::unique_ptr");
@@ -337,6 +377,18 @@ template<typename H, typename D>
   requires(!std::is_swappable_v<H> || !std::is_swappable_v<D>)
 void swap(unique_rc<H, D> &lhs, unique_rc<H, D> &rhs) = delete;
 
+
 RAII_NS_END
+
+namespace std {
+
+// std::hash specialization for unique_rc.
+template<typename H, typename D>
+struct hash<raii::unique_rc<H, D>>
+  : public raii::detail::unique_rc_hash_base<raii::unique_rc<H, D>, typename raii::unique_rc<H, D>::handle>
+{
+};
+
+}// namespace std
 
 #endif// UNIQUE_RC_HPP

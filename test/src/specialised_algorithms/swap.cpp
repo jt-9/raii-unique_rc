@@ -138,8 +138,8 @@ TEST_CASE("Swap static test raii::unique_ptr not swappable via the generic std::
 {
   // Not swappable, and unique_ptr not swappable via the generic std::swap.
   STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, B>>);
-  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, raii::deleter_wrapper<C>>>);
-  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, raii::deleter_wrapper<D>>>);
+  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, raii::pointer_deleter_wrapper<C>>>);
+  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, raii::pointer_deleter_wrapper<D>>>);
 }
 
 TEST_CASE("Swap static test raii::unique_rc not swappable via the generic std::swap",
@@ -147,16 +147,16 @@ TEST_CASE("Swap static test raii::unique_rc not swappable via the generic std::s
 {
   // Not swappable, and unique_ptr not swappable via the generic std::swap.
   STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int *, B>>);
-  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int *, raii::deleter_wrapper<C>>>);
-  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int *, raii::deleter_wrapper<D>>>);
+  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int *, raii::pointer_deleter_wrapper<C>>>);
+  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int *, raii::pointer_deleter_wrapper<D>>>);
 
   /* The following code doesn't even compile
 
   using PtrNoSwapURC = raii::unique_rc<NoSwapPtr::pointer, NoSwapPtr>;
   STATIC_REQUIRE_FALSE(std::is_swappable_v<PtrNoSwapURC>);
 
-  compile error: constraint (has_static_invalid_convertible_and_comparable_handle) not satisfied for class template
-  'unique_rc' because 'has_static_invalid_convertible_and_comparable_handle<std::remove_reference_t<NoSwapPtr>,
+  compile error: constraint (has_static_invalid_convertible_handle) not satisfied for class template
+  'unique_rc' because 'has_static_invalid_convertible_handle<std::remove_reference_t<NoSwapPtr>,
   std::decay_t<pointer> >' evaluated to false because type constraint 'std::convertible_to<(anonymous
   namespace)::NoSwapPtr::pointer, (anonymous namespace)::NoSwapPtr::pointer>' was not satisfied
   */
