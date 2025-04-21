@@ -1,4 +1,4 @@
-// unique_rc.h : Defines template class for handles
+// Defines template class for handles
 //
 
 #ifndef UNIQUE_RC_HPP
@@ -12,6 +12,8 @@
 #include <tuple>
 #include <utility>
 
+#include "concepts.hpp"
+
 //----------------------------------------------------------------------
 // Encapsulates handles and performs resource release
 // before going out of scope
@@ -20,18 +22,6 @@
 RAII_NS_BEGIN
 
 namespace detail {
-
-template<typename Handle, typename Del_noref, typename = void> struct resolve_handle_type
-{
-  using type = Handle;
-};
-
-template<typename Handle, typename Del_noref>
-struct resolve_handle_type<Handle, Del_noref, std::void_t<typename Del_noref::handle>>
-{
-  using type = typename Del_noref::handle;
-};
-
 
 // hash helper classes
 template<typename Urc, typename Handle> struct unique_rc_hash
@@ -65,6 +55,18 @@ using unique_rc_hash_base =
   std::conditional_t<is_hash_enabled_for<Handle>, unique_rc_hash<Urc, Handle>, hash_not_enabled<Handle>>;
 }// namespace detail
 
+template<typename Handle, typename Del_noref> struct resolve_handle_type
+{
+  using type = Handle;
+};
+
+template<typename Handle, typename Del_noref>
+  requires has_handle_type<Del_noref>
+struct resolve_handle_type<Handle, Del_noref>
+{
+  using type = typename Del_noref::handle;
+};
+
 // deleter requirements
 template<typename T>
 using is_not_pointer_default_constructable =
@@ -89,7 +91,7 @@ public:
   // __and_<__not_<is_pointer<Deleter>>,
   // 	is_default_constructible<Deleter>>::value>;
 
-  using handle = typename detail::resolve_handle_type<Handle, std::remove_reference_t<Deleter>>::type;
+  using handle = typename resolve_handle_type<Handle, std::remove_reference_t<Deleter>>::type;
 
   static_assert(!std::is_rvalue_reference_v<Deleter>,
     "unique_rc's deleter type must be a function object type"
@@ -199,7 +201,7 @@ struct unique_rc_holder<Handle, Deleter, false, false> : unique_rc_holder_impl<H
 // because it is impossible to distinguish a pointer obtained from array and non - array forms of new.
 template<typename Handle, typename Deleter>
   requires has_static_invalid_convertible_handle<std::remove_reference_t<Deleter>,
-    typename detail::resolve_handle_type<std::decay_t<Handle>, std::remove_reference_t<Deleter>>::type>
+    typename resolve_handle_type<std::decay_t<Handle>, std::remove_reference_t<Deleter>>::type>
 class unique_rc
 {
   static_assert(!std::is_array_v<Handle>, "unique_rc does not work with array, use raii::unique_ptr");
