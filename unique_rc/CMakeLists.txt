@@ -9,25 +9,29 @@ include(GenerateExportHeader)
 #   set(${VAR} ${headers} PARENT_SCOPE)
 # endfunction()
 
+set(LIB_HEADER_PREFIX inc)
+set(LIB_SOURCE_PREFIX src)
+
 set(HEADERS 
-  ${CMAKE_CURRENT_LIST_DIR}/inc/raii_defs.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/inc/unique_rc.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/inc/unique_ptr.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/coroutine_destroy.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/memory_delete.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/stdio_fclose.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_com_release.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_com_file_dlg_unadvise.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_gdi_deleter.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_gdi_select_object.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_dc_deleter.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_dc_restore.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/inc/deleter/windows_close_handle.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/raii_defs.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/concepts.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/unique_rc.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/unique_ptr.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/coroutine_destroy.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/memory_delete.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/stdio_fclose.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_com_release.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_com_file_dlg_unadvise.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_gdi_deleter.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_gdi_select_object.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_dc_deleter.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_dc_restore.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_close_handle.hpp
 )
 
 set(SOURCES
-  ${CMAKE_CURRENT_LIST_DIR}/src/unique_rc.cpp
-  ${CMAKE_CURRENT_LIST_DIR}/src/unique_ptr.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_SOURCE_PREFIX}/unique_rc.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_SOURCE_PREFIX}/unique_ptr.cpp
 )
 
 function(add_mylib_statics lib_name)
@@ -41,8 +45,8 @@ function(add_mylib_statics lib_name)
   #cmake_print_variables(CMAKE_CURRENT_LIST_DIR)
 
   target_include_directories(${lib_name} ${WARNING_GUARD} PUBLIC 
-                                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
-                                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/deleter>
+                                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${LIB_HEADER_PREFIX}>
+                                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${LIB_HEADER_PREFIX}/deleter>
                                 $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
 
 set_target_properties(${lib_name} PROPERTIES

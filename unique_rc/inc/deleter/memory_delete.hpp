@@ -10,6 +10,8 @@
 #include <type_traits>
 #include <utility>//std::forward
 
+#include "concepts.hpp"
+
 RAII_NS_BEGIN
 
 template<typename Handle>
@@ -84,8 +86,11 @@ public:
   }
 };
 
-template<typename Deleter, typename = void>
-  requires(!std::is_final_v<Deleter>)
+template<typename Base>
+concept not_final = !std::is_final_v<Base>;
+
+template<typename Deleter>
+  requires not_final<Deleter>
 struct pointer_deleter_wrapper : public Deleter
 {
   using Deleter::Deleter;
@@ -103,8 +108,8 @@ struct pointer_deleter_wrapper : public Deleter
 };
 
 template<typename Deleter>
-  requires(!std::is_final_v<Deleter>)
-struct pointer_deleter_wrapper<Deleter, std::void_t<typename std::remove_reference_t<Deleter>::pointer>> : public Deleter
+  requires not_final<Deleter> && has_pointer_type<Deleter>
+struct pointer_deleter_wrapper<Deleter> : public Deleter
 {
   using handle = typename std::remove_reference_t<Deleter>::pointer;
 
