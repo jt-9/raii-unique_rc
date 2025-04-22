@@ -9,6 +9,7 @@
 #include <cassert>
 #include <concepts>
 #include <functional>
+#include <ostream>
 #include <tuple>
 #include <utility>
 
@@ -114,6 +115,8 @@ public:
     reset(other.release());
     get_deleter() = std::forward<Deleter>(other.get_deleter());
 
+    // This is false positive, since reset(other.release()) calls deleter, and acquires ownership of other.release()
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     return *this;
   }
 
@@ -378,6 +381,15 @@ raii_inline constexpr void swap(unique_rc<H, D> &lhs, unique_rc<H, D> &rhs) noex
 template<typename H, typename D>
   requires(!std::is_swappable_v<H> || !std::is_swappable_v<D>)
 void swap(unique_rc<H, D> &lhs, unique_rc<H, D> &rhs) = delete;
+
+template<typename CharT, typename Traits, typename H, typename D>
+raii_inline constexpr std::basic_ostream<CharT, Traits> &operator<<(std::basic_ostream<CharT, Traits> &ostream,
+  const unique_rc<H, D> &rc) noexcept
+  requires requires { ostream << rc.get(); }
+{
+  ostream << rc.get();
+  return ostream;
+}
 
 
 RAII_NS_END
