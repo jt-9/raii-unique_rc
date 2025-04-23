@@ -133,7 +133,9 @@ public:
     const handle old_h = std::exchange(get_handle(), h);
     // if (old_h != Deleter::invalid()) {
     if (Deleter::is_owned(old_h)) {
+#ifdef UNIQUE_RC_ENABLE_SELF_RESET_ASSERT
       assert(old_h != h && "Failed self-reset check, like p.reset(p.get())");
+#endif// UNIQUE_RC_ENABLE_SELF_RESET_ASSERT
       get_deleter()(old_h);
     }
   }
