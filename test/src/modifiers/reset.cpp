@@ -5,6 +5,7 @@
 #include "unique_ptr.hpp"
 #include "unique_rc.hpp"
 
+
 namespace {
 
 struct A;
@@ -128,4 +129,39 @@ TEST_CASE("Reset initialised unique_ptr<float>", "[unique_ptr][reset]")
     REQUIRE(ptr1.get() == non_owner_ptr);
     REQUIRE(ptr1);
   }
+}
+
+
+namespace {
+struct D2
+{
+  static int count;
+
+  void operator()(int const *ptr) const
+  {
+    ++count;
+
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+    delete ptr;
+  }
+};
+int D2::count = 0;
+}// namespace
+
+TEST_CASE("Test deleter operator() is called as expected", "[unique_ptr][reset]")
+{
+  raii::unique_ptr<int, raii::pointer_deleter_wrapper<D2>> iptr;
+
+  iptr.reset();
+  REQUIRE(D2::count == 0);
+
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+  iptr.reset(new int);
+  REQUIRE(D2::count == 0);
+
+  iptr.reset(iptr.get());
+  REQUIRE(D2::count == 1);
+
+  iptr.release();
+  REQUIRE(D2::count == 1);
 }
