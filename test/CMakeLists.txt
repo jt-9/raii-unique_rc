@@ -52,6 +52,7 @@ set(TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/ptr_type_array.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/specialised_algorithms/comparisons.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/specialised_algorithms/swap.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/specialised_algorithms/swap_incomplete_type.cpp
 
   $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/winapi_tests.cpp>
 )
