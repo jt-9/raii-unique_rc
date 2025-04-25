@@ -1,10 +1,10 @@
 #ifndef UNIQUE_PTR_HPP
 #define UNIQUE_PTR_HPP
 
+#include "raii_defs.hpp"
+
 #include "memory_delete.hpp"
 #include "unique_rc.hpp"
-
-#include "raii_defs.hpp"
 
 #include <cassert>
 #include <concepts>

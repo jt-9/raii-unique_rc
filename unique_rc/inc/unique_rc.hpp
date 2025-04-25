@@ -6,14 +6,14 @@
 
 #include "raii_defs.hpp"
 
+#include "concepts.hpp"
+
 #include <cassert>
 #include <concepts>
 #include <functional>
 #include <ostream>
 #include <tuple>
 #include <utility>
-
-#include "concepts.hpp"
 
 //----------------------------------------------------------------------
 // Encapsulates handles and performs resource release
