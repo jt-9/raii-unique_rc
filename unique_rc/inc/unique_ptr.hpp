@@ -241,7 +241,7 @@ public:
   /// Access an element of owned array.
   raii_inline constexpr typename std::add_lvalue_reference_t<element_type> operator[](std::size_t i) const
   {
-    assert(get() != invalid() && "Error subscript operator on nullptr");
+    assert(deleter_type::is_owned(get()) && "Error subscript operator on nullptr");
     return get()[i];
   }
 
