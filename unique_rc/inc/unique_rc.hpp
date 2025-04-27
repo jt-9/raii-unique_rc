@@ -282,7 +282,7 @@ public:
   raii_inline constexpr unique_rc &operator=(unique_rc<H, D> &&rhs) noexcept
   {
     reset(rhs.release());
-    get_deleter() = std::forward<Deleter>(rhs.get_deleter());
+    get_deleter() = std::forward<D>(rhs.get_deleter());
 
     return *this;
   }

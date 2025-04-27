@@ -199,6 +199,7 @@ public:
   unique_ptr(U, std::remove_reference_t<D> &&) = delete;
 
   /// Move constructor.
+  // cppcheck-suppress noExplicitConstructor - move constructor
   constexpr unique_ptr(unique_ptr &&) = default;
 
   /// Creates a unique_ptr that owns nothing.
