@@ -3,12 +3,12 @@
 // the source template at `configured_files/config.hpp.in`.
 #include "internal_use_only/config.hpp"
 
-#include "test_deleter.hpp"
+// #include "test_deleter.hpp"
 
 #include "coroutine_example.hpp"
 #include "memory_delete.hpp"
-#include "unique_ptr.hpp"
-#include "unique_rc.hpp"
+
+// #include "unique_rc.hpp"
 
 #include <fmt/base.h>
 #include <fmt/core.h>
@@ -17,10 +17,10 @@
 #include <CLI/CLI.hpp>
 
 #include <memory>
-#include <utility>
+// #include <utility>
 
 #include <concepts>
-#include <cstdint>
+// #include <cstdint>
 #include <cstdio>
 // #include <string>
 #include <string_view>
@@ -101,6 +101,7 @@ void swap(SwapTestDel &lhs, SwapTestDel &rhs) noexcept
   lhs.swap(rhs);
 }
 
+
 // NOLINTNEXTLINE(bugprone-exception-escape)
 int main(int argc, char *argv[]) noexcept
 {
@@ -121,6 +122,7 @@ int main(int argc, char *argv[]) noexcept
 
   measureAndPrintUniquePtrSize();
 
+  /*/
   using namespace raii;
 
   {
@@ -253,15 +255,24 @@ int main(int argc, char *argv[]) noexcept
     raii::unique_ptr<int, raii::pointer_deleter_wrapper<SwapTestDel>> ptrB{ &initB,
       raii::pointer_deleter_wrapper<SwapTestDel>{ initB } };
 
-    fmt::println("Before swap ptrA {{v:{}, tag:{}}}, ptrB {{v:{}, tag:{}}}", *ptrA, ptrA.get_deleter().m_tag, *ptrB, ptrB.get_deleter().m_tag);
+    fmt::println("Before swap ptrA {{v:{}, tag:{}}}, ptrB {{v:{}, tag:{}}}",
+      *ptrA,
+      ptrA.get_deleter().m_tag,
+      *ptrB,
+      ptrB.get_deleter().m_tag);
 
     using namespace std;
     swap(ptrA, ptrB);
 
-    //constexpr auto isDeleterSwappable = std::is_swappable_v<SwapTestDel>;
+    // constexpr auto isDeleterSwappable = std::is_swappable_v<SwapTestDel>;
 
-    fmt::println("After swap ptrA {{v:{}, tag:{}}}, ptrB {{v:{}, tag:{}}}", *ptrA, ptrA.get_deleter().m_tag, *ptrB, ptrB.get_deleter().m_tag);
+    fmt::println("After swap ptrA {{v:{}, tag:{}}}, ptrB {{v:{}, tag:{}}}",
+      *ptrA,
+      ptrA.get_deleter().m_tag,
+      *ptrB,
+      ptrB.get_deleter().m_tag);
   }
+  //*/
 
   //*/
   {

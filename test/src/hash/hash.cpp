@@ -50,7 +50,7 @@ TEST_CASE("Test hash with empty pointer type", "[unique_ptr][hash]")
     {
       // cppcheck-suppress noExplicitConstructor intended behaviour
       // NOLINTNEXTLINE(hicpp-explicit-conversions)
-      pointer(std::nullptr_t);
+      pointer(std::nullptr_t) {};
     };
     void operator()([[maybe_unused]] pointer ptr) const noexcept {}
   };

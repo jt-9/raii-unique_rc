@@ -165,7 +165,6 @@ TEST_CASE("Swap static test raii::unique_rc not swappable via the generic std::s
   // but should be false
 }
 
-// NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
 TEST_CASE("Swap single value constructed unique_ptr", "[unique_ptr][swap]")
 {
   using raii::swap;
@@ -195,10 +194,10 @@ TEST_CASE("Swap single value constructed unique_ptr", "[unique_ptr][swap]")
   std::ranges::swap(ptr4, ptr1);
   REQUIRE(*ptr4 == 3);
   REQUIRE(*ptr1 == 4);
-}
-// NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 
-// NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
+  // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
+}
+
 TEST_CASE("Swap array constructed unique_ptr", "[unique_ptr][std::ranges::swap][swap]")
 {
   using raii::swap;
@@ -217,12 +216,14 @@ TEST_CASE("Swap array constructed unique_ptr", "[unique_ptr][std::ranges::swap][
   REQUIRE(ptr_a1[0] == 3);
 
   // NOLINTNEXTLINE
-  raii::unique_ptr<int[]> ptr_a4(new int[]{ 4, 5 });
+  raii::unique_ptr<int[]> ptr_a4{ new int[]{ 4, 5 } };
 
   std::ranges::swap(ptr_a1, ptr_a4);
   REQUIRE(ptr_a1[1] == 5);
+
+  // False positive resources are released in raii::unique_ptr destructor
+  // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
 }
-// NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 
 TEST_CASE("Swap value initialised unique_ptr", "[unique_ptr][unique_ptr::swap][swap]")
 {
