@@ -4,22 +4,22 @@
 #include "unique_ptr.hpp"
 // #include "unique_rc.hpp"
 
-#include <utility>
+#include <utility>// std::move
 
 namespace {
-struct B
+struct Base
 {
-  B() = default;
-  B(const B &) = default;
-  B(B &&) = default;
+  Base() = default;
+  Base(const Base &) = default;
+  Base(Base &&) = default;
 
-  B &operator=(const B &) = default;
-  B &operator=(B &&) = default;
+  Base &operator=(const Base &) = default;
+  Base &operator=(Base &&) = default;
 
-  virtual ~B() = default;
+  virtual ~Base() = default;
 };
 
-struct D : public B
+struct Derived : public Base
 {
 };
 }// namespace
@@ -28,15 +28,15 @@ struct D : public B
 TEST_CASE("Move assign array objects unique_ptr to default initialised unique_ptr", "[unique_ptr][operator=]")
 {
   // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-  D *const raw_d = new D[3];
+  auto *const raw_d = new Derived[3];
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
-  raii::unique_ptr<D[]> ptr1(raw_d);
+  raii::unique_ptr<Derived[]> ptr1(raw_d);
   REQUIRE(ptr1.get() == raw_d);
   REQUIRE(ptr1);
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
-  raii::unique_ptr<D[]> ptr2;
+  raii::unique_ptr<Derived[]> ptr2;
   REQUIRE(ptr2.get() == nullptr);
   REQUIRE_FALSE(ptr2);
 

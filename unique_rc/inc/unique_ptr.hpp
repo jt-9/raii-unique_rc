@@ -17,8 +17,6 @@ template<typename T, typename Deleter = raii::default_delete<T>> class unique_pt
 private:
   using Base = unique_rc<T *, Deleter>;
   using typename Base::handle;
-  using Base::Base;
-  using Base::operator=;
 
 public:
   using pointer = typename Base::handle;
@@ -130,10 +128,7 @@ template<typename T, typename Deleter> class unique_ptr<T[], Deleter> : public u
 {
 private:
   using Base = unique_rc<T *, Deleter>;
-
   using typename Base::handle;
-  using Base::Base;
-  using Base::operator=;
 
   // template<typename _Up> using _DeleterConstraint = typename __uniq_ptr_impl<_T, _Up>::_DeleterConstraint::type;
   //  like is_base_of<_T, _Up> but false if unqualified types are the same
@@ -156,7 +151,7 @@ public:
     std::conjunction<std::disjunction<std::disjunction<std::is_same<U, pointer>, std::is_same<U, std::nullptr_t>>,
       std::conjunction<std::is_pointer<U>,
         std::is_same<pointer, element_type *>,
-        std::is_convertible<typename std::remove_pointer<U>::type (*)[], element_type (*)[]>>>>;
+        std::is_convertible<typename std::remove_pointer_t<U> (*)[], element_type (*)[]>>>>;
 
   // helper template for detecting a safe conversion from another
   // unique_ptr
@@ -176,15 +171,15 @@ public:
     : Base()
   {}
 
-  template<typename U, typename D = deleter_type>
+  template<typename U>
   raii_inline constexpr explicit unique_ptr(U p) noexcept
-    requires std::conjunction_v<is_not_pointer_default_constructable<D>, safe_conversion_raw<U>>
+    requires std::conjunction_v<is_not_pointer_default_constructable<Deleter>, safe_conversion_raw<U>>
     : Base(p)
   {}
 
-  template<typename U, typename D = deleter_type>
+  template<typename U>
   raii_inline constexpr unique_ptr(U p, const deleter_type &d) noexcept
-    requires std::conjunction_v<safe_conversion_raw<U>, std::is_copy_constructible<D>>
+    requires std::conjunction_v<safe_conversion_raw<U>, std::is_copy_constructible<deleter_type>>
     : Base(p, d)
   {}
 

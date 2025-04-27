@@ -48,7 +48,9 @@ template<typename T> struct hash_not_enabled
 
   hash_not_enabled &operator=(hash_not_enabled &) = delete;
   hash_not_enabled &operator=(hash_not_enabled &&) = delete;
-  ~hash_not_enabled() = delete;
+
+  //Commented to prevent implicitly deleted warning on MSVC 19.43 treated as error
+  //~hash_not_enabled() = delete;
 };
 
 template<typename Urc, typename Handle>
@@ -138,6 +140,8 @@ public:
 #endif// UNIQUE_RC_ENABLE_SELF_RESET_ASSERT
       get_deleter()(old_h);
     }
+
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
   }
 
   raii_inline constexpr handle release() noexcept
@@ -301,6 +305,7 @@ public:
       get_deleter()(std::move(h));
       h = invalid();
     }
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
   }
 
   [[nodiscard]] raii_inline constexpr handle operator->() const noexcept(noexcept(get())) { return get(); }

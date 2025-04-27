@@ -7,19 +7,19 @@
 #include <utility>
 
 namespace {
-struct B
+struct Base
 {
-  B() = default;
-  B(const B &) = default;
-  B(B &&) = default;
+  Base() = default;
+  Base(const Base &) = default;
+  Base(Base &&) = default;
 
-  B &operator=(const B &) = default;
-  B &operator=(B &&) = default;
+  Base &operator=(const Base &) = default;
+  Base &operator=(Base &&) = default;
 
-  virtual ~B() = default;
+  virtual ~Base() = default;
 };
 
-struct D : public B
+struct Derived : public Base
 {
 };
 }// namespace
@@ -28,13 +28,13 @@ struct D : public B
 TEST_CASE("Move assign single object unique_ptr to other unique_ptr", "[unique_ptr][operator=]")
 {
   // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-  D *const raw_d = new D{};
+  auto *const raw_d = new Derived{};
 
-  raii::unique_ptr<D> ptr1(raw_d);
+  raii::unique_ptr<Derived> ptr1(raw_d);
   REQUIRE(ptr1.get() == raw_d);
   REQUIRE(ptr1);
 
-  raii::unique_ptr<D> ptr2{new D{}};
+  raii::unique_ptr<Derived> ptr2{ new Derived{} };
   REQUIRE(ptr2);
 
   ptr2 = std::move(ptr1);
@@ -44,7 +44,7 @@ TEST_CASE("Move assign single object unique_ptr to other unique_ptr", "[unique_p
   REQUIRE(ptr2.get() == raw_d);
   REQUIRE(ptr2);
 
-  raii::unique_ptr<B> ptr3{new B{}};
+  raii::unique_ptr<Base> ptr3{ new Base{} };
   REQUIRE(ptr3);
 
   ptr3 = std::move(ptr2);
