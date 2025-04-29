@@ -45,6 +45,7 @@ set(TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/move_array.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/move_single.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/nullptr.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/construct_move_neg.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/cv_qualifiers.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/lwg2905.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/hash/hash.cpp
