@@ -138,8 +138,8 @@ TEST_CASE("Swap static test raii::unique_ptr not swappable via the generic std::
 {
   // Not swappable, and unique_ptr not swappable via the generic std::swap.
   STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, B>>);
-  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, raii::pointer_deleter_wrapper<C>>>);
-  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, raii::pointer_deleter_wrapper<D>>>);
+  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, raii::deleter_class_wrapper<C>>>);
+  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_ptr<int, raii::deleter_class_wrapper<D>>>);
 }
 
 TEST_CASE("Swap static test raii::unique_rc not swappable via the generic std::swap",
@@ -147,8 +147,8 @@ TEST_CASE("Swap static test raii::unique_rc not swappable via the generic std::s
 {
   // Not swappable, and unique_ptr not swappable via the generic std::swap.
   STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int *, B>>);
-  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int *, raii::pointer_deleter_wrapper<C>>>);
-  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int *, raii::pointer_deleter_wrapper<D>>>);
+  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int *, raii::deleter_class_wrapper<C>>>);
+  STATIC_REQUIRE_FALSE(std::is_swappable_v<raii::unique_rc<int *, raii::deleter_class_wrapper<D>>>);
 
   /* The following code doesn't even compile
 

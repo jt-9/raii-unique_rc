@@ -6,9 +6,10 @@
 // #include "test_deleter.hpp"
 
 #include "coroutine_example.hpp"
+#include "test_deleter.hpp"
 #include "memory_delete.hpp"
-
-// #include "unique_rc.hpp"
+#include "unique_ptr.hpp"
+#include "unique_rc.hpp"
 
 #include <fmt/base.h>
 #include <fmt/core.h>
@@ -17,12 +18,12 @@
 #include <CLI/CLI.hpp>
 
 #include <memory>
-// #include <utility>
+#include <utility>
 
 #include <concepts>
-// #include <cstdint>
+#include <cstdint>
 #include <cstdio>
-// #include <string>
+
 #include <string_view>
 #include <tuple>
 
@@ -82,7 +83,7 @@ struct SwapTestDel
   // static constexpr auto invalid() noexcept { return nullptr; }
   // static constexpr bool is_owned(void const *ptr) noexcept { return ptr != invalid(); }
 
-  void operator()([[maybe_unused]] void *ptr) const {}
+  void operator()(void * /*unused*/) const {}
 
   void swap(SwapTestDel &rhs) noexcept
   {
@@ -122,7 +123,7 @@ int main(int argc, char *argv[]) noexcept
 
   measureAndPrintUniquePtrSize();
 
-  /*/
+  //*/
   using namespace raii;
 
   {
@@ -149,7 +150,7 @@ int main(int argc, char *argv[]) noexcept
     const auto kTiedArg1 = 64;
     const auto kTiedArg2 = 1331;
     // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new, readability-isolate-declaration)
-    unique_rc<int *, memory_delete<int *>> rc1{ new int{ kTiedArg1 } }, rc2{ new int{ kTiedArg2 } };
+    unique_rc<int *, raii::memory_delete<int *>> rc1{ new int{ kTiedArg1 } }, rc2{ new int{ kTiedArg2 } };
 
     rc1.swap(rc2);
 
@@ -158,8 +159,8 @@ int main(int argc, char *argv[]) noexcept
     rc1.reset();
     rc1.reset(rc1.get());
 
-    // std::cout << "Sizeof unique_rc<int*, memory_delete<int*> of long long is "sv << sizeof(rc1) << " bytes\n"sv;
-    fmt::println("Sizeof unique_rc<int*, memory_delete<int*> of long long is {} bytes"sv, sizeof(rc1));
+    // std::cout << "Sizeof unique_rc<int*, raii::deleter_class_wrapper<int*> of long long is "sv << sizeof(rc1) << " bytes\n"sv;
+    fmt::println("Sizeof unique_rc<int*, raii::deleter_class_wrapper<int*> of long long is {} bytes"sv, sizeof(rc1));
   }
 
   {
@@ -174,8 +175,8 @@ int main(int argc, char *argv[]) noexcept
     rc2 = std::move(rc1);
 
     fmt::println(
-      "After move assignment from unique_rc<int*, raii::memory_delete<int*>> to unique_rc<std::int32_t*, "
-      "raii::memory_delete<std::int32_t*>> {}",
+      "After move assignment from unique_rc<int*, raii::deleter_class_wrapper<int*>> to unique_rc<std::int32_t*, "
+      "raii::deleter_class_wrapper<std::int32_t*>> {}",
       *rc2.get());
   }
 
@@ -199,7 +200,7 @@ int main(int argc, char *argv[]) noexcept
     raii::unique_ptr<int> ptr1{ new int{ kVal1 } };
     // NOLINTEND(bugprone-unhandled-exception-at-new)
 
-    fmt::println("Value initialised unique_ptr<int, raii::memory_delete<int *>> address: {}, value: {}",
+    fmt::println("Value initialised unique_ptr<int, raii::deleter_class_wrapper<int *>> address: {}, value: {}",
       fmt::ptr(ptr1.get()),
       *ptr1.get());
 
@@ -233,7 +234,7 @@ int main(int argc, char *argv[]) noexcept
     std::puts("=======================================================");
     const auto kArraySize = 4;
     // NOLINTBEGIN
-    raii::unique_ptr<int[], raii::pointer_deleter_wrapper<std::default_delete<int[]>>> arrayWithStdDeleter{
+    raii::unique_ptr<int[], raii::deleter_class_wrapper<std::default_delete<int[]>>> arrayWithStdDeleter{
       new int[kArraySize]
     };
     arrayWithStdDeleter[0] = -1;
@@ -250,10 +251,10 @@ int main(int argc, char *argv[]) noexcept
     // NOLINTNEXTLINE
     int initA = 2, initB = -7;
 
-    raii::unique_ptr<int, raii::pointer_deleter_wrapper<SwapTestDel>> ptrA{ &initA,
-      raii::pointer_deleter_wrapper<SwapTestDel>{ initA } };
-    raii::unique_ptr<int, raii::pointer_deleter_wrapper<SwapTestDel>> ptrB{ &initB,
-      raii::pointer_deleter_wrapper<SwapTestDel>{ initB } };
+    raii::unique_ptr<int, raii::deleter_class_wrapper<SwapTestDel>> ptrA{ &initA,
+      raii::deleter_class_wrapper<SwapTestDel>{ initA } };
+    raii::unique_ptr<int, raii::deleter_class_wrapper<SwapTestDel>> ptrB{ &initB,
+      raii::deleter_class_wrapper<SwapTestDel>{ initB } };
 
     fmt::println("Before swap ptrA {{v:{}, tag:{}}}, ptrB {{v:{}, tag:{}}}",
       *ptrA,

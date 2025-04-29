@@ -25,70 +25,70 @@ TEST_CASE("LWG 2905 test is unique_ptr of int and int[] constructible from int* 
 {
   // Single int
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<int,
-    raii::pointer_deleter_wrapper<Del> &,
+    raii::deleter_class_wrapper<Del> &,
     int *,
-    raii::pointer_deleter_wrapper<Del>>());
+    raii::deleter_class_wrapper<Del>>());
 
   STATIC_REQUIRE(unique_ptr_is_constructible<int,
-    raii::pointer_deleter_wrapper<Del> &,
+    raii::deleter_class_wrapper<Del> &,
     int *,
-    raii::pointer_deleter_wrapper<Del> &>());
+    raii::deleter_class_wrapper<Del> &>());
 
   STATIC_REQUIRE(unique_ptr_is_constructible<int,
-    raii::pointer_deleter_wrapper<Del> const &,
+    raii::deleter_class_wrapper<Del> const &,
     int *,
-    raii::pointer_deleter_wrapper<Del> &>());
+    raii::deleter_class_wrapper<Del> &>());
 
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<int,
-    raii::pointer_deleter_wrapper<Del> &,
+    raii::deleter_class_wrapper<Del> &,
     int *,
-    raii::pointer_deleter_wrapper<Del> const &>());
+    raii::deleter_class_wrapper<Del> const &>());
 
   STATIC_REQUIRE(unique_ptr_is_constructible<int,
-    raii::pointer_deleter_wrapper<Del>,
+    raii::deleter_class_wrapper<Del>,
     int *,
-    raii::pointer_deleter_wrapper<Del> const &>());
+    raii::deleter_class_wrapper<Del> const &>());
 
   STATIC_REQUIRE(
-    unique_ptr_is_constructible<int, raii::pointer_deleter_wrapper<Del>, int *, raii::pointer_deleter_wrapper<Del>>());
+    unique_ptr_is_constructible<int, raii::deleter_class_wrapper<Del>, int *, raii::deleter_class_wrapper<Del>>());
 
 
   // Array of ints
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<int[],
-    raii::pointer_deleter_wrapper<Del> &,
+    raii::deleter_class_wrapper<Del> &,
     int *,
-    raii::pointer_deleter_wrapper<Del>>());
+    raii::deleter_class_wrapper<Del>>());
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_REQUIRE(unique_ptr_is_constructible<int[],
-    raii::pointer_deleter_wrapper<Del> &,
+    raii::deleter_class_wrapper<Del> &,
     int *,
-    raii::pointer_deleter_wrapper<Del> &>());
+    raii::deleter_class_wrapper<Del> &>());
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_REQUIRE(unique_ptr_is_constructible<int[],
-    raii::pointer_deleter_wrapper<Del> const &,
+    raii::deleter_class_wrapper<Del> const &,
     int *,
-    raii::pointer_deleter_wrapper<Del> &>());
+    raii::deleter_class_wrapper<Del> &>());
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<int[],
-    raii::pointer_deleter_wrapper<Del> &,
+    raii::deleter_class_wrapper<Del> &,
     int *,
-    raii::pointer_deleter_wrapper<Del> const &>());
+    raii::deleter_class_wrapper<Del> const &>());
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_REQUIRE(unique_ptr_is_constructible<int[],
-    raii::pointer_deleter_wrapper<Del>,
+    raii::deleter_class_wrapper<Del>,
     int *,
-    raii::pointer_deleter_wrapper<Del> const &>());
+    raii::deleter_class_wrapper<Del> const &>());
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_REQUIRE(unique_ptr_is_constructible<int[],
-    raii::pointer_deleter_wrapper<Del>,
+    raii::deleter_class_wrapper<Del>,
     int *,
-    raii::pointer_deleter_wrapper<Del>>());
+    raii::deleter_class_wrapper<Del>>());
 }
 
 namespace {
@@ -112,72 +112,72 @@ TEST_CASE("LWG 2905 test is unique_ptr of int and int[] constructible from int* 
 {
   // Single int
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<int,
-    raii::pointer_deleter_wrapper<DelNoCopy> &,
+    raii::deleter_class_wrapper<DelNoCopy> &,
     int *,
-    raii::pointer_deleter_wrapper<DelNoCopy>>());
+    raii::deleter_class_wrapper<DelNoCopy>>());
 
   STATIC_REQUIRE(unique_ptr_is_constructible<int,
-    raii::pointer_deleter_wrapper<DelNoCopy> &,
+    raii::deleter_class_wrapper<DelNoCopy> &,
     int *,
-    raii::pointer_deleter_wrapper<DelNoCopy> &>());
+    raii::deleter_class_wrapper<DelNoCopy> &>());
 
   STATIC_REQUIRE(unique_ptr_is_constructible<int,
-    raii::pointer_deleter_wrapper<DelNoCopy> const &,
+    raii::deleter_class_wrapper<DelNoCopy> const &,
     int *,
-    raii::pointer_deleter_wrapper<DelNoCopy> &>());
+    raii::deleter_class_wrapper<DelNoCopy> &>());
 
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<int,
-    raii::pointer_deleter_wrapper<DelNoCopy> &,
+    raii::deleter_class_wrapper<DelNoCopy> &,
     int *,
-    raii::pointer_deleter_wrapper<DelNoCopy> const &>());
+    raii::deleter_class_wrapper<DelNoCopy> const &>());
 
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<int,
-    raii::pointer_deleter_wrapper<DelNoCopy>,
+    raii::deleter_class_wrapper<DelNoCopy>,
     int *,
-    raii::pointer_deleter_wrapper<DelNoCopy> const &>());
+    raii::deleter_class_wrapper<DelNoCopy> const &>());
 
   STATIC_REQUIRE(unique_ptr_is_constructible<int,
-    raii::pointer_deleter_wrapper<DelNoCopy>,
+    raii::deleter_class_wrapper<DelNoCopy>,
     int *,
-    raii::pointer_deleter_wrapper<DelNoCopy>>());
+    raii::deleter_class_wrapper<DelNoCopy>>());
 
 
   // Array of ints
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<int[],
-    raii::pointer_deleter_wrapper<DelNoCopy> &,
+    raii::deleter_class_wrapper<DelNoCopy> &,
     int *,
-    raii::pointer_deleter_wrapper<DelNoCopy>>());
+    raii::deleter_class_wrapper<DelNoCopy>>());
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_REQUIRE(unique_ptr_is_constructible<int[],
-    raii::pointer_deleter_wrapper<DelNoCopy> &,
+    raii::deleter_class_wrapper<DelNoCopy> &,
     int *,
-    raii::pointer_deleter_wrapper<DelNoCopy> &>());
+    raii::deleter_class_wrapper<DelNoCopy> &>());
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_REQUIRE(unique_ptr_is_constructible<int[],
-    raii::pointer_deleter_wrapper<DelNoCopy> const &,
+    raii::deleter_class_wrapper<DelNoCopy> const &,
     int *,
-    raii::pointer_deleter_wrapper<DelNoCopy> &>());
+    raii::deleter_class_wrapper<DelNoCopy> &>());
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<int[],
-    raii::pointer_deleter_wrapper<DelNoCopy> &,
+    raii::deleter_class_wrapper<DelNoCopy> &,
     int *,
-    raii::pointer_deleter_wrapper<DelNoCopy> const &>());
+    raii::deleter_class_wrapper<DelNoCopy> const &>());
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<int[],
-    raii::pointer_deleter_wrapper<DelNoCopy>,
+    raii::deleter_class_wrapper<DelNoCopy>,
     int *,
-    raii::pointer_deleter_wrapper<DelNoCopy> const &>());
+    raii::deleter_class_wrapper<DelNoCopy> const &>());
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_REQUIRE(unique_ptr_is_constructible<int[],
-    raii::pointer_deleter_wrapper<DelNoCopy>,
+    raii::deleter_class_wrapper<DelNoCopy>,
     int *,
-    raii::pointer_deleter_wrapper<DelNoCopy>>());
+    raii::deleter_class_wrapper<DelNoCopy>>());
 }
 
 namespace {
@@ -207,67 +207,67 @@ TEST_CASE("LWG 2905 test is unique_ptr of Base[] constructible from Base* and De
 
   // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<Base[],
-    raii::pointer_deleter_wrapper<Del> &,
+    raii::deleter_class_wrapper<Del> &,
     Base *,
-    raii::pointer_deleter_wrapper<Del>>());
+    raii::deleter_class_wrapper<Del>>());
 
 
   STATIC_REQUIRE(unique_ptr_is_constructible<Base[],
-    raii::pointer_deleter_wrapper<Del> &,
+    raii::deleter_class_wrapper<Del> &,
     Base *,
-    raii::pointer_deleter_wrapper<Del> &>());
+    raii::deleter_class_wrapper<Del> &>());
 
   STATIC_REQUIRE(unique_ptr_is_constructible<Base[],
-    raii::pointer_deleter_wrapper<Del> const &,
+    raii::deleter_class_wrapper<Del> const &,
     Base *,
-    raii::pointer_deleter_wrapper<Del> &>());
+    raii::deleter_class_wrapper<Del> &>());
 
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<Base[],
-    raii::pointer_deleter_wrapper<Del> &,
+    raii::deleter_class_wrapper<Del> &,
     Base *,
-    raii::pointer_deleter_wrapper<Del> const &>());
+    raii::deleter_class_wrapper<Del> const &>());
 
   STATIC_REQUIRE(unique_ptr_is_constructible<Base[],
-    raii::pointer_deleter_wrapper<Del>,
+    raii::deleter_class_wrapper<Del>,
     Base *,
-    raii::pointer_deleter_wrapper<Del> const &>());
+    raii::deleter_class_wrapper<Del> const &>());
 
   STATIC_REQUIRE(unique_ptr_is_constructible<Base[],
-    raii::pointer_deleter_wrapper<Del>,
+    raii::deleter_class_wrapper<Del>,
     Base *,
-    raii::pointer_deleter_wrapper<Del>>());
+    raii::deleter_class_wrapper<Del>>());
 
 
   // From derived Derived*
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<Base[],
-    raii::pointer_deleter_wrapper<Del> &,
+    raii::deleter_class_wrapper<Del> &,
     Derived *,
-    raii::pointer_deleter_wrapper<Del>>());
+    raii::deleter_class_wrapper<Del>>());
 
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<Base[],
-    raii::pointer_deleter_wrapper<Del> &,
+    raii::deleter_class_wrapper<Del> &,
     Derived *,
-    raii::pointer_deleter_wrapper<Del> &>());
+    raii::deleter_class_wrapper<Del> &>());
 
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<Base[],
-    raii::pointer_deleter_wrapper<Del> const &,
+    raii::deleter_class_wrapper<Del> const &,
     Derived *,
-    raii::pointer_deleter_wrapper<Del> &>());
+    raii::deleter_class_wrapper<Del> &>());
 
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<Base[],
-    raii::pointer_deleter_wrapper<Del> &,
+    raii::deleter_class_wrapper<Del> &,
     Derived *,
-    raii::pointer_deleter_wrapper<Del> const &>());
+    raii::deleter_class_wrapper<Del> const &>());
 
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<Base[],
-    raii::pointer_deleter_wrapper<Del>,
+    raii::deleter_class_wrapper<Del>,
     Derived *,
-    raii::pointer_deleter_wrapper<Del> const &>());
+    raii::deleter_class_wrapper<Del> const &>());
 
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<Base[],
-    raii::pointer_deleter_wrapper<Del>,
+    raii::deleter_class_wrapper<Del>,
     Derived *,
-    raii::pointer_deleter_wrapper<Del>>());
+    raii::deleter_class_wrapper<Del>>());
 
   // NOLINTEND(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 }

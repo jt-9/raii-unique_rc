@@ -91,7 +91,7 @@ concept not_final = !std::is_final_v<Base>;
 
 template<typename Deleter>
   requires not_final<Deleter>
-struct pointer_deleter_wrapper : public Deleter
+struct deleter_class_wrapper : public Deleter
 {
   using Deleter::Deleter;
   using Deleter::operator=;
@@ -109,7 +109,7 @@ struct pointer_deleter_wrapper : public Deleter
 
 template<typename Deleter>
   requires not_final<Deleter> && has_pointer_type<Deleter>
-struct pointer_deleter_wrapper<Deleter> : public Deleter
+struct deleter_class_wrapper<Deleter> : public Deleter
 {
   using handle = typename std::remove_reference_t<Deleter>::pointer;
 
@@ -127,10 +127,9 @@ struct pointer_deleter_wrapper<Deleter> : public Deleter
   }
 };
 
-
 template<typename Deleter>
   requires std::is_swappable_v<Deleter> && std::swappable<Deleter>
-raii_inline constexpr void swap(pointer_deleter_wrapper<Deleter> &lhs, pointer_deleter_wrapper<Deleter> &rhs) noexcept(
+raii_inline constexpr void swap(deleter_class_wrapper<Deleter> &lhs, deleter_class_wrapper<Deleter> &rhs) noexcept(
   noexcept(std::is_nothrow_swappable_v<Deleter>))
 {
   std::ranges::swap(static_cast<Deleter &>(lhs), static_cast<Deleter &>(rhs));
@@ -138,7 +137,29 @@ raii_inline constexpr void swap(pointer_deleter_wrapper<Deleter> &lhs, pointer_d
 
 template<typename Deleter>
   requires(!std::is_swappable_v<Deleter>)
-void swap(pointer_deleter_wrapper<Deleter> &lhs, pointer_deleter_wrapper<Deleter> &rhs) = delete;
+void swap(deleter_class_wrapper<Deleter> &lhs, deleter_class_wrapper<Deleter> &rhs) = delete;
+
+
+// template<typename Deleter, Deleter deleter_func_ptr>
+//   requires std::is_function_v<std::remove_pointer_t<Deleter>>
+// struct deleter_func_ptr_wrapper
+// {
+//   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
+
+//   template<typename Handle>
+//     requires std::is_pointer_v<Handle>
+//   [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept
+//   {
+//     return h;
+//   }
+
+//   template<typename Handle>
+//     requires std::is_pointer_v<Handle>
+//   raii_inline constexpr void operator()(Handle h) const noexcept
+//   {
+//     deleter_func_ptr(h);
+//   }
+// };
 
 RAII_NS_END
 
