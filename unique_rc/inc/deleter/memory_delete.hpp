@@ -32,19 +32,15 @@ struct memory_delete
 
   raii_inline constexpr void operator()(Handle h) const noexcept
   {
-    static_assert(!std::is_void_v<Handle>, "can't delete pointer to incomplete type");
-    static_assert(sizeof(Handle) > 0, "can't delete pointer to incomplete type");
+    static_assert(!std::is_void_v<std::remove_pointer_t<Handle>>, "can't delete pointer to incomplete type");
+    static_assert(sizeof(std::remove_pointer_t<Handle>) > 0, "can't delete pointer to incomplete type");
 
     delete h;
   }
 };
 
-template<typename T> struct default_delete : public memory_delete<T *>
+template<typename T> struct default_delete
 {
-private:
-  using Base = memory_delete<T *>;
-
-public:
   constexpr default_delete() noexcept = default;
 
   template<typename U>
@@ -53,18 +49,22 @@ public:
   raii_inline constexpr default_delete(const default_delete<U> &) noexcept
   {}
 
-  using Base::invalid;
-  using Base::is_owned;
-  using Base::operator();
+  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
+
+  [[nodiscard]] raii_inline static constexpr bool is_owned(T* h) noexcept { return h; }
+
+  raii_inline constexpr void operator()(T* h) const noexcept
+  {
+    static_assert(!std::is_void_v<T>, "can't delete pointer to incomplete type");
+    static_assert(sizeof(T) > 0, "can't delete pointer to incomplete type");
+
+    delete h;
+  }
 };
 
 // Specialization of default_delete for arrays, used by 'unique_ptr<T[]>'
-template<typename T> struct default_delete<T[]> : public memory_delete<T *>
+template<typename T> struct default_delete<T[]>
 {
-private:
-  using Base = memory_delete<T *>;
-
-public:
   constexpr default_delete() noexcept = default;
 
   template<typename U>
@@ -73,8 +73,9 @@ public:
   raii_inline constexpr default_delete(const default_delete<U[]> &) noexcept
   {}
 
-  using Base::invalid;
-  using Base::is_owned;
+  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
+
+  [[nodiscard]] raii_inline static constexpr bool is_owned(T *h) noexcept { return h; }
 
   template<typename U>
     requires std::is_convertible_v<U (*)[], T (*)[]>
@@ -97,6 +98,7 @@ struct deleter_class_wrapper : public Deleter
   using Deleter::operator=;
   using Deleter::operator();
 
+  // cppcheck-suppress duplInheritedMember false positive mixed std::default_delete and raii::default_delete
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
 
   template<typename Handle>
