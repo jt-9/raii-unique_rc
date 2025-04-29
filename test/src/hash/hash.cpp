@@ -57,7 +57,7 @@ TEST_CASE("Test hash with empty pointer type", "[unique_ptr][hash]")
 
   STATIC_REQUIRE_FALSE(is_callable_v<std::hash<D::pointer> &, D::pointer>);
 
-  using UP = raii::unique_ptr<int, raii::pointer_deleter_wrapper<D>>;
+  using UP = raii::unique_ptr<int, raii::deleter_class_wrapper<D>>;
 
   // Disabled specializations of hash are not function object types
   STATIC_REQUIRE_FALSE(is_callable_v<std::hash<UP> &, UP>);

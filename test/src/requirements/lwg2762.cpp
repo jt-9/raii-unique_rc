@@ -32,7 +32,7 @@ template<bool B> struct TestDeleter
 };
 
 template<typename T, bool Nothrow>
-using UPtr = raii::unique_ptr<T, raii::pointer_deleter_wrapper<TestDeleter<Nothrow>>>;
+using UPtr = raii::unique_ptr<T, raii::deleter_class_wrapper<TestDeleter<Nothrow>>>;
 }// namespace
 
 TEST_CASE("LWG 2762 unique_ptr operator*() should be noexcept", "[unique_ptr::operator *]")
@@ -53,5 +53,5 @@ TEST_CASE("LWG 2762 unique_rc operator->() should be noexcept", "[unique_rc::ope
 {
   STATIC_REQUIRE(noexcept(std::declval<raii::unique_rc<long *, raii::default_delete<long>>>().operator->()));
   STATIC_REQUIRE(
-    noexcept(std::declval<raii::unique_rc<int *, raii::pointer_deleter_wrapper<TestDeleter<false>>> &>().operator->()));
+    noexcept(std::declval<raii::unique_rc<int *, raii::deleter_class_wrapper<TestDeleter<false>>> &>().operator->()));
 }

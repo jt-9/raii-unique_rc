@@ -23,10 +23,10 @@ TEST_CASE("Array objects unique_ptr::pointer type deduction", "[unique_ptr][uniq
 {
   // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   using up = raii::unique_ptr<int[]>;
-  using upA = raii::unique_ptr<int[], raii::pointer_deleter_wrapper<A>>;
-  using upB = raii::unique_ptr<int[], raii::pointer_deleter_wrapper<B>>;
-  using upAr = raii::unique_ptr<int[], raii::pointer_deleter_wrapper<A> &>;
-  using upBr = raii::unique_ptr<int[], raii::pointer_deleter_wrapper<B> &>;
+  using upA = raii::unique_ptr<int[], raii::deleter_class_wrapper<A>>;
+  using upB = raii::unique_ptr<int[], raii::deleter_class_wrapper<B>>;
+  using upAr = raii::unique_ptr<int[], raii::deleter_class_wrapper<A> &>;
+  using upBr = raii::unique_ptr<int[], raii::deleter_class_wrapper<B> &>;
   // NOLINTEND(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 
   STATIC_REQUIRE(std::is_same_v<up::pointer, int *>);
