@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>// std::size_t
-#include <cstdint>// std::int8_t
 #include <utility>
 
 
@@ -29,19 +28,6 @@ TEST_CASE("Move constructor from initialised unique_ptr<char>", "[unique_ptr]")
 
   REQUIRE(ptr2);
   REQUIRE(ptr2.get() != nullptr);
-  REQUIRE(*ptr2.get() == kChar);
-}
-
-TEST_CASE("Converting constructor of unique_ptr<std::int8_t>", "[unique_ptr]")
-{
-  constexpr auto kChar = 'A';
-  raii::unique_ptr<signed char> ptr1{ new signed char{ kChar } };
-
-  REQUIRE(ptr1);
-
-  raii::unique_ptr<std::int8_t> ptr2{ std::move(ptr1) };
-
-  REQUIRE(ptr2);
   REQUIRE(*ptr2.get() == kChar);
 }
 

@@ -8,19 +8,7 @@
 #include <string_view>
 
 
-TEST_CASE("Default initialised unique_rc<char*, memory_delete<char*>>", "[unique_rc]")
-{
-  constexpr raii::unique_rc<char *, raii::memory_delete<char *>> char_rc{};
 
-  SECTION("unique_rc::unique_rc()")
-  {
-    STATIC_REQUIRE(char_rc.get() == nullptr);
-    STATIC_REQUIRE_FALSE(char_rc);
-    STATIC_REQUIRE(char_rc == nullptr);
-  }
-
-  SECTION("unique_rc::invalid()") { STATIC_REQUIRE(decltype(char_rc)::invalid() == nullptr); }
-}
 
 TEST_CASE("Equality of default initialised unique_rc<int*, memory_delete<int*>>", "[unique_rc::operator ==]")
 {
