@@ -262,8 +262,8 @@ int main(int argc, char *argv[]) noexcept
       *ptrB,
       ptrB.get_deleter().m_tag);
 
-    using namespace std;
-    swap(ptrA, ptrB);
+    
+    std::ranges::swap(ptrA, ptrB);
 
     // constexpr auto isDeleterSwappable = std::is_swappable_v<SwapTestDel>;
 

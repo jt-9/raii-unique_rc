@@ -3,42 +3,60 @@
 
 #include "raii_defs.hpp"
 
-#include <concepts>
-#include <cstddef>
-#include <utility>
-
 #include <Windows.h>
+
+#include <concepts>
+#include <utility>
 
 
 RAII_NS_BEGIN
 
 // Selects GDI objects such as pen, brush, bitmap, etc.
 // nullptr indicates invalid object
-template<typename Handle>
-  requires std::convertible_to<Handle, HGDIOBJ>
-struct gdi_select_object_nullptr
+template<typename GdiObjHandle = HGDIOBJ>
+  requires std::convertible_to<GdiObjHandle, HGDIOBJ>
+struct gdi_select_object
 {
-  raii_inline explicit constexpr gdi_select_object_nullptr(HDC hdc) noexcept : hdc_{ hdc } {}
+  struct handle
+  {
+    HDC hdc;
+    GdiObjHandle hobj;
 
-  template<typename U>
-  raii_inline constexpr gdi_select_object_nullptr(const gdi_select_object_nullptr<U> &src) noexcept
-    requires std::is_convertible_v<U, Handle>
-    : hdc_{ src.hdc_ }
-  {}
 
-  template<typename U>
-  raii_inline constexpr gdi_select_object_nullptr(gdi_select_object_nullptr<U> &&src) noexcept
-    requires std::is_convertible_v<U, Handle>
-    : hdc_{ std::exchange(src.hdc_, nullptr) }
-  {}
+    raii_inline constexpr handle(HDC dc, GdiObjHandle obj) noexcept : hdc{ dc }, hobj{ obj } {}
 
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-  [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept { return h; }
+    raii_inline constexpr handle() noexcept : handle(nullptr, nullptr) {}
 
-  raii_inline constexpr void operator()(Handle h) const noexcept { SelectObject(hdc_, h); }
+    constexpr handle(const handle &) noexcept = default;
+    constexpr handle(handle &&) noexcept = default;
 
-private:
-  HDC hdc_;
+    constexpr handle &operator=(const handle &) noexcept = default;
+    constexpr handle &operator=(handle &&) noexcept = default;
+
+    constexpr ~handle() noexcept = default;
+
+    // [[nodiscard]] raii_inline constexpr HDC operator*() const noexcept { return hdc; }
+
+    [[nodiscard]] friend raii_inline constexpr bool operator==(const handle &lhs, const handle &rhs) noexcept
+    {
+      return (lhs.hobj == rhs.hobj) && (lhs.hdc == rhs.hdc);
+    }
+
+    friend raii_inline constexpr void swap(handle &lhs, handle &rhs) noexcept
+    {
+      std::ranges::swap(lhs.hdc, rhs.hdc);
+      std::ranges::swap(lhs.hobj, rhs.hobj);
+    }
+  };
+
+  [[nodiscard]] raii_inline static constexpr handle invalid() noexcept { return {}; }
+
+  [[nodiscard]] raii_inline static constexpr bool is_owned(const handle &h) noexcept
+  {
+    return static_cast<bool>(h.hobj);
+  }
+
+  raii_inline constexpr void operator()(const handle &h) const noexcept { SelectObject(h.hdc, h.hobj); }
 };
 
 RAII_NS_END

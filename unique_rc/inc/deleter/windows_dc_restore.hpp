@@ -3,10 +3,9 @@
 
 #include "raii_defs.hpp"
 
-#include <concepts>
-#include <cstddef>
-
 #include <Windows.h>
+
+#include <concepts>
 
 
 RAII_NS_BEGIN
@@ -16,16 +15,47 @@ RAII_NS_BEGIN
 // nullptr indicates invalid dc
 struct gdi_restore_dc_nullptr
 {
-  raii_inline explicit constexpr gdi_restore_dc_nullptr(int state) noexcept : state_{ state } {}
+  struct handle
+  {
+    HDC hdc;
+    int state;
 
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-  [[nodiscard]] raii_inline static constexpr bool is_owned(HDC h) noexcept { return h; }
+
+    raii_inline constexpr handle(HDC dc, int nstate) noexcept : hdc{ dc }, state{ nstate } {}
+
+    raii_inline constexpr handle() noexcept : handle(nullptr, 0) {}
+
+    constexpr handle(const handle &) noexcept = default;
+    constexpr handle(handle &&) noexcept = default;
+
+    constexpr handle &operator=(const handle &) noexcept = default;
+    constexpr handle &operator=(handle &&) noexcept = default;
+
+    constexpr ~handle() noexcept = default;
+
+    // [[nodiscard]] raii_inline constexpr HDC operator*() const noexcept { return hdc; }
+
+    [[nodiscard]] friend raii_inline constexpr bool operator==(const handle &lhs, const handle &rhs) noexcept
+    {
+      return (lhs.state == rhs.state) && (lhs.hdc == rhs.hdc);
+    }
+
+    friend raii_inline constexpr void swap(handle &lhs, handle &rhs) noexcept
+    {
+      std::ranges::swap(lhs.hdc, rhs.hdc);
+      std::ranges::swap(lhs.state, rhs.state);
+    }
+  };
+
+  [[nodiscard]] raii_inline static constexpr handle invalid() noexcept { return {}; }
+
+  [[nodiscard]] raii_inline static constexpr bool is_owned(const handle &h) noexcept
+  {
+    return static_cast<bool>(h.hdc) && (h.state != 0);
+  }
 
   // constexpr generates error - constexpr function doesn't evaluate at compile time
-  raii_inline void operator()(HDC h) const noexcept { RestoreDC(h, state_); }
-
-private:
-  int state_;
+  raii_inline void operator()(const handle &h) const noexcept { RestoreDC(h.hdc, h.state); }
 };
 
 
