@@ -106,10 +106,10 @@ public:
   using Base::get;
   using Base::operator->;
 
-  raii_inline constexpr typename std::add_lvalue_reference_t<element_type> operator*() const
+  [[nodiscard]] raii_inline constexpr typename std::add_lvalue_reference_t<element_type> operator*() const
     noexcept(noexcept(*std::declval<pointer>()))
   {
-    assert(get() != invalid() && "Cannot dereference nullptr");
+    assert(deleter_type::is_owned(get()) && "Cannot dereference invalid pointer");
     return *get();
   }
 

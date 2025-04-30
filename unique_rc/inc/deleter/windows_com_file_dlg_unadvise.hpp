@@ -3,30 +3,55 @@
 
 #include "raii_defs.hpp"
 
+#include <Shobjidl.h>
+
 #include <concepts>
-#include <cstddef>
-#include <shobjidl_core.h>
+
 
 RAII_NS_BEGIN
 
 struct com_object_file_dialog_unadvise
 {
-  raii_inline explicit constexpr com_object_file_dialog_unadvise(IFileDialog *d) noexcept : dlg_{ d } {}
-
-  raii_inline constexpr com_object_file_dialog_unadvise(com_object_file_dialog_unadvise &&src) noexcept
-    : dlg_{ std::exchange(src.dlg_, nullptr) }
-  {}
-
-  [[nodiscard]] raii_inline static constexpr DWORD invalid() noexcept { return 0; }
-  [[nodiscard]] raii_inline static constexpr bool is_owned(DWORD h) noexcept { return h != invalid(); }
-
-  raii_inline void operator()(DWORD h) const noexcept
+  struct handle
   {
-    if (dlg_) { dlg_->Unadvise(h); }
+    IFileDialog *idlg;
+    DWORD cookie;
+
+
+    raii_inline constexpr handle(IFileDialog *dlg, DWORD ncookie) noexcept : idlg{ dlg }, cookie{ ncookie } {}
+
+    raii_inline constexpr handle() noexcept : handle(nullptr, 0) {}
+
+    constexpr handle(const handle &) noexcept = default;
+    constexpr handle(handle &&) noexcept = default;
+
+    constexpr handle &operator=(const handle &) noexcept = default;
+    constexpr handle &operator=(handle &&) noexcept = default;
+
+    constexpr ~handle() noexcept = default;
+
+    // [[nodiscard]] raii_inline constexpr IFileDialog* operator*() const noexcept { return idlg; }
+
+    [[nodiscard]] friend raii_inline constexpr bool operator==(const handle &lhs, const handle &rhs) noexcept
+    {
+      return (lhs.cookie == rhs.cookie) && (lhs.idlg == rhs.idlg);
+    }
+
+    friend raii_inline constexpr void swap(handle &lhs, handle &rhs) noexcept
+    {
+      std::ranges::swap(lhs.idlg, rhs.idlg);
+      std::ranges::swap(lhs.cookie, rhs.cookie);
+    }
+  };
+
+  [[nodiscard]] raii_inline static constexpr handle invalid() noexcept { return {}; }
+
+  [[nodiscard]] raii_inline static constexpr bool is_owned(const handle &h) noexcept
+  {
+    return static_cast<bool>(h.idlg);
   }
 
-private:
-  IFileDialog *dlg_;
+  raii_inline void operator()(const handle &h) const noexcept { h.idlg->Unadvise(h.cookie); }
 };
 
 
