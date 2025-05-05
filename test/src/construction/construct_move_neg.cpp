@@ -49,32 +49,32 @@ struct DelArray
 TEST_CASE("is_constructible unique_ptr of array of base objects from unique_ptr of array of derived objects",
   "[unique_ptr][unique_ptr::unique_ptr][std::is_constructible_v]")
 {
-  // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+  // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<Base[],
     raii::deleter_class_wrapper<DelArray>,
     raii::unique_ptr<Derived[], raii::deleter_class_wrapper<DelArray>> &&>());
   STATIC_REQUIRE_FALSE(unique_ptr_is_assignable<Base[],
     raii::deleter_class_wrapper<DelArray>,
     raii::unique_ptr<Derived[], raii::deleter_class_wrapper<DelArray>> &&>());
-  // NOLINTEND(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+  // NOLINTEND(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 }
 
 // Conversion from non-array form of unique_ptr
 TEST_CASE("is_constructible unique_ptr of array of base objects from unique_ptr of single derived object",
   "[unique_ptr][unique_ptr::unique_ptr][std::is_constructible_v]")
 {
-  // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+  // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<Base[], raii::default_delete<Base[]>, raii::unique_ptr<Base> &&>());
   STATIC_REQUIRE_FALSE(unique_ptr_is_assignable<Base[], raii::default_delete<Base[]>, raii::unique_ptr<Base> &&>());
-  // NOLINTEND(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+  // NOLINTEND(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 }
 
 // Conversion to non-array form of unique_ptr
 TEST_CASE("is_constructible unique_ptr of single base object from unique_ptr of array of base objects",
   "[unique_ptr][unique_ptr::unique_ptr][std::is_constructible_v]")
 {
-  // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+  // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<Base, raii::default_delete<Base>, raii::unique_ptr<Base[]> &&>());
   STATIC_REQUIRE_FALSE(unique_ptr_is_assignable<Base, raii::default_delete<Base>, raii::unique_ptr<Base[]> &&>());
-  // NOLINTEND(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+  // NOLINTEND(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 }
