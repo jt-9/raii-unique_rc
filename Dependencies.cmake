@@ -9,7 +9,7 @@ function(myproject_setup_dependencies)
   # already been provided to us by a parent project
 
   if(NOT TARGET fmtlib::fmtlib)
-    cpmaddpackage("gh:fmtlib/fmt#11.1.4")
+    cpmaddpackage("gh:fmtlib/fmt#11.2.0")
   endif()
 
   # if(NOT TARGET spdlog::spdlog)
