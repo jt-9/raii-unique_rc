@@ -3,6 +3,7 @@
 
 #include "raii_defs.hpp"
 
+#include "concepts.hpp"
 #include "memory_delete.hpp"
 #include "unique_rc.hpp"
 
@@ -13,7 +14,9 @@
 RAII_NS_BEGIN
 
 
-template<typename T, typename Deleter = raii::default_delete<T>> class unique_ptr : public unique_rc<T *, Deleter>
+template<typename T, typename Deleter = raii::default_delete<T>>
+  requires can_form_pointer<T>
+class unique_ptr : public unique_rc<T *, Deleter>
 {
 private:
   using Base = unique_rc<T *, Deleter>;

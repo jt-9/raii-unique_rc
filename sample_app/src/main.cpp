@@ -124,8 +124,8 @@ int main(int argc, char *argv[]) noexcept
   measureAndPrintUniquePtrSize();
 
   //*/
-  using namespace raii;
-
+  using raii::unique_rc;
+  
   {
     std::puts("=======================================================");
     const auto kTiedArg1 = -24;
