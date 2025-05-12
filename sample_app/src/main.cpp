@@ -5,6 +5,7 @@
 
 // #include "test_deleter.hpp"
 
+#include "consteval_lambda_example.hpp"
 #include "coroutine_example.hpp"
 #include "test_deleter.hpp"
 #include "memory_delete.hpp"
@@ -121,6 +122,7 @@ int main(int argc, char *argv[]) noexcept
     return 0;
   }
 
+  raii_sample::testTypeConstructAssignWithConsteval();
   measureAndPrintUniquePtrSize();
 
   //*/

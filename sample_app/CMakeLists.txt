@@ -2,6 +2,7 @@
 
 set(SAMPLE_APP_HEADERS 
   ${CMAKE_CURRENT_SOURCE_DIR}/inc/test_deleter.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/inc/consteval_lambda_example.hpp
 )
 
 set(SAMPLE_APP_SOURCES
@@ -13,6 +14,7 @@ set(SAMPLE_APP_SOURCES
 set(EXEC_TARGET sample_app)
 
 add_executable(${EXEC_TARGET} ${SAMPLE_APP_HEADERS} ${SAMPLE_APP_SOURCES})
+target_compile_features(${EXEC_TARGET} PUBLIC cxx_std_23)
 
 target_link_libraries(${EXEC_TARGET} PRIVATE 
                   myproject::myproject_options
