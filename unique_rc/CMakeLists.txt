@@ -59,5 +59,8 @@ endfunction()
 add_mylib_statics(urc)
 add_library(myproject::urc ALIAS urc)
 
+#urc library uses c++ 20 which is set via myproject::myproject_options
+# target_compile_features(urc PUBLIC cxx_std_20)
+
 
 #generate_export_header(unique_rc EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/unique_rc/include/unique_rc_export.hpp)
