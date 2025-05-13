@@ -4,89 +4,93 @@
 #include "unique_ptr.hpp"
 // #include "unique_rc.hpp"
 
+#include <cassert>
+#include <cstddef>
+
+
 namespace {
-constexpr bool test_reset() noexcept
+
+template<typename T> constexpr bool ConstexprUPtrSingle(T const val1, T const val2) noexcept
 {
-  {
-    raii::unique_ptr<int> ptr1;
-    ptr1.reset();
-    // STATIC_REQUIRE(!ptr1);
+  raii::unique_ptr<T> ptr1;
+  ptr1.reset();
+  assert(!ptr1);
+  // Catch 3.8.1 doesn't work with constexpr: error non-constexpr constructor 'AssertionHandler' cannot be used in a
+  // constant expression CHECK_FALSE(ptr1);
 
-    ptr1.reset(nullptr);
-    // STATIC_REQUIRE(!ptr1);
-    // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new, cppcoreguidelines-owning-memory)
-    ptr1.reset(new int(2));
-    // STATIC_REQUIRE(*ptr1 == 2);
+  ptr1.reset(nullptr);
+  assert(!ptr1);
+  // CHECK(!ptr1);
 
-    // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new, cppcoreguidelines-owning-memory)
-    ptr1.reset(new int(3));
-    // STATIC_REQUIRE(*ptr1 == 3);
-    ptr1.reset(nullptr);
-    // STATIC_REQUIRE(!ptr1);
-  }
+  // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new, cppcoreguidelines-owning-memory)
+  ptr1.reset(new T{ val1 });
+  assert(ptr1);
+  assert(val1 == *ptr1);
+  // CHECK(*ptr1 == 2);
 
-  {
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
-    raii::unique_ptr<int[]> ptra1;
-    ptra1.reset();
-    // STATIC_REQUIRE(!ptra1);
-    ptra1.reset(nullptr);
-    // STATIC_REQUIRE(!ptra1);
+  // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new, cppcoreguidelines-owning-memory)
+  ptr1.reset(new T{ val2 });
+  assert(val2 == *ptr1);
+  // CHECK(*ptr1 == 3);
+  ptr1.reset(nullptr);
+  assert(!ptr1);
+  // CHECK(!ptr1);
 
-    // cppcheck-suppress leakNoVarFunctionCall false positive
-    // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new, cppcoreguidelines-owning-memory)
-    ptra1.reset(new int[]{ 2, 3 });
-    //STATIC_REQUIRE(ptra1[0] == 2);
-
-    // NOLINTNEXTLINE(readability-isolate-declaration)
-    const auto c_Elem0 = 4, c_Elem1 = 5, c_Elem2 = 6;
-
-    // cppcheck-suppress leakNoVarFunctionCall false positive
-    // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new, cppcoreguidelines-owning-memory)
-    ptra1.reset(new int[]{ c_Elem0, c_Elem1, c_Elem2 });
-    // STATIC_REQUIRE(ptra1[1] == c_Elem1);
-    ptra1.reset(nullptr);
-    // STATIC_REQUIRE(!ptra1);
-  }
-
-  {
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
-    raii::unique_ptr<const int[]> ptra2;
-
-    // cppcheck-suppress leakNoVarFunctionCall false positive
-    // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new, cppcoreguidelines-owning-memory)
-    ptra2.reset(new int[2]{});
-  }
   return true;
 }
+
+// template<typename T>
+constexpr bool ConstexprUPtrValueArray(int const elem1, int const elem2, int const elem3, int const elem4) noexcept
+{
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
+  raii::unique_ptr<int[]> ptra1;
+  ptra1.reset();
+  assert(!ptra1);
+
+  ptra1.reset(nullptr);
+  assert(!ptra1);
+
+  // cppcheck-suppress leakNoVarFunctionCall false positive
+  // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new, cppcoreguidelines-owning-memory)
+  ptra1.reset(new int[]{ elem1, elem2 });
+  assert(elem1 == ptra1[0]);
+
+  // cppcheck-suppress leakNoVarFunctionCall false positive
+  // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new, cppcoreguidelines-owning-memory)
+  ptra1.reset(new int[]{ elem1, elem2, elem3, elem4 });
+  assert(elem2 == ptra1[1]);
+  assert(elem4 == ptra1[3]);
+
+  ptra1.reset(nullptr);
+  assert(!ptra1);
+
+  return true;
+}
+
+template<typename T> constexpr bool ConstexprUPtrDefaultArray(std::size_t size) noexcept
+{
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
+  raii::unique_ptr<const T[]> ptra2;
+
+  // cppcheck-suppress leakNoVarFunctionCall false positive
+  // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new, cppcoreguidelines-owning-memory)
+  ptra2.reset(new T[size]{});
+
+  constexpr auto c_DefaultValue = T{};
+  // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
+  for (std::size_t i = 0; i < size; i++) { assert(c_DefaultValue == ptra2[i]); }
+
+  ptra2.reset(nullptr);
+  assert(!ptra2);
+
+  return true;
+}
+
 }// namespace
 
-TEST_CASE("constexpr unique_ptr::reset", "[unique_ptr][reset]") { STATIC_REQUIRE(test_reset()); }
-
-// constexpr bool test_release()
-// {
-//   std::unique_ptr<int> ptr1;
-//   int *raw_ptr = ptr1.release();
-//   VERIFY(!raw_ptr);
-//   VERIFY(!ptr1);
-
-//   std::unique_ptr<int> p2(new int(2));
-//   raw_ptr = p2.release();
-//   VERIFY(raw_ptr);
-//   VERIFY(!p2);
-//   delete raw_ptr;
-
-//   std::unique_ptr<int[]> a1;
-//   raw_ptr = a1.release();
-//   VERIFY(!raw_ptr);
-//   VERIFY(!a1);
-
-//   std::unique_ptr<int[]> a2(new int[2]{});
-//   raw_ptr = a2.release();
-//   VERIFY(raw_ptr);
-//   VERIFY(!a2);
-//   delete[] raw_ptr;
-
-//   return true;
-// }
-// static_assert(test_release());
+TEST_CASE("constexpr unique_ptr::reset", "[unique_ptr][reset]")
+{
+  STATIC_REQUIRE(ConstexprUPtrSingle<int>(4, -2));
+  STATIC_REQUIRE(ConstexprUPtrValueArray('a', 'B', 'C', 'd'));
+  STATIC_REQUIRE(ConstexprUPtrDefaultArray<int>(7));
+}

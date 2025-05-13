@@ -60,6 +60,7 @@ set(TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/hash/hash.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/hash/types.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/io/lwg2948.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_release.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_reset.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/reset.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/cv_qualifiers.cpp
@@ -112,8 +113,16 @@ catch_discover_tests(
   OUTPUT_SUFFIX
   .xml)
 
+set(CONSTEXPR_TESTS_SOURCES
+  ${CMAKE_CURRENT_SOURCE_DIR}/constexpr_tests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/unique_ptr_tests.cpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_release.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_reset.cpp
+)
+
   # Add a file containing a set of constexpr tests
-add_executable(constexpr_tests ${TESTS_HEADERS} constexpr_tests.cpp)
+add_executable(constexpr_tests ${TESTS_HEADERS} ${CONSTEXPR_TESTS_SOURCES})
 target_compile_features(constexpr_tests PUBLIC cxx_std_23)
 
 target_link_libraries(
