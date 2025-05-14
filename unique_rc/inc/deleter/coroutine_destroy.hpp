@@ -25,7 +25,16 @@ template<typename Promise> struct coroutine_destroy
     return static_cast<bool>(h);
   }
 
-  template<typename P> raii_inline void operator()(std::coroutine_handle<P> h) const noexcept { h.destroy(); }
+#ifdef __cpp_static_call_operator
+  // False poisitive, guarded by feature #ifdef __cpp_static_call_operator
+  // NOLINTNEXTLINE(clang-diagnostic-c++23-extensions)
+  raii_inline static void operator()(std::coroutine_handle<Promise> h) noexcept
+#else
+  raii_inline void operator()(std::coroutine_handle<Promise> h) const noexcept
+#endif
+  {
+    h.destroy();
+  }
 };
 
 RAII_NS_END

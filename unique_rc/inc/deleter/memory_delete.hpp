@@ -30,7 +30,13 @@ struct memory_delete
 
   [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept { return h; }
 
+#ifdef __cpp_static_call_operator
+  // False poisitive, guarded by feature #ifdef __cpp_static_call_operator
+  // NOLINTNEXTLINE(clang-diagnostic-c++23-extensions)
+  raii_inline static constexpr void operator()(Handle h) noexcept
+#else
   raii_inline constexpr void operator()(Handle h) const noexcept
+#endif
   {
     static_assert(!std::is_void_v<std::remove_pointer_t<Handle>>, "can't delete pointer to incomplete type");
     static_assert(sizeof(std::remove_pointer_t<Handle>) > 0, "can't delete pointer to incomplete type");
@@ -51,9 +57,15 @@ template<typename T> struct default_delete
 
   [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
 
-  [[nodiscard]] raii_inline static constexpr bool is_owned(T* h) noexcept { return h; }
+  [[nodiscard]] raii_inline static constexpr bool is_owned(T *h) noexcept { return h; }
 
-  raii_inline constexpr void operator()(T* h) const noexcept
+#ifdef __cpp_static_call_operator
+  // False poisitive, guarded by feature #ifdef __cpp_static_call_operator
+  // NOLINTNEXTLINE(clang-diagnostic-c++23-extensions)
+  raii_inline static constexpr void operator()(T *h) noexcept
+#else
+  raii_inline constexpr void operator()(T *h) const noexcept
+#endif
   {
     static_assert(!std::is_void_v<T>, "can't delete pointer to incomplete type");
     static_assert(sizeof(T) > 0, "can't delete pointer to incomplete type");
@@ -79,7 +91,13 @@ template<typename T> struct default_delete<T[]>
 
   template<typename U>
     requires std::is_convertible_v<U (*)[], T (*)[]>
+#ifdef __cpp_static_call_operator
+  // False poisitive, guarded by feature #ifdef __cpp_static_call_operator
+  // NOLINTNEXTLINE(clang-diagnostic-c++23-extensions)
+  raii_inline static constexpr void operator()(U *p) noexcept
+#else
   raii_inline constexpr void operator()(U *p) const noexcept
+#endif
   {
     static_assert(sizeof(U) > 0, "can't delete pointer to incomplete type");
 

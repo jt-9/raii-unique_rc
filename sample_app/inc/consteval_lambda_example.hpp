@@ -18,6 +18,8 @@ namespace raii_sample {
 
 void testTypeConstructAssignWithConsteval() noexcept
 {
+  // Requires c++23, doesn't work in MSVC 2022
+  /*/
   [] consteval {
     IntUPtr empty;
     assert(!empty);
@@ -57,6 +59,7 @@ void testTypeConstructAssignWithConsteval() noexcept
     assert(val2 == *src);
     assert(val1 == *dst);
   }(42, -4);
+  //*/
 }
 
 }// namespace raii_sample
