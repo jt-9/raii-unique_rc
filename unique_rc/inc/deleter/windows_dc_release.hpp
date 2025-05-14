@@ -1,29 +1,14 @@
-#ifndef WIN_GDI_DC_DELETER_HPP
-#define WIN_GDI_DC_DELETER_HPP
+#ifndef WIN_GDI_DC_RELEASE_HPP
+#define WIN_GDI_DC_RELEASE_HPP
 
 #include "raii_defs.hpp"
 
 #include <Windows.h>
 
-#include <concepts>
+#include <concepts>// std::ranges::swap
 
 
 RAII_NS_BEGIN
-
-
-// Deallocates device context (DC) acquired via CreateDC, CreateCompatibleDC, etc.
-// nullptr indicates invalid dc
-struct gdi_delete_dc_nullptr
-{
-  constexpr gdi_delete_dc_nullptr() noexcept = default;
-
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-
-  [[nodiscard]] raii_inline static constexpr bool is_owned(HDC h) noexcept { return static_cast<bool>(h); }
-
-  // constexpr generates error - constexpr function doesn't evaluate at compile time
-  raii_inline void operator()(HDC h) const noexcept { DeleteDC(h); }
-};
 
 // Deallocates device context (DC) acquired via GetDC, GetWindowDC, etc.
 // nullptr indicates invalid dc
@@ -70,10 +55,16 @@ struct gdi_release_wnd_dc_nullptr
     return static_cast<bool>(h.hdc);
   }
 
-  // constexpr generates error - constexpr function doesn't evaluate at compile time
-  raii_inline void operator()(const handle &h) const noexcept { ReleaseDC(h.hwnd, h.hdc); }
+// constexpr generates error - constexpr function doesn't evaluate at compile time
+#ifdef __cpp_static_call_operator
+  raii_inline static void operator()(const handle &h) noexcept
+#else
+  raii_inline void operator()(const handle &h) const noexcept
+#endif
+  {
+    ReleaseDC(h.hwnd, h.hdc);
+  }
 };
-
 
 RAII_NS_END
 

@@ -54,8 +54,15 @@ struct gdi_restore_dc_nullptr
     return static_cast<bool>(h.hdc) && (h.state != 0);
   }
 
-  // constexpr generates error - constexpr function doesn't evaluate at compile time
-  raii_inline void operator()(const handle &h) const noexcept { RestoreDC(h.hdc, h.state); }
+// constexpr generates error - constexpr function doesn't evaluate at compile time
+#ifdef __cpp_static_call_operator
+  raii_inline static void operator()(const handle &h) noexcept
+#else
+  raii_inline void operator()(const handle &h) const noexcept
+#endif
+  {
+    RestoreDC(h.hdc, h.state);
+  }
 };
 
 

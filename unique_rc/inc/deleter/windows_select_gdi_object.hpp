@@ -5,8 +5,8 @@
 
 #include <Windows.h>
 
-#include <concepts>
-#include <utility>
+#include <concepts>// std::convertible_to
+#include <cstddef>// std::nullptr_t
 
 
 RAII_NS_BEGIN
@@ -56,7 +56,14 @@ struct gdi_select_object
     return static_cast<bool>(h.hobj);
   }
 
-  raii_inline constexpr void operator()(const handle &h) const noexcept { SelectObject(h.hdc, h.hobj); }
+#ifdef __cpp_static_call_operator
+  raii_inline static void operator()(const handle &h) noexcept
+#else
+  raii_inline void operator()(const handle &h) const noexcept
+#endif
+  {
+    SelectObject(h.hdc, h.hobj);
+  }
 };
 
 RAII_NS_END

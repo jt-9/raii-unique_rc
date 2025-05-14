@@ -22,9 +22,10 @@ set(HEADERS
   ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/stdio_fclose.hpp
   ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_com_release.hpp
   ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_com_file_dlg_unadvise.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_gdi_deleter.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_gdi_select_object.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_dc_deleter.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_delete_gdi_object.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_select_gdi_object.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_dc_delete.hpp
+  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_dc_release.hpp
   ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_dc_restore.hpp
   ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_close_handle.hpp
 )
