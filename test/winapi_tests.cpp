@@ -2,13 +2,14 @@
 
 #include "unique_rc.hpp"
 #include "windows_close_handle.hpp"
-#include "windows_dc_deleter.hpp"
-#include "windows_gdi_deleter.hpp"
+#include "windows_dc_delete.hpp"
+#include "windows_delete_gdi_object.hpp"
 
 #include "mock_pointer_no_op.hpp"
 
+#include <Windows.h>
+
 #include <utility>
-#include <windows.h>
 
 
 //----------------------------------------------------------------
