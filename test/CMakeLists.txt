@@ -77,7 +77,7 @@ set(TESTS_SOURCES
 )
 
 add_executable(tests ${TESTS_HEADERS} ${TESTS_SOURCES})
-target_compile_features(tests PUBLIC cxx_std_23)
+#target_compile_features(tests PUBLIC cxx_std_23)
 #target_sources(tests PRIVATE $<$<PLATFORM_ID:Windows>:${CMAKE_CURRENT_SOURCE_DIR}/winapi_tests.cpp>)
 
 target_link_libraries(
@@ -123,7 +123,7 @@ set(CONSTEXPR_TESTS_SOURCES
 
   # Add a file containing a set of constexpr tests
 add_executable(constexpr_tests ${TESTS_HEADERS} ${CONSTEXPR_TESTS_SOURCES})
-target_compile_features(constexpr_tests PUBLIC cxx_std_23)
+#target_compile_features(constexpr_tests PUBLIC cxx_std_23)
 
 target_link_libraries(
   constexpr_tests
