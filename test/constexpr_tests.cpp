@@ -8,8 +8,6 @@
 #include <string_view>
 
 
-
-
 TEST_CASE("Equality of default initialised unique_rc<int*, memory_delete<int*>>", "[unique_rc::operator ==]")
 {
   constexpr raii::unique_rc<int *, raii::memory_delete<int *>> int_rc1{};
@@ -101,12 +99,9 @@ TEST_CASE("Three-way comparison of initialised unique_rc<const char*, memory_moc
   constexpr decltype(char_rc1) copy_rc1{ str.data() };
   // NOLINTEND(bugprone-suspicious-stringview-data-usage)
 
-  SECTION("unique_rc::operator <=>(unique_rc, unique_rc)")
-  {
-    STATIC_CHECK(char_rc1);
-    STATIC_CHECK(char_rc2);
-    STATIC_REQUIRE((char_rc1 <=> char_rc2) == std::strong_ordering::less);
-    STATIC_REQUIRE((char_rc2 <=> char_rc1) == std::strong_ordering::greater);
-    STATIC_REQUIRE((char_rc1 <=> copy_rc1) == std::strong_ordering::equal);
-  }
+  STATIC_CHECK(char_rc1);
+  STATIC_CHECK(char_rc2);
+  STATIC_REQUIRE((char_rc1 <=> char_rc2) == std::strong_ordering::less);
+  STATIC_REQUIRE((char_rc2 <=> char_rc1) == std::strong_ordering::greater);
+  STATIC_REQUIRE((char_rc1 <=> copy_rc1) == std::strong_ordering::equal);
 }

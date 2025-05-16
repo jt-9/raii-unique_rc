@@ -68,7 +68,7 @@ constexpr bool ConstexprUPtrValueArray(int const elem1, int const elem2, int con
 TEST_CASE("constexpr unique_ptr::release", "[unique_ptr][release]")
 {
   STATIC_REQUIRE(ConstexprUPtrDefaultSingle<int>());
-  STATIC_REQUIRE(ConstexprUPtrValueSingle<char>('B'));
+  STATIC_REQUIRE(ConstexprUPtrValueSingle('B'));
   STATIC_REQUIRE(ConstexprUPtrDefaultArray<float>());
   STATIC_REQUIRE(ConstexprUPtrValueArray(7, -3, 11));
 }

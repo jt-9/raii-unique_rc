@@ -38,7 +38,6 @@ set(TESTS_HEADERS
 )
 
 set(TESTS_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/tests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/unique_ptr_tests.cpp
 
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/deleter_inheritance.cpp
@@ -46,6 +45,7 @@ set(TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/move_single.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/nullptr.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/construct_default.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/construct_move.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/construct_move_neg.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/cv_qualifiers.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/from_pointer.cpp
@@ -62,6 +62,7 @@ set(TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/io/lwg2948.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_release.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_reset.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/release.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/reset.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/cv_qualifiers.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/dr2228.cpp
@@ -117,6 +118,7 @@ set(CONSTEXPR_TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/constexpr_tests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/unique_ptr_tests.cpp
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/construct_move.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_release.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_reset.cpp
 )

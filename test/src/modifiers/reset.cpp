@@ -66,16 +66,16 @@ TEST_CASE("Reset initialised unique_rc<float*, memory_delete<float*>>", "[unique
   constexpr auto test_number = 496.0F;
   raii::unique_rc<float *, raii::memory_delete<float *>> rc1{ new float{ test_number } };
 
-  REQUIRE(rc1);
-  REQUIRE(rc1.get() != nullptr);
+  CHECK(rc1);
+  CHECK(rc1.get() != nullptr);
 
   SECTION("Reset with invalid value (nullptr)")
   {
     CHECK(*rc1.get() == test_number);
     REQUIRE_NOTHROW(rc1.reset());
 
-    REQUIRE(rc1.get() == nullptr);
-    REQUIRE_FALSE(rc1);
+    CHECK(rc1.get() == nullptr);
+    CHECK_FALSE(rc1);
   }
 
   SECTION("Reset with other constructed float")
@@ -84,8 +84,8 @@ TEST_CASE("Reset initialised unique_rc<float*, memory_delete<float*>>", "[unique
     auto *const non_owner_ptr = new float{ test_number };
     rc1.reset(non_owner_ptr);
 
-    REQUIRE(rc1.get() == non_owner_ptr);
-    REQUIRE(rc1);
+    CHECK(rc1.get() == non_owner_ptr);
+    CHECK(rc1);
   }
 }
 
@@ -93,13 +93,13 @@ TEST_CASE("Reset empty unique_rc<float*, memory_delete<float*>> default", "[uniq
 {
   raii::unique_rc<float *, raii::memory_delete<float *>> float_rc{};
 
-  REQUIRE_FALSE(float_rc);
-  REQUIRE(float_rc.get() == nullptr);
+  CHECK_FALSE(float_rc);
+  CHECK(float_rc.get() == nullptr);
 
   REQUIRE_NOTHROW(float_rc.reset());
 
-  REQUIRE(float_rc.get() == nullptr);
-  REQUIRE_FALSE(float_rc);
+  CHECK(float_rc.get() == nullptr);
+  CHECK_FALSE(float_rc);
 }
 
 TEST_CASE("Reset initialised unique_ptr<float>", "[unique_ptr][reset]")
@@ -107,16 +107,16 @@ TEST_CASE("Reset initialised unique_ptr<float>", "[unique_ptr][reset]")
   constexpr auto test_number = 8128.0F;
   raii::unique_ptr<float> ptr1{ new float{ test_number } };
 
-  REQUIRE(ptr1);
-  REQUIRE(ptr1.get() != nullptr);
+  CHECK(ptr1);
+  CHECK(ptr1.get() != nullptr);
   CHECK(*ptr1 == test_number);
 
   SECTION("Reset with invalid value (nullptr)")
   {
     REQUIRE_NOTHROW(ptr1.reset());
 
-    REQUIRE(ptr1.get() == nullptr);
-    REQUIRE_FALSE(ptr1);
+    CHECK(ptr1.get() == nullptr);
+    CHECK_FALSE(ptr1);
   }
 
   SECTION("Reset with other constructed float")
@@ -126,8 +126,8 @@ TEST_CASE("Reset initialised unique_ptr<float>", "[unique_ptr][reset]")
     auto *const non_owner_ptr = new float{ test_number2 };
     ptr1.reset(non_owner_ptr);
 
-    REQUIRE(ptr1.get() == non_owner_ptr);
-    REQUIRE(ptr1);
+    CHECK(ptr1.get() == non_owner_ptr);
+    CHECK(ptr1);
   }
 }
 
@@ -153,15 +153,15 @@ TEST_CASE("Test deleter operator() is called as expected", "[unique_ptr][reset]"
   raii::unique_ptr<int, raii::deleter_class_wrapper<D2>> iptr;
 
   iptr.reset();
-  REQUIRE(D2::count == 0);
+  CHECK(D2::count == 0);
 
   // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
   iptr.reset(new int);
-  REQUIRE(D2::count == 0);
+  CHECK(D2::count == 0);
 
   iptr.reset(iptr.get());
-  REQUIRE(D2::count == 1);
+  CHECK(D2::count == 1);
 
   iptr.release();
-  REQUIRE(D2::count == 1);
+  CHECK(D2::count == 1);
 }
