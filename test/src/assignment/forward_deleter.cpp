@@ -31,10 +31,7 @@ struct CopyAssignDeleter
 
   [[nodiscard]] static constexpr std::nullptr_t invalid() noexcept { return {}; }
 
-  template<class T> [[nodiscard]] static constexpr bool is_owned(T *ptr) noexcept
-  {
-    return static_cast<bool>(ptr);
-  }
+  template<class T> [[nodiscard]] static constexpr bool is_owned(T *ptr) noexcept { return static_cast<bool>(ptr); }
 };
 
 struct DerivedCopyAssignDeleter : CopyAssignDeleter
@@ -43,7 +40,7 @@ struct DerivedCopyAssignDeleter : CopyAssignDeleter
 }// namespace
 
 
-TEST_CASE("unique_ptr move assignment forwards deleter", "[unique_ptr][unique_ptr::unique_ptr]")
+TEST_CASE("unique_ptr move assignment forwards deleter", "[unique_ptr][unique_ptr::operator=]")
 {
   CopyAssignDeleter baseDeleter;
 
