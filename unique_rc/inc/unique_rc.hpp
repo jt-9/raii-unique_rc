@@ -49,7 +49,7 @@ template<typename T> struct hash_not_enabled
   hash_not_enabled &operator=(hash_not_enabled &) = delete;
   hash_not_enabled &operator=(hash_not_enabled &&) = delete;
 
-  //Commented to prevent implicitly deleted warning on MSVC 19.43 treated as error
+  // Commented to prevent implicitly deleted warning on MSVC 19.43 treated as error
   //~hash_not_enabled() = delete;
 };
 
@@ -107,7 +107,7 @@ public:
 
   raii_inline constexpr unique_rc_holder_impl(unique_rc_holder_impl &&other) noexcept : hdt_{ std::move(other.hdt_) }
   {
-    other.get_handle() = Deleter::invalid();
+    other.get_handle() = get_deleter().invalid();
   }
 
   // cppcheck-suppress operatorEqVarError - false positive, member variable is assigned indirectly via get_handle() in
@@ -134,7 +134,7 @@ public:
   {
     const handle old_h = std::exchange(get_handle(), h);
     // if (old_h != Deleter::invalid()) {
-    if (Deleter::is_owned(old_h)) {
+    if (get_deleter().is_owned(old_h)) {
 #ifdef UNIQUE_RC_ENABLE_SELF_RESET_ASSERT
       assert(old_h != h && "Failed self-reset check, like p.reset(p.get())");
 #endif// UNIQUE_RC_ENABLE_SELF_RESET_ASSERT
@@ -147,7 +147,7 @@ public:
   raii_inline constexpr handle release() noexcept
   {
     handle h = get_handle();
-    get_handle() = Deleter::invalid();
+    get_handle() = get_deleter().invalid();
 
     return h;
   }
@@ -301,7 +301,8 @@ public:
     static_assert(std::is_invocable_v<deleter_type &, handle>, "unique_rc's deleter must be invocable with a handle");
 
     auto &h = uh_.get_handle();
-    if (Deleter::is_owned(h)) {
+    // NOLINTNEXTLINE(clang-diagnostic-unused-result)
+    if (get_deleter().is_owned(h)) {
       get_deleter()(std::move(h));
       h = invalid();
     }
@@ -324,11 +325,15 @@ public:
     uh_.reset(std::move(new_h));
   }
 
-  [[nodiscard]] raii_inline constexpr explicit operator bool() const noexcept { return Deleter::is_owned(get()); }
-
-  [[nodiscard]] raii_inline static constexpr invalid_handle_type invalid() noexcept(noexcept(Deleter::invalid()))
+  [[nodiscard]] raii_inline constexpr explicit operator bool() const noexcept
   {
-    return Deleter::invalid();
+    // NOLINTNEXTLINE(clang-diagnostic-unused-result)
+    return get_deleter().is_owned(get());
+  }
+
+  [[nodiscard]] raii_inline static constexpr invalid_handle_type invalid() noexcept(noexcept(std::remove_reference_t<Deleter>::invalid()))
+  {
+    return std::remove_reference_t<Deleter>::invalid();
   }
 
   raii_inline constexpr void swap(unique_rc &other) noexcept(
