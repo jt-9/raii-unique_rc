@@ -90,7 +90,7 @@ template<typename T> constexpr bool ConstexprUPtrDefaultArray(std::size_t size) 
 
 TEST_CASE("constexpr unique_ptr::reset", "[unique_ptr][reset]")
 {
-  STATIC_REQUIRE(ConstexprUPtrSingle<int>(4, -2));
+  STATIC_REQUIRE(ConstexprUPtrSingle(4, -2));
   STATIC_REQUIRE(ConstexprUPtrValueArray('a', 'B', 'C', 'd'));
   STATIC_REQUIRE(ConstexprUPtrDefaultArray<int>(7));
 }
