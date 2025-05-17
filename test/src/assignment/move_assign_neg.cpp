@@ -44,7 +44,7 @@ TEST_CASE("unique_ptr disallowed move assignment", "[unique_ptr][unique_ptr::ope
   STATIC_CHECK_FALSE(std::is_assignable_v<decltype(ub_ptr1), decltype(std::move(ud_ptr))>);
 
   // ub_ptr2 = ud_ptr; // { dg-error "no match" }
-//   STATIC_CHECK(std::is_assignable_v<raii::unique_ptr<int, Base>, raii::unique_ptr<int, Derived &>>);
+  // STATIC_CHECK_FALSE(std::is_assignable_v<decltype(ub_ptr2), decltype(ud_ptr)>);
 
   // NOLINTBEGIN
   raii::unique_ptr<int[], Base &> uba{ nullptr, baseDeleter };
