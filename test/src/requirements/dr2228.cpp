@@ -4,19 +4,19 @@
 #include "unique_ptr.hpp"
 #include "unique_rc.hpp"
 
-// #include <cstddef>//std::nullptr_t
 #include <type_traits>
+
 
 struct do_nothing
 {
-  template<class T> void operator()([[maybe_unused]] T * ptr) const noexcept {}
+  template<class T> void operator()([[maybe_unused]] T *ptr) const noexcept {}
 };
 
 TEST_CASE("DR 2228 is not assignable unique_rc", "[unique_rc::operator=]")
 {
   int initValue = 0;
-  const raii::unique_rc<int*, raii::deleter_class_wrapper<do_nothing>> uptr1{ &initValue };
-  const raii::unique_rc<int*, raii::default_delete<int>> uptr2{};
+  const raii::unique_rc<int *, raii::deleter_class_wrapper<do_nothing>> uptr1{ &initValue };
+  const raii::unique_rc<int *, raii::default_delete<int>> uptr2{};
 
   STATIC_CHECK_FALSE(std::is_assignable_v<decltype(uptr2), decltype(uptr1)>);
 }

@@ -38,12 +38,12 @@ TEST_CASE("Move assign array objects unique_ptr to default initialised unique_pt
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
   raii::unique_ptr<Derived[]> ptr2;
   CHECK(ptr2.get() == nullptr);
-  REQUIRE_FALSE(ptr2);
+  CHECK_FALSE(ptr2);
 
   ptr2 = std::move(ptr1);
 
   // cppcheck-suppress accessMoved only in test to make sure the pointer is nullptr
-  REQUIRE_FALSE(ptr1);
+  CHECK_FALSE(ptr1);
   CHECK(ptr2.get() == raw_d);
   CHECK(ptr2);
 }

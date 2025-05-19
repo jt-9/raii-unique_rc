@@ -20,7 +20,6 @@ struct B : A
 }// namespace
 
 
-
 TEST_CASE("Compare empty with allocated array unique_ptr", "[unique_ptr][compare]")
 {
   // NOLINTNEXTLINE
@@ -36,7 +35,8 @@ TEST_CASE("Compare empty with allocated array unique_ptr", "[unique_ptr][compare
   CHECK_FALSE(((ptr1 >= ptr2) && (ptr1 != ptr2)));
 }
 
-TEST_CASE("Equality of value initialised unique_rc<double*, memory_delete<double*>>", "[unique_rc][operator ==][compare]")
+TEST_CASE("Equality of value initialised unique_rc<double*, memory_delete<double*>>",
+  "[unique_rc][operator ==][compare]")
 {
   const auto test_number = 13.11;
   const raii::unique_rc<double *, raii::memory_delete<double *>> rc1{ new double{ test_number } };

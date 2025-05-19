@@ -8,14 +8,12 @@
 // LWG 2905 is_constructible_v<unique_ptr<P, D>, P, D const &> should be false when D is not copy constructible
 
 namespace {
-template<typename T, typename D, typename... Args>
-constexpr bool unique_ptr_is_constructible() noexcept
+template<typename T, typename D, typename... Args> constexpr bool unique_ptr_is_constructible() noexcept
 {
   return std::is_constructible_v<raii::unique_ptr<T, D>, Args...>;
 }
 
-template<typename T, typename D, typename U>
-constexpr bool unique_ptr_is_assignable() noexcept
+template<typename T, typename D, typename U> constexpr bool unique_ptr_is_assignable() noexcept
 {
   return std::is_assignable_v<raii::unique_ptr<T, D>, U>;
 }

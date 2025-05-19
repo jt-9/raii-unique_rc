@@ -128,26 +128,6 @@ struct deleter_class_wrapper : public Deleter
 };
 
 template<typename Deleter>
-  requires not_final<Deleter> && has_pointer_type<Deleter>
-struct deleter_class_wrapper<Deleter> : public Deleter
-{
-  using handle = typename std::remove_reference_t<Deleter>::pointer;
-
-  using Deleter::Deleter;
-  using Deleter::operator=;
-  using Deleter::operator();
-
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-
-  template<typename Handle>
-    requires std::is_pointer_v<Handle>
-  [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept
-  {
-    return h;
-  }
-};
-
-template<typename Deleter>
   requires std::is_swappable_v<Deleter> && std::swappable<Deleter>
 raii_inline constexpr void swap(deleter_class_wrapper<Deleter> &lhs, deleter_class_wrapper<Deleter> &rhs) noexcept(
   noexcept(std::is_nothrow_swappable_v<Deleter>))

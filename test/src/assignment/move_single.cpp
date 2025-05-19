@@ -40,7 +40,7 @@ TEST_CASE("Move assign single object unique_ptr to other unique_ptr", "[unique_p
   ptr2 = std::move(ptr1);
 
   // cppcheck-suppress accessMoved only in test to make sure the pointer is nullptr
-  REQUIRE_FALSE(ptr1);
+  CHECK_FALSE(ptr1);
   CHECK(ptr2.get() == raw_d);
   CHECK(ptr2);
 
@@ -50,7 +50,7 @@ TEST_CASE("Move assign single object unique_ptr to other unique_ptr", "[unique_p
   ptr3 = std::move(ptr2);
 
   // cppcheck-suppress accessMoved only in test to make sure the pointer is nullptr
-  REQUIRE_FALSE(ptr2);
+  CHECK_FALSE(ptr2);
   CHECK(ptr3.get() == raw_d);
   CHECK(ptr3);
 }

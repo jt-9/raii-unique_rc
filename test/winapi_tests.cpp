@@ -20,7 +20,7 @@ TEST_CASE("Default initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>"
   constexpr raii::unique_rc<HPEN, raii::gdi_delete_object_nullptr<HPEN>> pen_rc{};
 
   CHECK(pen_rc.get() == nullptr);
-  REQUIRE_FALSE(pen_rc);
+  CHECK_FALSE(pen_rc);
 }
 
 TEST_CASE("Value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPEN>>", "[unique_rc]")
@@ -54,7 +54,7 @@ TEST_CASE("Reset value initialised unique_rc<HPEN, gdi_delete_object_nullptr<HPE
     pen_rc.reset();
 
     CHECK(pen_rc.get() == nullptr);
-    REQUIRE_FALSE(pen_rc);
+    CHECK_FALSE(pen_rc);
   }
 
   SECTION("Reset with other constructed HPEN")
@@ -79,7 +79,7 @@ TEST_CASE("Equality of value initialised unique_rc<HPEN, gdi_delete_object_nullp
       PS_DASH, 4, RGB(0xFF, 0xFF, 0xFF)) };
     CHECK(pen_rc2);
 
-    REQUIRE_FALSE(pen_rc == pen_rc2);
+    CHECK_FALSE(pen_rc == pen_rc2);
     CHECK(pen_rc != pen_rc2);
   }
 
@@ -88,7 +88,7 @@ TEST_CASE("Equality of value initialised unique_rc<HPEN, gdi_delete_object_nullp
     const raii::unique_rc<HPEN, mock_raii::mock_pointer_no_op<HPEN>> noop_pen_rc{ pen_rc.get() };
 
     CHECK(pen_rc == noop_pen_rc);
-    REQUIRE_FALSE(pen_rc != noop_pen_rc);
+    CHECK_FALSE(pen_rc != noop_pen_rc);
   }
 
   SECTION("unique_rc::operator == to default constructed unique_rc")
@@ -208,7 +208,7 @@ TEST_CASE("Equality of value initialised unique_rc<HANDLE, close_handle_invalid_
     const raii::unique_rc<HANDLE, mock_raii::mock_pointer_no_op<HANDLE>> noop_pipe{ pipe.get() };
 
     CHECK(pipe == noop_pipe);
-    REQUIRE_FALSE(pipe != noop_pipe);
+    CHECK_FALSE(pipe != noop_pipe);
   }
 
   SECTION("unique_rc::operator == to default constructed unique_rc")

@@ -31,8 +31,7 @@ template<bool B> struct TestDeleter
   void operator()([[maybe_unused]] pointer ptr) const noexcept {}
 };
 
-template<typename T, bool Nothrow>
-using UPtr = raii::unique_ptr<T, raii::deleter_class_wrapper<TestDeleter<Nothrow>>>;
+template<typename T, bool Nothrow> using UPtr = raii::unique_ptr<T, raii::deleter_class_wrapper<TestDeleter<Nothrow>>>;
 }// namespace
 
 TEST_CASE("LWG 2762 unique_ptr operator*() should be noexcept", "[unique_ptr::operator *]")

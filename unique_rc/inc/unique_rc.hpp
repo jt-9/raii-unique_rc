@@ -58,12 +58,12 @@ using unique_rc_hash_base =
   std::conditional_t<is_hash_enabled_for<Handle>, unique_rc_hash<Urc, Handle>, hash_not_enabled<Handle>>;
 }// namespace detail
 
-template<typename Handle, typename Del_noref> struct resolve_handle_type
+template<typename Handle, class Del_noref> struct resolve_handle_type
 {
   using type = Handle;
 };
 
-template<typename Handle, typename Del_noref>
+template<typename Handle, class Del_noref>
   requires has_handle_type<Del_noref>
 struct resolve_handle_type<Handle, Del_noref>
 {
@@ -78,7 +78,7 @@ using is_not_pointer_default_constructable =
 template<typename T>
 concept is_not_pointer_default_constructable_v = is_not_pointer_default_constructable<T>::value;
 
-template<typename D, typename Hr>
+template<class D, typename Hr>
 concept has_static_invalid_convertible_handle = requires {
   { D::invalid() } noexcept -> std::convertible_to<Hr>;
   //{ D::invalid() } noexcept -> std::equality_comparable_with<typename detail::resolve_handle_type<H, D>::type>;
@@ -87,14 +87,14 @@ concept has_static_invalid_convertible_handle = requires {
 };
 
 
-template<typename Handle, typename Deleter> class unique_rc_holder_impl
+template<typename Handle, class Deleter, template<typename, typename> typename TypeResolver> class unique_rc_holder_impl
 {
 public:
   // using _DeleterConstraint = enable_if<
   // __and_<__not_<is_pointer<Deleter>>,
   // 	is_default_constructible<Deleter>>::value>;
 
-  using handle = typename resolve_handle_type<Handle, std::remove_reference_t<Deleter>>::type;
+  using handle = typename TypeResolver<Handle, std::remove_reference_t<Deleter>>::type;
 
   static_assert(!std::is_rvalue_reference_v<Deleter>,
     "unique_rc's deleter type must be a function object type"
@@ -103,7 +103,7 @@ public:
   // cppcheck-suppress passedByValueCallback - handle is not a heavy type, it is okay to pass by value
   raii_inline explicit constexpr unique_rc_holder_impl(handle h) noexcept : hdt_{ h, Deleter{} } {}
 
-  template<typename D> raii_inline constexpr unique_rc_holder_impl(handle h, D &&d) : hdt_{ h, std::forward<D>(d) } {}
+  template<class D> raii_inline constexpr unique_rc_holder_impl(handle h, D &&d) : hdt_{ h, std::forward<D>(d) } {}
 
   raii_inline constexpr unique_rc_holder_impl(unique_rc_holder_impl &&other) noexcept : hdt_{ std::move(other.hdt_) }
   {
@@ -165,39 +165,43 @@ private:
 
 // Defines move construction + assignment as either defaulted or deleted.
 template<typename Handle,
-  typename Deleter,
+  class Deleter,
+  template<typename, typename> class TypeResolver,
   bool = std::is_move_constructible_v<Deleter>,
   bool = std::is_move_assignable_v<Deleter>>
-struct unique_rc_holder : unique_rc_holder_impl<Handle, Deleter>
+struct unique_rc_holder : unique_rc_holder_impl<Handle, Deleter, TypeResolver>
 {
-  using unique_rc_holder_impl<Handle, Deleter>::unique_rc_holder_impl;
+  using unique_rc_holder_impl<Handle, Deleter, TypeResolver>::unique_rc_holder_impl;
 
   unique_rc_holder(unique_rc_holder &&) = default;
   unique_rc_holder &operator=(unique_rc_holder &&) = default;
 };
 
-template<typename Handle, typename Deleter>
-struct unique_rc_holder<Handle, Deleter, true, false> : unique_rc_holder_impl<Handle, Deleter>
+template<typename Handle, class Deleter, template<typename, typename> typename TypeResolver>
+struct unique_rc_holder<Handle, Deleter, TypeResolver, true, false>
+  : unique_rc_holder_impl<Handle, Deleter, TypeResolver>
 {
-  using unique_rc_holder_impl<Handle, Deleter>::unique_rc_holder_impl;
+  using unique_rc_holder_impl<Handle, Deleter, TypeResolver>::unique_rc_holder_impl;
 
   unique_rc_holder(unique_rc_holder &&) = default;
   unique_rc_holder &operator=(unique_rc_holder &&) = delete;
 };
 
-template<typename Handle, typename Deleter>
-struct unique_rc_holder<Handle, Deleter, false, true> : unique_rc_holder_impl<Handle, Deleter>
+template<typename Handle, class Deleter, template<typename, typename> typename TypeResolver>
+struct unique_rc_holder<Handle, Deleter, TypeResolver, false, true>
+  : unique_rc_holder_impl<Handle, Deleter, TypeResolver>
 {
-  using unique_rc_holder_impl<Handle, Deleter>::unique_rc_holder_impl;
+  using unique_rc_holder_impl<Handle, Deleter, TypeResolver>::unique_rc_holder_impl;
 
   unique_rc_holder(unique_rc_holder &&) = delete;
   unique_rc_holder &operator=(unique_rc_holder &&) = default;
 };
 
-template<typename Handle, typename Deleter>
-struct unique_rc_holder<Handle, Deleter, false, false> : unique_rc_holder_impl<Handle, Deleter>
+template<typename Handle, class Deleter, template<typename, typename> typename TypeResolver>
+struct unique_rc_holder<Handle, Deleter, TypeResolver, false, false>
+  : unique_rc_holder_impl<Handle, Deleter, TypeResolver>
 {
-  using unique_rc_holder_impl<Handle, Deleter>::unique_rc_holder_impl;
+  using unique_rc_holder_impl<Handle, Deleter, TypeResolver>::unique_rc_holder_impl;
 
   unique_rc_holder(unique_rc_holder &&) = delete;
   unique_rc_holder &operator=(unique_rc_holder &&) = delete;
@@ -208,7 +212,7 @@ struct unique_rc_holder<Handle, Deleter, false, false> : unique_rc_holder_impl<H
 
 // There is no class template argument deduction from pointer type
 // because it is impossible to distinguish a pointer obtained from array and non - array forms of new.
-template<typename Handle, typename Deleter>
+template<typename Handle, class Deleter, template<typename, typename> typename TypeResolver = resolve_handle_type>
   requires has_static_invalid_convertible_handle<std::remove_reference_t<Deleter>,
     typename resolve_handle_type<std::decay_t<Handle>, std::remove_reference_t<Deleter>>::type>
 class unique_rc
@@ -216,53 +220,52 @@ class unique_rc
   static_assert(!std::is_array_v<Handle>, "unique_rc does not work with array, use raii::unique_ptr");
 
 public:
-  using handle = typename unique_rc_holder_impl<Handle, Deleter>::handle;
+  using handle = typename unique_rc_holder_impl<Handle, Deleter, TypeResolver>::handle;
   using element_type = Handle;
   using deleter_type = Deleter;
   using invalid_handle_type = std::remove_cvref_t<decltype(std::remove_reference_t<Deleter>::invalid())>;
 
 private:
-  // helper template for detecting a safe conversion from another
-  // unique_ptr
-  template<typename H, typename D>
-  using safe_conversion_from =
-    std::conjunction<std::is_convertible<typename unique_rc<H, D>::handle, handle>, std::negation<std::is_array<H>>>;
+  // helper template for detecting a safe conversion from another unique_rc
+  template<typename H, class D, template<typename, typename> class TR>
+  using safe_conversion_from = std::conjunction<std::is_convertible<typename unique_rc<H, D, TR>::handle, handle>,
+    std::negation<std::is_array<H>>>;
 
 public:
   /// Default constructor, creates a unique_rc that owns nothing.
-  // template<typename D = Deleter>
+  // template<class D = Deleter>
   //   requires is_not_pointer_default_constructable_v<Deleter>
   raii_inline constexpr unique_rc() noexcept
     requires is_not_pointer_default_constructable_v<Deleter>
     : uh_{ invalid() }
   {}
 
-  // template<typename D = Deleter>
+  // template<class D = Deleter>
   //   requires is_not_pointer_default_constructable_v<D>
   raii_inline explicit constexpr unique_rc(handle h) noexcept
     requires is_not_pointer_default_constructable_v<Deleter>
     : uh_{ h }
   {}
 
-  // template<typename D = Deleter>
+  // template<class D = Deleter>
   //   requires std::is_copy_constructible_v<D>
   raii_inline constexpr unique_rc(handle h, const Deleter &d) noexcept
     requires std::is_copy_constructible_v<Deleter>
     : uh_{ h, d }
   {}
 
-  // template<typename D = Deleter>
+  // template<class D = Deleter>
   //   requires std::conjunction_v<std::negation<std::is_reference<D>>, std::is_move_constructible<D>>
   raii_inline constexpr unique_rc(handle h, Deleter &&d) noexcept
     requires std::conjunction_v<std::negation<std::is_reference<Deleter>>, std::is_move_constructible<Deleter>>
     : uh_{ h, std::move(d) }
   {}
 
-  template<typename D = Deleter>
+  template<class D = Deleter>
     requires std::conjunction_v<std::is_reference<D>, std::is_constructible<D, std::remove_reference_t<D>>>
   unique_rc(handle, std::remove_reference_t<Deleter> &&) = delete;
 
-  // template<typename D>
+  // template<class D>
   // raii_inline constexpr unique_rc(handle h, D&& d) noexcept requires std::constructible_from<deleter_type, D>
   //	: uh_{ h, std::forward<D>(d) }
   //{}
@@ -270,20 +273,20 @@ public:
   constexpr unique_rc(unique_rc &&) = default;
 
   // Converting constructor from another type
-  template<typename H, typename D>
-    requires std::conjunction_v<safe_conversion_from<H, D>,
+  template<typename H, class D, template<typename, typename> class TR>
+    requires std::conjunction_v<safe_conversion_from<H, D, TR>,
       std::conditional_t<std::is_reference_v<Deleter>, std::is_same<D, Deleter>, std::is_convertible<D, Deleter>>>
   // cppcheck-suppress noExplicitConstructor intended converting constructor
-  raii_inline constexpr unique_rc(unique_rc<H, D> &&src) noexcept
+  raii_inline constexpr unique_rc(unique_rc<H, D, TR> &&src) noexcept
     : uh_{ src.release(), std::forward<D>(src.get_deleter()) }
   {}
 
   constexpr unique_rc &operator=(unique_rc &&) = default;
 
   // Assignment from another type
-  template<typename H, typename D>
-    requires std::conjunction_v<safe_conversion_from<H, D>, std::is_assignable<deleter_type &, D &&>>
-  raii_inline constexpr unique_rc &operator=(unique_rc<H, D> &&rhs) noexcept
+  template<typename H, class D, template<typename, typename> class TR>
+    requires std::conjunction_v<safe_conversion_from<H, D, TR>, std::is_assignable<deleter_type &, D &&>>
+  raii_inline constexpr unique_rc &operator=(unique_rc<H, D, TR> &&rhs) noexcept
   {
     reset(rhs.release());
     get_deleter() = std::forward<D>(rhs.get_deleter());
@@ -331,7 +334,8 @@ public:
     return get_deleter().is_owned(get());
   }
 
-  [[nodiscard]] raii_inline static constexpr invalid_handle_type invalid() noexcept(noexcept(std::remove_reference_t<Deleter>::invalid()))
+  [[nodiscard]] raii_inline static constexpr invalid_handle_type invalid() noexcept(
+    noexcept(std::remove_reference_t<Deleter>::invalid()))
   {
     return std::remove_reference_t<Deleter>::invalid();
   }
@@ -344,59 +348,71 @@ public:
   }
 
 private:
-  unique_rc_holder<Handle, Deleter> uh_;
+  unique_rc_holder<Handle, Deleter, TypeResolver> uh_;
 };
 
-template<typename H1, class D1, typename H2, class D2>
+template<typename H1,
+  class D1,
+  template<typename, typename> class TR1,
+  typename H2,
+  class D2,
+  template<typename, typename> class TR2>
   requires std::equality_comparable_with<H1, H2>
-[[nodiscard]] raii_inline constexpr bool operator==(const unique_rc<H1, D1> &lhs,
-  const unique_rc<H2, D2> &rhs) noexcept(noexcept(lhs.get() == rhs.get()))
+[[nodiscard]] raii_inline constexpr bool operator==(const unique_rc<H1, D1, TR1> &lhs,
+  const unique_rc<H2, D2, TR2> &rhs) noexcept(noexcept(lhs.get() == rhs.get()))
 {
   return lhs.get() == rhs.get();
 }
 
 // unique_ptr comparison with nullptr
-template<typename H, typename D>
-  requires std::same_as<typename unique_rc<H, D>::invalid_handle_type, std::nullptr_t>
-[[nodiscard]] raii_inline constexpr bool operator==(const unique_rc<H, D> &lhs, std::nullptr_t) noexcept
+template<typename H, class D, template<typename, typename> class TR>
+  requires std::same_as<typename unique_rc<H, D, TR>::invalid_handle_type, std::nullptr_t>
+[[nodiscard]] raii_inline constexpr bool operator==(const unique_rc<H, D, TR> &lhs, std::nullptr_t) noexcept
 {
   return !lhs;
 }
 
-template<typename H1, class D1, typename H2, class D2>
-  requires std::three_way_comparable_with<typename unique_rc<H1, D1>::handle, typename unique_rc<H2, D2>::handle>
-[[nodiscard]] raii_inline constexpr std::compare_three_way_result_t<typename unique_rc<H1, D1>::handle,
-  typename unique_rc<H2, D2>::handle>
-  operator<=>(const unique_rc<H1, D1> &lhs, const unique_rc<H2, D2> &rhs) noexcept(noexcept(lhs.get() <=> rhs.get()))
+template<typename H1,
+  class D1,
+  template<typename, typename> class TR1,
+  typename H2,
+  class D2,
+  template<typename, typename> class TR2>
+  requires std::three_way_comparable_with<typename unique_rc<H1, D1, TR1>::handle,
+    typename unique_rc<H2, D2, TR2>::handle>
+[[nodiscard]] raii_inline constexpr std::compare_three_way_result_t<typename unique_rc<H1, D1, TR1>::handle,
+  typename unique_rc<H2, D2, TR2>::handle>
+  operator<=>(const unique_rc<H1, D1, TR1> &lhs, const unique_rc<H2, D2, TR2> &rhs) noexcept(
+    noexcept(lhs.get() <=> rhs.get()))
 {
   return lhs.get() <=> rhs.get();
 }
 
-template<typename H, typename D>
-  requires std::same_as<typename unique_rc<H, D>::invalid_handle_type, std::nullptr_t>
-           && std::three_way_comparable<typename unique_rc<H, D>::handle>
-[[nodiscard]] raii_inline constexpr std::compare_three_way_result_t<typename unique_rc<H, D>::handle>
-  operator<=>(const unique_rc<H, D> &lhs, std::nullptr_t) noexcept(noexcept(lhs.get()))
+template<typename H, class D, template<typename, typename> class TR>
+  requires std::same_as<typename unique_rc<H, D, TR>::invalid_handle_type, std::nullptr_t>
+           && std::three_way_comparable<typename unique_rc<H, D, TR>::handle>
+[[nodiscard]] raii_inline constexpr std::compare_three_way_result_t<typename unique_rc<H, D, TR>::handle>
+  operator<=>(const unique_rc<H, D, TR> &lhs, std::nullptr_t) noexcept(noexcept(lhs.get()))
 {
-  using handle = typename unique_rc<H, D>::handle;
+  using handle = typename unique_rc<H, D, TR>::handle;
   return lhs.get() <=> static_cast<handle>(nullptr);
 }
 
-template<typename H, typename D>
+template<typename H, class D, template<typename, typename> class TR>
   requires std::is_swappable_v<H> && std::is_swappable_v<D>
-raii_inline constexpr void swap(unique_rc<H, D> &lhs, unique_rc<H, D> &rhs) noexcept(
+raii_inline constexpr void swap(unique_rc<H, D, TR> &lhs, unique_rc<H, D, TR> &rhs) noexcept(
   noexcept(std::is_nothrow_swappable_v<H> && std::is_nothrow_swappable_v<D>))
 {
   lhs.swap(rhs);
 }
 
-template<typename H, typename D>
+template<typename H, class D, template<typename, typename> class TR>
   requires(!std::is_swappable_v<H> || !std::is_swappable_v<D>)
-void swap(unique_rc<H, D> &lhs, unique_rc<H, D> &rhs) = delete;
+void swap(unique_rc<H, D, TR> &lhs, unique_rc<H, D, TR> &rhs) = delete;
 
-template<typename CharT, typename Traits, typename H, typename D>
+template<typename CharT, typename Traits, typename H, class D, template<typename, typename> class TR>
 raii_inline constexpr std::basic_ostream<CharT, Traits> &operator<<(std::basic_ostream<CharT, Traits> &ostream,
-  const unique_rc<H, D> &rc) noexcept
+  const unique_rc<H, D, TR> &rc) noexcept
   requires requires { ostream << rc.get(); }
 {
   ostream << rc.get();
@@ -409,9 +425,9 @@ RAII_NS_END
 namespace std {
 
 // std::hash specialization for unique_rc.
-template<typename H, typename D>
-struct hash<raii::unique_rc<H, D>>
-  : public raii::detail::unique_rc_hash_base<raii::unique_rc<H, D>, typename raii::unique_rc<H, D>::handle>
+template<typename H, class D, template<typename, typename> class TR>
+struct hash<raii::unique_rc<H, D, TR>>
+  : public raii::detail::unique_rc_hash_base<raii::unique_rc<H, D, TR>, typename raii::unique_rc<H, D, TR>::handle>
 {
 };
 
