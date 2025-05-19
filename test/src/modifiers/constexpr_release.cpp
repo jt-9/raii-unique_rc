@@ -9,8 +9,7 @@
 
 
 namespace {
-template<typename T>
-[[nodiscard]] constexpr bool unique_ptr_default_single() noexcept
+template<typename T> [[nodiscard]] constexpr bool unique_ptr_default_single() noexcept
 {
   raii::unique_ptr<T> ptr1;
   T *raw_ptr = ptr1.release();
@@ -20,8 +19,7 @@ template<typename T>
   return true;
 }
 
-template<typename T>
-[[nodiscard]] constexpr bool unique_ptr_value_single(T const val) noexcept
+template<typename T> [[nodiscard]] constexpr bool unique_ptr_value_single(T const val) noexcept
 {
   // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new)
   raii::unique_ptr<T> ptr2(new T{ val });
@@ -35,8 +33,7 @@ template<typename T>
   return true;
 }
 
-template<typename T>
-[[nodiscard]] constexpr bool unique_ptr_default_array() noexcept
+template<typename T> [[nodiscard]] constexpr bool unique_ptr_default_array() noexcept
 {
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   raii::unique_ptr<T[]> ptr1;
@@ -70,8 +67,8 @@ template<typename T>
 
 TEST_CASE("constexpr unique_ptr::release", "[unique_ptr][release]")
 {
-  STATIC_REQUIRE(unique_ptr_default_single<int>());
-  STATIC_REQUIRE(unique_ptr_value_single('B'));
-  STATIC_REQUIRE(unique_ptr_default_array<float>());
-  STATIC_REQUIRE(unique_ptr_value_array(7, -3, 11));
+  STATIC_CHECK(unique_ptr_default_single<int>());
+  STATIC_CHECK(unique_ptr_value_single('B'));
+  STATIC_CHECK(unique_ptr_default_array<float>());
+  STATIC_CHECK(unique_ptr_value_array(7, -3, 11));
 }

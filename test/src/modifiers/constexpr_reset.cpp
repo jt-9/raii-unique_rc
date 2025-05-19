@@ -4,13 +4,14 @@
 #include "unique_ptr.hpp"
 // #include "unique_rc.hpp"
 
+#include <array>
 #include <cassert>
 #include <cstddef>
 
 
 namespace {
 
-template<typename T> constexpr bool ConstexprUPtrSingle(T const val1, T const val2) noexcept
+template<typename T> constexpr bool unique_ptr_value_single(T const val1, T const val2) noexcept
 {
   raii::unique_ptr<T> ptr1;
   ptr1.reset();
@@ -67,21 +68,40 @@ constexpr bool unique_ptr_value_array(int const elem1, int const elem2, int cons
   return true;
 }
 
-template<typename T> constexpr bool unique_ptr_default_array(std::size_t size) noexcept
+template<typename T> constexpr bool unique_ptr_default_array(std::size_t array_size) noexcept
 {
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   raii::unique_ptr<const T[]> ptra2;
 
   // cppcheck-suppress leakNoVarFunctionCall false positive
   // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new, cppcoreguidelines-owning-memory)
-  ptra2.reset(new T[size]{});
+  ptra2.reset(new T[array_size]{});
 
-  constexpr auto c_DefaultValue = T{};
+  constexpr auto default_value = T{};
   // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
-  for (std::size_t i = 0; i < size; i++) { assert(c_DefaultValue == ptra2[i]); }
+  for (std::size_t i = 0; i < array_size; i++) { assert(default_value == ptra2[i]); }
 
   ptra2.reset(nullptr);
   assert(!ptra2);
+
+  return true;
+}
+
+template<typename T> constexpr bool unique_ptr_default_array_reset_nullptr(std::size_t array_size) noexcept
+{
+  // NOLINTNEXTLINE
+  raii::unique_ptr<T[]> ptra1{ new T[array_size] };
+  assert(ptra1);
+
+  // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new)
+  ptra1.reset(new T[array_size + 3]);
+  assert(ptra1);
+
+  ptra1.reset(nullptr);
+  assert(!ptra1);
+
+  ptra1.reset();
+  assert(!ptra1);
 
   return true;
 }
@@ -90,7 +110,9 @@ template<typename T> constexpr bool unique_ptr_default_array(std::size_t size) n
 
 TEST_CASE("constexpr unique_ptr::reset", "[unique_ptr][reset]")
 {
-  STATIC_REQUIRE(ConstexprUPtrSingle(4, -2));
-  STATIC_REQUIRE(unique_ptr_value_array('a', 'B', 'C', 'd'));
-  STATIC_REQUIRE(unique_ptr_default_array<int>(7));
+  STATIC_CHECK(unique_ptr_value_single(4, -2));
+  STATIC_CHECK(unique_ptr_value_array('a', 'B', 'C', 'd'));
+  STATIC_CHECK(unique_ptr_default_array<int>(7));
+  STATIC_CHECK(unique_ptr_default_array_reset_nullptr<char>(3));
+  STATIC_CHECK(unique_ptr_default_array_reset_nullptr<std::array<int, 4>>(3));
 }
