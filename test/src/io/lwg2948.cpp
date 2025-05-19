@@ -36,13 +36,9 @@ template<typename> struct deleter
 
   using handle = pointer;
 
-  static constexpr pointer invalid() noexcept {
-    return {};
-  }
+  static constexpr pointer invalid() noexcept { return {}; }
 
-  static constexpr bool is_owned([[maybe_unused]] const pointer& ptr) noexcept {
-    return false;
-  }
+  static constexpr bool is_owned([[maybe_unused]] const pointer &ptr) noexcept { return false; }
 
   void operator()([[maybe_unused]] pointer ptr) const {}
 };
@@ -56,8 +52,7 @@ int operator<<(std::basic_ostream<C, Traits> &ostream, typename deleter<C>::poin
   return 1;// no requirement that this operator returns the stream
 }
 
-template<typename D>
-  using UniquePtr = raii::unique_ptr<typename D::pointer, D>;
+template<typename D> using UniquePtr = raii::unique_ptr<typename D::pointer, D>;
 }// namespace
 
 TEST_CASE("unique_ptr should define operator <<", "[unique_ptr][operator <<]")
@@ -72,8 +67,8 @@ TEST_CASE("unique_ptr should define operator <<", "[unique_ptr][operator <<]")
 
 TEST_CASE("unique_ptr with deleter should define operator <<", "[unique_ptr][operator <<]")
 {
-  STATIC_CHECK( streamable<std::ostream, UniquePtr<deleter<char>>> );
+  STATIC_CHECK(streamable<std::ostream, UniquePtr<deleter<char>>>);
 
   const UniquePtr<deleter<char>> ptr;
-  CHECK( check(ptr) );
+  CHECK(check(ptr));
 }

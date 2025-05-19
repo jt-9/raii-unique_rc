@@ -13,7 +13,7 @@ TEST_CASE("Default initialised unique_ptr<char>", "[unique_ptr]")
   constexpr raii::unique_ptr<char> ptr1{};
 
   CHECK(ptr1.get() == nullptr);
-  REQUIRE_FALSE(ptr1);
+  CHECK_FALSE(ptr1);
 }
 
 TEST_CASE("Move constructor from initialised unique_ptr<char>", "[unique_ptr]")
@@ -61,7 +61,7 @@ TEST_CASE("Release empty initialised unique_ptr<float>", "[unique_ptr]")
   CHECK(default_init.get() == nullptr);
 
   CHECK(default_init.release() == nullptr);
-  REQUIRE_FALSE(default_init);
+  CHECK_FALSE(default_init);
 }
 
 TEST_CASE("Release initialised unique_ptr<float>", "[unique_ptr]")
@@ -76,7 +76,7 @@ TEST_CASE("Release initialised unique_ptr<float>", "[unique_ptr]")
   CHECK(init_from_release);
 
   CHECK(ptr1.get() == nullptr);
-  REQUIRE_FALSE(ptr1);
+  CHECK_FALSE(ptr1);
 }
 
 
@@ -84,13 +84,13 @@ TEST_CASE("Reset empty unique_ptr<float> default", "[unique_ptr]")
 {
   raii::unique_ptr<float> ptr1{};
 
-  REQUIRE_FALSE(ptr1);
+  CHECK_FALSE(ptr1);
   CHECK(ptr1.get() == nullptr);
 
   REQUIRE_NOTHROW(ptr1.reset());
 
   CHECK(ptr1.get() == nullptr);
-  REQUIRE_FALSE(ptr1);
+  CHECK_FALSE(ptr1);
 }
 
 TEST_CASE("Default initialised unique_ptr<char[]>", "[unique_ptr]")
@@ -99,7 +99,7 @@ TEST_CASE("Default initialised unique_ptr<char[]>", "[unique_ptr]")
   constexpr raii::unique_ptr<char[]> ptr1{};
 
   CHECK(ptr1.get() == nullptr);
-  REQUIRE_FALSE(ptr1);
+  CHECK_FALSE(ptr1);
 }
 
 TEST_CASE("Move constructor from initialised unique_ptr<char[]>", "[unique_ptr]")

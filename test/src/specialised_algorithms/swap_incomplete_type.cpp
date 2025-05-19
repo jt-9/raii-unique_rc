@@ -73,8 +73,8 @@ struct DeleterArray : public Deleter
     delete[] ptr;
   }
 
-   // found by ADL
-   friend void swap(DeleterArray &lhs, DeleterArray &rhs) noexcept { std::ranges::swap(lhs.id, rhs.id); }
+  // found by ADL
+  friend void swap(DeleterArray &lhs, DeleterArray &rhs) noexcept { std::ranges::swap(lhs.id, rhs.id); }
 };
 
 }// namespace

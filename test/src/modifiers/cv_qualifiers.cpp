@@ -44,7 +44,7 @@ TEST_CASE("unique_ptr base class with const, volatile qualifiers, single object 
 
     // Allow conversions from user-defined pointer-like types for the single-object version
     c_ptr_a.reset(like_ptr);
-    REQUIRE_FALSE(c_ptr_a);
+    CHECK_FALSE(c_ptr_a);
   }
 
   {
@@ -55,7 +55,7 @@ TEST_CASE("unique_ptr base class with const, volatile qualifiers, single object 
 
     // Allow conversions from user-defined pointer-like types for the single-object version
     v_ptr_a.reset(like_ptr);
-    REQUIRE_FALSE(v_ptr_a);
+    CHECK_FALSE(v_ptr_a);
   }
 
   {
@@ -66,7 +66,7 @@ TEST_CASE("unique_ptr base class with const, volatile qualifiers, single object 
 
     // Allow conversions from user-defined pointer-like types for the single-object version
     cv_ptr_a.reset(like_ptr);
-    REQUIRE_FALSE(cv_ptr_a);
+    CHECK_FALSE(cv_ptr_a);
   }
 }
 
@@ -109,8 +109,8 @@ TEST_CASE("unique_ptr base class with const, volatile qualifiers, array objects 
 
     // Allow conversions from user-defined pointer-like types for the array version when the type is converted
     // explicitly
-    c_ptr_a.reset(static_cast<A*>(like_ptr));
-    REQUIRE_FALSE(c_ptr_a);
+    c_ptr_a.reset(static_cast<A *>(like_ptr));
+    CHECK_FALSE(c_ptr_a);
   }
 
   {
@@ -122,8 +122,8 @@ TEST_CASE("unique_ptr base class with const, volatile qualifiers, array objects 
 
     // Allow conversions from user-defined pointer-like types for the array version when the type is converted
     // explicitly
-    v_ptr_a.reset(static_cast<A*>(like_ptr));
-    REQUIRE_FALSE(v_ptr_a);
+    v_ptr_a.reset(static_cast<A *>(like_ptr));
+    CHECK_FALSE(v_ptr_a);
   }
 
   {
@@ -135,7 +135,7 @@ TEST_CASE("unique_ptr base class with const, volatile qualifiers, array objects 
 
     // Allow conversions from user-defined pointer-like types for the array version when the type is converted
     // explicitly
-    cv_ptr_a.reset(static_cast<A*>(like_ptr));
-    REQUIRE_FALSE(cv_ptr_a);
+    cv_ptr_a.reset(static_cast<A *>(like_ptr));
+    CHECK_FALSE(cv_ptr_a);
   }
 }

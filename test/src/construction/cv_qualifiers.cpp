@@ -127,41 +127,41 @@ TEST_CASE("unique_ptr base class with const, volatile, array objects initialised
 
   {
     const raii::unique_ptr<A> ptr_a{ like_ptr };
-    REQUIRE_FALSE(ptr_a);
+    CHECK_FALSE(ptr_a);
 
     // Allow conversions from user-defined pointer-like types for the array version when the type is converted
     // explicitly
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
     const raii::unique_ptr<A[]> ptr_aa{ static_cast<A *>(like_ptr) };
-    REQUIRE_FALSE(ptr_aa);
+    CHECK_FALSE(ptr_aa);
   }
 
   {
     const raii::unique_ptr<const A> c_ptr_a{ like_ptr };
-    REQUIRE_FALSE(c_ptr_a);
+    CHECK_FALSE(c_ptr_a);
 
     // Allow conversions from user-defined pointer-like types for the array version when the type is converted
     // explicitly
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
     const raii::unique_ptr<const A[]> c_ptr_aa{ static_cast<A *>(like_ptr) };
-    REQUIRE_FALSE(c_ptr_aa);
+    CHECK_FALSE(c_ptr_aa);
   }
 
   {
     const raii::unique_ptr<const A> v_ptr_a{ like_ptr };
-    REQUIRE_FALSE(v_ptr_a);
+    CHECK_FALSE(v_ptr_a);
     
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
     const raii::unique_ptr<volatile A[]> v_ptr_aa{static_cast<A *>(like_ptr)};
-    REQUIRE_FALSE(v_ptr_aa);
+    CHECK_FALSE(v_ptr_aa);
   }
 
   {
     const raii::unique_ptr<const volatile A> cv_ptr_a{ like_ptr };
-    REQUIRE_FALSE(cv_ptr_a);
+    CHECK_FALSE(cv_ptr_a);
     
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
     const raii::unique_ptr<const volatile A[]> cv_ptr_aa{static_cast<A *>(like_ptr)};
-    REQUIRE_FALSE(cv_ptr_aa);
+    CHECK_FALSE(cv_ptr_aa);
   }
 }

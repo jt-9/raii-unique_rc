@@ -79,13 +79,13 @@ TEST_CASE("Swap single value constructed unique_ptr", "[unique_ptr][swap]")
   raii::unique_ptr<int> ptr1;
 
   swap(ptr1, ptr1);
-  REQUIRE_FALSE(ptr1);
+  CHECK_FALSE(ptr1);
 
   raii::unique_ptr<int> ptr2;
 
   swap(ptr1, ptr2);
-  REQUIRE_FALSE(ptr1);
-  REQUIRE_FALSE(ptr2);
+  CHECK_FALSE(ptr1);
+  CHECK_FALSE(ptr2);
 
   raii::unique_ptr<int> ptr3{ new int{ 3 } };
 
@@ -113,8 +113,8 @@ TEST_CASE("Swap array constructed unique_ptr", "[unique_ptr][std::ranges::swap][
   raii::unique_ptr<int[]> ptr_a1, ptr_a2;
 
   swap(ptr_a1, ptr_a2);
-  REQUIRE_FALSE(ptr_a1);
-  REQUIRE_FALSE(ptr_a2);
+  CHECK_FALSE(ptr_a1);
+  CHECK_FALSE(ptr_a2);
 
   // NOLINTNEXTLINE
   raii::unique_ptr<int[]> ptr_a3{ new int[]{ 3 } };

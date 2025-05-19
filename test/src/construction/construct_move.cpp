@@ -4,13 +4,13 @@
 #include "unique_rc.hpp"
 
 #include <cassert>
-#include <utility>
 #include <string>
+#include <utility>
 
 namespace {
 template<typename T>
   requires(!std::is_pointer_v<T>)
-constexpr bool ConstexprURcSingle(const T& kInitValue) noexcept
+constexpr bool ConstexprURcSingle(const T &kInitValue) noexcept
 {
   // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new)
   raii::unique_rc<T *, raii::memory_delete<T *>> urc1{ new T{ kInitValue } };
@@ -32,5 +32,5 @@ TEST_CASE("Move constructor from initialised unique_rc<char*, memory_delete<char
   "[unique_rc][unique_rc::unique_rc]")
 {
   STATIC_CHECK(ConstexprURcSingle('Q'));
-  STATIC_CHECK(ConstexprURcSingle(std::string{"constexpr urc"}));
+  STATIC_CHECK(ConstexprURcSingle(std::string{ "constexpr urc" }));
 }
