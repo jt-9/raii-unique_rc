@@ -27,9 +27,9 @@ TEST_CASE("Single object unique_ptr::pointer type deduction", "[unique_ptr][uniq
   using upAr = raii::unique_ptr<int, raii::deleter_class_wrapper<A> &>;
   using upBr = raii::unique_ptr<int, raii::deleter_class_wrapper<B> &>;
 
-  STATIC_REQUIRE(std::is_same_v<up::pointer, int *>);
-  STATIC_REQUIRE(std::is_same_v<upA::pointer, int *>);
-  STATIC_REQUIRE(std::is_same_v<upB::pointer, char *>);
-  STATIC_REQUIRE(std::is_same_v<upAr::pointer, int *>);
-  STATIC_REQUIRE(std::is_same_v<upBr::pointer, char *>);
+  STATIC_CHECK(std::is_same_v<up::pointer, int *>);
+  STATIC_CHECK(std::is_same_v<upA::pointer, int *>);
+  STATIC_CHECK(std::is_same_v<upB::pointer, char *>);
+  STATIC_CHECK(std::is_same_v<upAr::pointer, int *>);
+  STATIC_CHECK(std::is_same_v<upBr::pointer, char *>);
 }

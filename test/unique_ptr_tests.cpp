@@ -12,7 +12,7 @@ TEST_CASE("Default initialised unique_ptr<char>", "[unique_ptr]")
 {
   constexpr raii::unique_ptr<char> ptr1{};
 
-  REQUIRE(ptr1.get() == nullptr);
+  CHECK(ptr1.get() == nullptr);
   REQUIRE_FALSE(ptr1);
 }
 
@@ -26,9 +26,9 @@ TEST_CASE("Move constructor from initialised unique_ptr<char>", "[unique_ptr]")
 
   decltype(ptr1) ptr2{ std::move(ptr1) };
 
-  REQUIRE(ptr2);
-  REQUIRE(ptr2.get() != nullptr);
-  REQUIRE(*ptr2.get() == kChar);
+  CHECK(ptr2);
+  CHECK(ptr2.get() != nullptr);
+  CHECK(*ptr2.get() == kChar);
 }
 
 TEST_CASE("Indirection operator* to get/set value unique_ptr<float>", "[unique_ptr]")
@@ -36,20 +36,20 @@ TEST_CASE("Indirection operator* to get/set value unique_ptr<float>", "[unique_p
   constexpr auto test_number = 28.0F;
   raii::unique_ptr<float> ptr1{ new float{ test_number } };
 
-  REQUIRE(ptr1.get() != nullptr);
+  CHECK(ptr1.get() != nullptr);
 
   SECTION("Read stored value")
   {
-    REQUIRE(*ptr1 == test_number);
-    REQUIRE(*ptr1 == *ptr1.get());
+    CHECK(*ptr1 == test_number);
+    CHECK(*ptr1 == *ptr1.get());
   }
 
   SECTION("Write new value")
   {
     constexpr auto new_number = 8128.0F;
     REQUIRE_NOTHROW(*ptr1 = new_number);
-    REQUIRE(*ptr1 == new_number);
-    REQUIRE(*ptr1 == *ptr1.get());
+    CHECK(*ptr1 == new_number);
+    CHECK(*ptr1 == *ptr1.get());
   }
 }
 
@@ -60,7 +60,7 @@ TEST_CASE("Release empty initialised unique_ptr<float>", "[unique_ptr]")
   CHECK_FALSE(default_init);
   CHECK(default_init.get() == nullptr);
 
-  REQUIRE(default_init.release() == nullptr);
+  CHECK(default_init.release() == nullptr);
   REQUIRE_FALSE(default_init);
 }
 
@@ -73,9 +73,9 @@ TEST_CASE("Release initialised unique_ptr<float>", "[unique_ptr]")
   CHECK(ptr1.get() != nullptr);
 
   decltype(ptr1) init_from_release{ ptr1.release() };
-  REQUIRE(init_from_release);
+  CHECK(init_from_release);
 
-  REQUIRE(ptr1.get() == nullptr);
+  CHECK(ptr1.get() == nullptr);
   REQUIRE_FALSE(ptr1);
 }
 
@@ -85,11 +85,11 @@ TEST_CASE("Reset empty unique_ptr<float> default", "[unique_ptr]")
   raii::unique_ptr<float> ptr1{};
 
   REQUIRE_FALSE(ptr1);
-  REQUIRE(ptr1.get() == nullptr);
+  CHECK(ptr1.get() == nullptr);
 
   REQUIRE_NOTHROW(ptr1.reset());
 
-  REQUIRE(ptr1.get() == nullptr);
+  CHECK(ptr1.get() == nullptr);
   REQUIRE_FALSE(ptr1);
 }
 
@@ -98,7 +98,7 @@ TEST_CASE("Default initialised unique_ptr<char[]>", "[unique_ptr]")
   // NOLINTNEXTLINE cppcoreguidelines-avoid-c-arrays and similar
   constexpr raii::unique_ptr<char[]> ptr1{};
 
-  REQUIRE(ptr1.get() == nullptr);
+  CHECK(ptr1.get() == nullptr);
   REQUIRE_FALSE(ptr1);
 }
 
@@ -117,10 +117,10 @@ TEST_CASE("Move constructor from initialised unique_ptr<char[]>", "[unique_ptr]"
 
   decltype(ptr1) ptr2{ std::move(ptr1) };
 
-  REQUIRE(ptr2);
-  REQUIRE(ptr2.get() != nullptr);
+  CHECK(ptr2);
+  CHECK(ptr2.get() != nullptr);
 
-  REQUIRE(std::equal(std::cbegin(input), std::cend(input), ptr2.get()));
+  CHECK(std::equal(std::cbegin(input), std::cend(input), ptr2.get()));
 }
 
 TEST_CASE("Array subscript operator unique_ptr<int[]>", "[unique_ptr]")
@@ -137,5 +137,5 @@ TEST_CASE("Array subscript operator unique_ptr<int[]>", "[unique_ptr]")
   // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
   for (std::size_t i = 0; i < input.size(); i++) { ptr1[i] = input[i]; }
 
-  REQUIRE(std::equal(std::cbegin(input), std::cend(input), ptr1.get()));
+  CHECK(std::equal(std::cbegin(input), std::cend(input), ptr1.get()));
 }

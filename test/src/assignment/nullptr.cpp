@@ -15,7 +15,7 @@ TEST_CASE("Move assign nullptr to single object unique_ptr", "[unique_ptr][opera
   raii::unique_ptr<A> ptr_a(new A);
   CHECK(ptr_a.get() != nullptr);
   ptr_a = nullptr;
-  REQUIRE(ptr_a.get() == nullptr);
+  CHECK(ptr_a.get() == nullptr);
 }
 
 TEST_CASE("Move assign nullptr to array objects unique_ptr", "[unique_ptr][operator=]")
@@ -24,5 +24,5 @@ TEST_CASE("Move assign nullptr to array objects unique_ptr", "[unique_ptr][opera
   raii::unique_ptr<A[]> ptr_aa(new A[2]);
   CHECK(ptr_aa.get() != nullptr);
   ptr_aa = nullptr;
-  REQUIRE(ptr_aa.get() == nullptr);
+  CHECK(ptr_aa.get() == nullptr);
 }

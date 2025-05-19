@@ -31,8 +31,8 @@ TEST_CASE("Member swap value initialised unique_rc<int*, memory_delete<int*>>", 
     CHECK(rc1);
     CHECK(rc2);
 
-    REQUIRE(ptr2 == rc1.get());
-    REQUIRE(ptr1 == rc2.get());
+    CHECK(ptr2 == rc1.get());
+    CHECK(ptr1 == rc2.get());
   }
 
   SECTION("unique_rc::swap with default constructed unique_rc")
@@ -46,8 +46,8 @@ TEST_CASE("Member swap value initialised unique_rc<int*, memory_delete<int*>>", 
 
     rc1.swap(default_init_rc);
 
-    REQUIRE(ptr2 == rc1.get());
-    REQUIRE(ptr1 == default_init_rc.get());
+    CHECK(ptr2 == rc1.get());
+    CHECK(ptr1 == default_init_rc.get());
   }
 }
 
@@ -67,9 +67,9 @@ TEST_CASE("Swap unique_ptr with other unique_ptr", "[unique_ptr][std::swap][swap
 
   std::swap(p3, p2);
 
-  REQUIRE(p1 != p3);
-  REQUIRE(p2 != p3);
-  REQUIRE(p1 == p2);
+  CHECK(p1 != p3);
+  CHECK(p2 != p3);
+  CHECK(p1 == p2);
 }
 
 TEST_CASE("Swap single value constructed unique_ptr", "[unique_ptr][swap]")
@@ -90,17 +90,17 @@ TEST_CASE("Swap single value constructed unique_ptr", "[unique_ptr][swap]")
   raii::unique_ptr<int> ptr3{ new int{ 3 } };
 
   std::ranges::swap(ptr3, ptr3);
-  REQUIRE(*ptr3 == 3);
+  CHECK(*ptr3 == 3);
 
   std::ranges::swap(ptr1, ptr3);
-  REQUIRE(*ptr1 == 3);
+  CHECK(*ptr1 == 3);
 
   // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
   raii::unique_ptr<int> ptr4{ new int{ 4 } };
 
   std::ranges::swap(ptr4, ptr1);
-  REQUIRE(*ptr4 == 3);
-  REQUIRE(*ptr1 == 4);
+  CHECK(*ptr4 == 3);
+  CHECK(*ptr1 == 4);
 
   // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
 }
@@ -120,13 +120,13 @@ TEST_CASE("Swap array constructed unique_ptr", "[unique_ptr][std::ranges::swap][
   raii::unique_ptr<int[]> ptr_a3{ new int[]{ 3 } };
 
   std::ranges::swap(ptr_a1, ptr_a3);
-  REQUIRE(ptr_a1[0] == 3);
+  CHECK(ptr_a1[0] == 3);
 
   // NOLINTNEXTLINE
   raii::unique_ptr<int[]> ptr_a4{ new int[]{ 4, 5 } };
 
   std::ranges::swap(ptr_a1, ptr_a4);
-  REQUIRE(ptr_a1[1] == 5);
+  CHECK(ptr_a1[1] == 5);
 
   // False positive resources are released in raii::unique_ptr destructor
   // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
@@ -144,7 +144,7 @@ TEST_CASE("Swap value initialised unique_ptr", "[unique_ptr][unique_ptr::swap][s
     const auto test_number2 = -36;
     using element_type = decltype(ptr1)::element_type;
     raii::unique_ptr<element_type, decltype(ptr1)::deleter_type> ptr2{ new int{ test_number2 } };
-    REQUIRE(ptr2);
+    CHECK(ptr2);
 
     auto *const raw_ptr1 = ptr1.get();
     auto *const raw_ptr2 = ptr2.get();
@@ -154,8 +154,8 @@ TEST_CASE("Swap value initialised unique_ptr", "[unique_ptr][unique_ptr::swap][s
     CHECK(ptr1);
     CHECK(ptr2);
 
-    REQUIRE(raw_ptr2 == ptr1.get());
-    REQUIRE(raw_ptr1 == ptr2.get());
+    CHECK(raw_ptr2 == ptr1.get());
+    CHECK(raw_ptr1 == ptr2.get());
   }
 
   SECTION("unique_ptr::swap with default constructed unique_ptr")
@@ -169,7 +169,7 @@ TEST_CASE("Swap value initialised unique_ptr", "[unique_ptr][unique_ptr::swap][s
 
     ptr1.swap(ptr2);
 
-    REQUIRE(raw_ptr2 == ptr1.get());
-    REQUIRE(raw_ptr1 == ptr2.get());
+    CHECK(raw_ptr2 == ptr1.get());
+    CHECK(raw_ptr1 == ptr2.get());
   }
 }

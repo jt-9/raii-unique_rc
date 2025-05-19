@@ -50,10 +50,10 @@ TEST_CASE("is_constructible unique_ptr of array of base objects from unique_ptr 
   "[unique_ptr][unique_ptr::unique_ptr][std::is_constructible_v]")
 {
   // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
-  STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<Base[],
+  STATIC_CHECK_FALSE(unique_ptr_is_constructible<Base[],
     raii::deleter_class_wrapper<DelArray>,
     raii::unique_ptr<Derived[], raii::deleter_class_wrapper<DelArray>> &&>());
-  STATIC_REQUIRE_FALSE(unique_ptr_is_assignable<Base[],
+  STATIC_CHECK_FALSE(unique_ptr_is_assignable<Base[],
     raii::deleter_class_wrapper<DelArray>,
     raii::unique_ptr<Derived[], raii::deleter_class_wrapper<DelArray>> &&>());
   // NOLINTEND(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
@@ -64,8 +64,8 @@ TEST_CASE("is_constructible unique_ptr of array of base objects from unique_ptr 
   "[unique_ptr][unique_ptr::unique_ptr][std::is_constructible_v]")
 {
   // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
-  STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<Base[], raii::default_delete<Base[]>, raii::unique_ptr<Base> &&>());
-  STATIC_REQUIRE_FALSE(unique_ptr_is_assignable<Base[], raii::default_delete<Base[]>, raii::unique_ptr<Base> &&>());
+  STATIC_CHECK_FALSE(unique_ptr_is_constructible<Base[], raii::default_delete<Base[]>, raii::unique_ptr<Base> &&>());
+  STATIC_CHECK_FALSE(unique_ptr_is_assignable<Base[], raii::default_delete<Base[]>, raii::unique_ptr<Base> &&>());
   // NOLINTEND(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 }
 
@@ -74,7 +74,7 @@ TEST_CASE("is_constructible unique_ptr of single base object from unique_ptr of 
   "[unique_ptr][unique_ptr::unique_ptr][std::is_constructible_v]")
 {
   // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
-  STATIC_REQUIRE_FALSE(unique_ptr_is_constructible<Base, raii::default_delete<Base>, raii::unique_ptr<Base[]> &&>());
-  STATIC_REQUIRE_FALSE(unique_ptr_is_assignable<Base, raii::default_delete<Base>, raii::unique_ptr<Base[]> &&>());
+  STATIC_CHECK_FALSE(unique_ptr_is_constructible<Base, raii::default_delete<Base>, raii::unique_ptr<Base[]> &&>());
+  STATIC_CHECK_FALSE(unique_ptr_is_assignable<Base, raii::default_delete<Base>, raii::unique_ptr<Base[]> &&>());
   // NOLINTEND(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 }

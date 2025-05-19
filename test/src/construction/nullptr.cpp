@@ -17,11 +17,11 @@ TEST_CASE("constexpr default initialised unique_rc single object A*", "[unique_r
 
   constexpr URc urc{};
 
-  STATIC_REQUIRE(urc.get() == nullptr);
-  STATIC_REQUIRE_FALSE(urc);
-  STATIC_REQUIRE(urc == nullptr);
+  STATIC_CHECK(urc.get() == nullptr);
+  STATIC_CHECK_FALSE(urc);
+  STATIC_CHECK(urc == nullptr);
 
-  STATIC_REQUIRE(decltype(urc)::invalid() == nullptr);
+  STATIC_CHECK(decltype(urc)::invalid() == nullptr);
 }
 
 TEST_CASE("constexpr default initialised unique_ptr single object", "[unique_ptr][unique_ptr::unique_ptr]")
@@ -30,11 +30,11 @@ TEST_CASE("constexpr default initialised unique_ptr single object", "[unique_ptr
 
   constexpr UPtr uptr{};
 
-  STATIC_REQUIRE(uptr.get() == nullptr);
-  STATIC_REQUIRE_FALSE(uptr);
-  STATIC_REQUIRE(uptr == nullptr);
+  STATIC_CHECK(uptr.get() == nullptr);
+  STATIC_CHECK_FALSE(uptr);
+  STATIC_CHECK(uptr == nullptr);
 
-  STATIC_REQUIRE(decltype(uptr)::invalid() == nullptr);
+  STATIC_CHECK(decltype(uptr)::invalid() == nullptr);
 }
 
 TEST_CASE("constexpr default initialised unique_ptr array of objects", "[unique_ptr][unique_ptr::unique_ptr]")
@@ -44,9 +44,9 @@ TEST_CASE("constexpr default initialised unique_ptr array of objects", "[unique_
 
   constexpr UPtr uptr{};
 
-  STATIC_REQUIRE(uptr.get() == nullptr);
-  STATIC_REQUIRE_FALSE(uptr);
-  STATIC_REQUIRE(uptr == nullptr);
+  STATIC_CHECK(uptr.get() == nullptr);
+  STATIC_CHECK_FALSE(uptr);
+  STATIC_CHECK(uptr == nullptr);
 
-  STATIC_REQUIRE(decltype(uptr)::invalid() == nullptr);
+  STATIC_CHECK(decltype(uptr)::invalid() == nullptr);
 }

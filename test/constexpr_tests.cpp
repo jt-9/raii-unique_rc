@@ -17,12 +17,12 @@ TEST_CASE("Equality of default initialised unique_rc<int*, memory_delete<int*>>"
   {
     STATIC_CHECK_FALSE(int_rc1);
     STATIC_CHECK_FALSE(int_rc2);
-    STATIC_REQUIRE(int_rc1 == int_rc2);
+    STATIC_CHECK(int_rc1 == int_rc2);
   }
 
-  SECTION("unique_rc::operator ==(unique_rc, std::nullptr_t)") { STATIC_REQUIRE(int_rc1 == nullptr); }
+  SECTION("unique_rc::operator ==(unique_rc, std::nullptr_t)") { STATIC_CHECK(int_rc1 == nullptr); }
 
-  SECTION("unique_rc::operator ==(std::nullptr_t, unique_rc)") { STATIC_REQUIRE(nullptr == int_rc2); }
+  SECTION("unique_rc::operator ==(std::nullptr_t, unique_rc)") { STATIC_CHECK(nullptr == int_rc2); }
 }
 
 TEST_CASE("Three-way comparison of default initialised unique_rc<int*, memory_delete<int*>>",
@@ -35,17 +35,17 @@ TEST_CASE("Three-way comparison of default initialised unique_rc<int*, memory_de
   {
     STATIC_CHECK_FALSE(int_rc1);
     STATIC_CHECK_FALSE(int_rc2);
-    STATIC_REQUIRE((int_rc1 <=> int_rc2) == std::strong_ordering::equal);
+    STATIC_CHECK((int_rc1 <=> int_rc2) == std::strong_ordering::equal);
   }
 
   SECTION("unique_rc::operator <=>(unique_rc, std::nullptr_t)")
   {
-    STATIC_REQUIRE((int_rc1 <=> nullptr) == std::strong_ordering::equal);
+    STATIC_CHECK((int_rc1 <=> nullptr) == std::strong_ordering::equal);
   }
 
   SECTION("unique_rc::operator <=>(std::nullptr_t, unique_rc)")
   {
-    STATIC_REQUIRE((nullptr <=> int_rc2) == std::strong_ordering::equal);
+    STATIC_CHECK((nullptr <=> int_rc2) == std::strong_ordering::equal);
   }
 }
 
@@ -59,8 +59,8 @@ TEST_CASE("Pointer initialised unique_rc<const char*, memory_mock_delete<const c
   constexpr raii::unique_rc<const char *, mock_raii::mock_pointer_no_op<const char *>> char_rc{ str.data() };
   // NOLINTEND(bugprone-suspicious-stringview-data-usage)
 
-  STATIC_REQUIRE(char_rc.get() != nullptr);
-  STATIC_REQUIRE(char_rc.get() == str.data());
+  STATIC_CHECK(char_rc.get() != nullptr);
+  STATIC_CHECK(char_rc.get() == str.data());
 }
 
 TEST_CASE("Equality of initialised unique_rc<const char*, memory_mock_delete<const char*>>", "[unique_rc::operator ==]")
@@ -78,12 +78,12 @@ TEST_CASE("Equality of initialised unique_rc<const char*, memory_mock_delete<con
   {
     STATIC_CHECK(char_rc1);
     STATIC_CHECK(char_rc2);
-    STATIC_REQUIRE(char_rc1 != char_rc2);
+    STATIC_CHECK(char_rc1 != char_rc2);
   }
 
-  SECTION("unique_rc::operator ==(unique_rc, std::nullptr_t)") { STATIC_REQUIRE(char_rc1 != nullptr); }
+  SECTION("unique_rc::operator ==(unique_rc, std::nullptr_t)") { STATIC_CHECK(char_rc1 != nullptr); }
 
-  SECTION("unique_rc::operator ==(std::nullptr_t, unique_rc)") { STATIC_REQUIRE(nullptr != char_rc2); }
+  SECTION("unique_rc::operator ==(std::nullptr_t, unique_rc)") { STATIC_CHECK(nullptr != char_rc2); }
 }
 
 TEST_CASE("Three-way comparison of initialised unique_rc<const char*, memory_mock_delete<const char*>>",
@@ -101,7 +101,7 @@ TEST_CASE("Three-way comparison of initialised unique_rc<const char*, memory_moc
 
   STATIC_CHECK(char_rc1);
   STATIC_CHECK(char_rc2);
-  STATIC_REQUIRE((char_rc1 <=> char_rc2) == std::strong_ordering::less);
-  STATIC_REQUIRE((char_rc2 <=> char_rc1) == std::strong_ordering::greater);
-  STATIC_REQUIRE((char_rc1 <=> copy_rc1) == std::strong_ordering::equal);
+  STATIC_CHECK((char_rc1 <=> char_rc2) == std::strong_ordering::less);
+  STATIC_CHECK((char_rc2 <=> char_rc1) == std::strong_ordering::greater);
+  STATIC_CHECK((char_rc1 <=> copy_rc1) == std::strong_ordering::equal);
 }

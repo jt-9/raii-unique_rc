@@ -93,10 +93,10 @@ TEST_CASE("unique_ptr<int> is swappable with non move-assignable deleter", "[uni
   // This type must swappable even though the deleter is not move-assignable:
   std::ranges::swap(ptr1, ptr2);
 
-  REQUIRE(ptr1.get() == pi2);
-  REQUIRE(ptr1.get_deleter().id == -2);
-  REQUIRE(ptr2.get() == pi1);
-  REQUIRE(ptr2.get_deleter().id == -1);
+  CHECK(ptr1.get() == pi2);
+  CHECK(ptr1.get_deleter().id == -2);
+  CHECK(ptr2.get() == pi1);
+  CHECK(ptr2.get_deleter().id == -1);
 }
 
 TEST_CASE("unique_ptr<int[]> is swappable with non move-assignable deleter", "[unique_ptr][unique_ptr::swap][swap]")
@@ -114,8 +114,8 @@ TEST_CASE("unique_ptr<int[]> is swappable with non move-assignable deleter", "[u
   // This type must swappable even though the deleter is not move-assignable:
   std::ranges::swap(ptr1, ptr2);
 
-  REQUIRE(ptr1.get() == pi2);
-  REQUIRE(ptr1.get_deleter().id == -2);
-  REQUIRE(ptr2.get() == pi1);
-  REQUIRE(ptr2.get_deleter().id == -1);
+  CHECK(ptr1.get() == pi2);
+  CHECK(ptr1.get_deleter().id == -2);
+  CHECK(ptr2.get() == pi1);
+  CHECK(ptr2.get_deleter().id == -1);
 }

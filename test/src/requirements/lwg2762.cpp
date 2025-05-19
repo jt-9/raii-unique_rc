@@ -45,13 +45,13 @@ TEST_CASE("LWG 2762 unique_ptr operator*() should be noexcept", "[unique_ptr::op
   STATIC_CHECK_FALSE(noexcept(*std::declval<UPtr<int, false> &>()));
 
   // This has always been required, even in C++11.
-  STATIC_REQUIRE(noexcept(std::declval<raii::unique_ptr<long>>().operator->()));
-  STATIC_REQUIRE(noexcept(std::declval<UPtr<int, false> &>().operator->()));
+  STATIC_CHECK(noexcept(std::declval<raii::unique_ptr<long>>().operator->()));
+  STATIC_CHECK(noexcept(std::declval<UPtr<int, false> &>().operator->()));
 }
 
 TEST_CASE("LWG 2762 unique_rc operator->() should be noexcept", "[unique_rc::operator ->]")
 {
-  STATIC_REQUIRE(noexcept(std::declval<raii::unique_rc<long *, raii::default_delete<long>>>().operator->()));
-  STATIC_REQUIRE(
+  STATIC_CHECK(noexcept(std::declval<raii::unique_rc<long *, raii::default_delete<long>>>().operator->()));
+  STATIC_CHECK(
     noexcept(std::declval<raii::unique_rc<int *, raii::deleter_class_wrapper<TestDeleter<false>>> &>().operator->()));
 }
