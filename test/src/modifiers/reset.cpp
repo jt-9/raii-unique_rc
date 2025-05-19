@@ -20,7 +20,7 @@ struct A
 {
   B *b = nullptr;
 
-  ~A() { REQUIRE(b->a != nullptr); }
+  ~A() { CHECK(b->a != nullptr); }
 };
 
 struct C;
@@ -36,7 +36,7 @@ struct C
 {
   D *d = nullptr;
 
-  ~C() { REQUIRE(d->c != nullptr); }
+  ~C() { CHECK(d->c != nullptr); }
 };
 
 }// namespace

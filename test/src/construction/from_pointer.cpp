@@ -55,25 +55,25 @@ TEST_CASE("unique_ptr of single object constructed via new", "[unique_ptr][uniqu
   reset_counters<B>();
 
   constexpr raii::unique_ptr<A> A_default;
-  REQUIRE(A_default.get() == 0);
-  REQUIRE(A::ctor_count == 0);
-  REQUIRE(A::dtor_count == 0);
-  REQUIRE(B::ctor_count == 0);
-  REQUIRE(B::dtor_count == 0);
+  CHECK(A_default.get() == 0);
+  CHECK(A::ctor_count == 0);
+  CHECK(A::dtor_count == 0);
+  CHECK(B::ctor_count == 0);
+  CHECK(B::dtor_count == 0);
 
   const raii::unique_ptr<A> A_from_A{ new A };
-  REQUIRE(A_from_A.get() != 0);
-  REQUIRE(A::ctor_count == 1);
-  REQUIRE(A::dtor_count == 0);
-  REQUIRE(B::ctor_count == 0);
-  REQUIRE(B::dtor_count == 0);
+  CHECK(A_from_A.get() != 0);
+  CHECK(A::ctor_count == 1);
+  CHECK(A::dtor_count == 0);
+  CHECK(B::ctor_count == 0);
+  CHECK(B::dtor_count == 0);
 
   const raii::unique_ptr<A> A_from_B{ new B };
-  REQUIRE(A_from_B.get() != 0);
-  REQUIRE(A::ctor_count == 2);
-  REQUIRE(A::dtor_count == 0);
-  REQUIRE(B::ctor_count == 1);
-  REQUIRE(B::dtor_count == 0);
+  CHECK(A_from_B.get() != 0);
+  CHECK(A::ctor_count == 2);
+  CHECK(A::dtor_count == 0);
+  CHECK(B::ctor_count == 1);
+  CHECK(B::dtor_count == 0);
 }
 
 TEST_CASE("unique_ptr of single object constructed from raw pointer", "[unique_ptr][unique_ptr::unique_ptr]")
@@ -83,18 +83,18 @@ TEST_CASE("unique_ptr of single object constructed from raw pointer", "[unique_p
 
   A *const A_default = nullptr;
   const raii::unique_ptr<A> ptr1{ A_default };
-  REQUIRE(ptr1.get() == nullptr);
-  REQUIRE(A::ctor_count == 0);
-  REQUIRE(A::dtor_count == 0);
-  REQUIRE(B::ctor_count == 0);
-  REQUIRE(B::dtor_count == 0);
+  CHECK(ptr1.get() == nullptr);
+  CHECK(A::ctor_count == 0);
+  CHECK(A::dtor_count == 0);
+  CHECK(B::ctor_count == 0);
+  CHECK(B::dtor_count == 0);
 
   // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
   A *const A_from_A = new A;
   const raii::unique_ptr<A> ptr2{ A_from_A };
-  REQUIRE(ptr2.get() == A_from_A);
-  REQUIRE(A::ctor_count == 1);
-  REQUIRE(A::dtor_count == 0);
-  REQUIRE(B::ctor_count == 0);
-  REQUIRE(B::dtor_count == 0);
+  CHECK(ptr2.get() == A_from_A);
+  CHECK(A::ctor_count == 1);
+  CHECK(A::dtor_count == 0);
+  CHECK(B::ctor_count == 0);
+  CHECK(B::dtor_count == 0);
 }

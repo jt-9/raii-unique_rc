@@ -46,7 +46,7 @@ TEST_CASE("raii::make_unique_for_overwrite single int via malloc with memset",
   "[unique_ptr][make_unique_for_overwrite]")
 {
   raii::unique_ptr<int> ptr = raii::make_unique_for_overwrite<int>();
-  REQUIRE(ptr != nullptr);
+  CHECK(ptr != nullptr);
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   unsigned char buffer[sizeof(int)];
@@ -60,7 +60,7 @@ TEST_CASE("raii::make_unique_for_overwrite array of ints via malloc with memset"
 {
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   raii::unique_ptr<int[]> aptr = raii::make_unique_for_overwrite<int[]>(constArraySize);
-  REQUIRE(aptr != nullptr);
+  CHECK(aptr != nullptr);
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   unsigned char buffer[constArraySize * sizeof(int)];

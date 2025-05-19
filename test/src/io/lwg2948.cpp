@@ -62,18 +62,18 @@ template<typename D>
 
 TEST_CASE("unique_ptr should define operator <<", "[unique_ptr][operator <<]")
 {
-  STATIC_REQUIRE(streamable<std::ostream, raii::unique_ptr<int>>);
+  STATIC_CHECK(streamable<std::ostream, raii::unique_ptr<int>>);
 
   raii::unique_ptr<int> ptr;
-  REQUIRE(check(ptr));
+  CHECK(check(ptr));
   ptr = raii::make_unique<int>();
-  REQUIRE(check(ptr));
+  CHECK(check(ptr));
 }
 
 TEST_CASE("unique_ptr with deleter should define operator <<", "[unique_ptr][operator <<]")
 {
-  STATIC_REQUIRE( streamable<std::ostream, UniquePtr<deleter<char>>> );
+  STATIC_CHECK( streamable<std::ostream, UniquePtr<deleter<char>>> );
 
   const UniquePtr<deleter<char>> ptr;
-  REQUIRE( check(ptr) );
+  CHECK( check(ptr) );
 }

@@ -40,7 +40,7 @@ TEST_CASE("unique_ptr base class with const, volatile qualifiers, single object 
     raii::unique_ptr<const A> c_ptr_a;
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     c_ptr_a.reset(new A);
-    REQUIRE(c_ptr_a);
+    CHECK(c_ptr_a);
 
     // Allow conversions from user-defined pointer-like types for the single-object version
     c_ptr_a.reset(like_ptr);
@@ -51,7 +51,7 @@ TEST_CASE("unique_ptr base class with const, volatile qualifiers, single object 
     raii::unique_ptr<volatile A> v_ptr_a;
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     v_ptr_a.reset(new A);
-    REQUIRE(v_ptr_a);
+    CHECK(v_ptr_a);
 
     // Allow conversions from user-defined pointer-like types for the single-object version
     v_ptr_a.reset(like_ptr);
@@ -62,7 +62,7 @@ TEST_CASE("unique_ptr base class with const, volatile qualifiers, single object 
     raii::unique_ptr<const volatile A> cv_ptr_a;
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     cv_ptr_a.reset(new A);
-    REQUIRE(cv_ptr_a);
+    CHECK(cv_ptr_a);
 
     // Allow conversions from user-defined pointer-like types for the single-object version
     cv_ptr_a.reset(like_ptr);
@@ -77,21 +77,21 @@ TEST_CASE("unique_ptr derived class with const, volatile qualifiers, single obje
     raii::unique_ptr<const A> c_ptr_b;
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     c_ptr_b.reset(new B);
-    REQUIRE(c_ptr_b);
+    CHECK(c_ptr_b);
   }
 
   {
     raii::unique_ptr<volatile A> v_ptr_b;
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     v_ptr_b.reset(new B);
-    REQUIRE(v_ptr_b);
+    CHECK(v_ptr_b);
   }
 
   {
     raii::unique_ptr<const volatile A> cv_ptr_b;
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     cv_ptr_b.reset(new B);
-    REQUIRE(cv_ptr_b);
+    CHECK(cv_ptr_b);
   }
 }
 
@@ -105,7 +105,7 @@ TEST_CASE("unique_ptr base class with const, volatile qualifiers, array objects 
     raii::unique_ptr<const A[]> c_ptr_a;
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     c_ptr_a.reset(new A[1]);
-    REQUIRE(c_ptr_a);
+    CHECK(c_ptr_a);
 
     // Allow conversions from user-defined pointer-like types for the array version when the type is converted
     // explicitly
@@ -118,7 +118,7 @@ TEST_CASE("unique_ptr base class with const, volatile qualifiers, array objects 
     raii::unique_ptr<volatile A[]> v_ptr_a;
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     v_ptr_a.reset(new A[1]);
-    REQUIRE(v_ptr_a);
+    CHECK(v_ptr_a);
 
     // Allow conversions from user-defined pointer-like types for the array version when the type is converted
     // explicitly
@@ -131,7 +131,7 @@ TEST_CASE("unique_ptr base class with const, volatile qualifiers, array objects 
     raii::unique_ptr<const volatile A[]> cv_ptr_a;
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     cv_ptr_a.reset(new A[1]);
-    REQUIRE(cv_ptr_a);
+    CHECK(cv_ptr_a);
 
     // Allow conversions from user-defined pointer-like types for the array version when the type is converted
     // explicitly

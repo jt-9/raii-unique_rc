@@ -31,7 +31,7 @@ TEST_CASE("Test hash for unique_ptr{new Empty{}}, and unique_ptr{new Empty[]]}",
   const std::hash<raii::unique_ptr<Empty>> hu0;
   const std::hash<typename raii::unique_ptr<Empty>::pointer> hp0;
 
-  REQUIRE(hu0(ptr0) == hp0(ptr0.get()));
+  CHECK(hu0(ptr0) == hp0(ptr0.get()));
 
   // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   const raii::unique_ptr<Empty[]> ptr1{ new Empty[10] };
@@ -39,7 +39,7 @@ TEST_CASE("Test hash for unique_ptr{new Empty{}}, and unique_ptr{new Empty[]]}",
   const std::hash<typename raii::unique_ptr<Empty[]>::pointer> hp1;
   // NOLINTEND(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 
-  REQUIRE(hu1(ptr1) == hp1(ptr1.get()));
+  CHECK(hu1(ptr1) == hp1(ptr1.get()));
 }
 
 TEST_CASE("Test hash with empty pointer type", "[unique_ptr][hash]")
@@ -55,14 +55,14 @@ TEST_CASE("Test hash with empty pointer type", "[unique_ptr][hash]")
     void operator()([[maybe_unused]] pointer ptr) const noexcept {}
   };
 
-  STATIC_REQUIRE_FALSE(is_callable_v<std::hash<D::pointer> &, D::pointer>);
+  STATIC_CHECK_FALSE(is_callable_v<std::hash<D::pointer> &, D::pointer>);
 
   using UP = raii::unique_ptr<int, raii::deleter_class_wrapper<D>>;
 
   // Disabled specializations of hash are not function object types
-  STATIC_REQUIRE_FALSE(is_callable_v<std::hash<UP> &, UP>);
-  STATIC_REQUIRE_FALSE(is_callable_v<std::hash<UP> &, UP &>);
-  STATIC_REQUIRE_FALSE(is_callable_v<std::hash<UP> &, const UP &>);
+  STATIC_CHECK_FALSE(is_callable_v<std::hash<UP> &, UP>);
+  STATIC_CHECK_FALSE(is_callable_v<std::hash<UP> &, UP &>);
+  STATIC_CHECK_FALSE(is_callable_v<std::hash<UP> &, const UP &>);
 }
 
 
@@ -134,7 +134,7 @@ TEST_CASE("Test hash operator() throw", "[unique_ptr][hash][throw]")
   constexpr UP2 ptr2;
   constexpr std::hash<UP2> hu2;
 
-  STATIC_REQUIRE(noexcept(hu2(ptr2)));
+  STATIC_CHECK(noexcept(hu2(ptr2)));
 
 
   using UP3 = raii::unique_ptr<int, F>;

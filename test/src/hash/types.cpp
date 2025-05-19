@@ -57,11 +57,11 @@ template<> struct std::hash<S *>
 
 TEST_CASE("Nested types result_type and argument_type are not present", "[unique_ptr][hash][types]")
 {
-  STATIC_REQUIRE(has_no_types<raii::unique_ptr<int>>());
-  STATIC_REQUIRE(has_no_types<raii::unique_ptr<double>>());
+  STATIC_CHECK(has_no_types<raii::unique_ptr<int>>());
+  STATIC_CHECK(has_no_types<raii::unique_ptr<double>>());
 }
 
 TEST_CASE("Disabled specializations do not have the nested types", "[unique_ptr][hash][types]")
 {
-  STATIC_REQUIRE(has_no_types<raii::unique_ptr<S>>());
+  STATIC_CHECK(has_no_types<raii::unique_ptr<S>>());
 }

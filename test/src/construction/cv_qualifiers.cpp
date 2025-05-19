@@ -35,32 +35,32 @@ TEST_CASE("unique_ptr base class with const, volatile, initialised single object
   "[unique_ptr][unique_ptr::unique_ptr][const][volatile]")
 {
   const raii::unique_ptr<const A> constA{ new A };
-  REQUIRE(constA);
-  REQUIRE(constA.get());
+  CHECK(constA);
+  CHECK(constA.get());
 
   const raii::unique_ptr<volatile A> volatA{ new A };
-  REQUIRE(volatA);
-  REQUIRE(volatA.get());
+  CHECK(volatA);
+  CHECK(volatA.get());
 
   const raii::unique_ptr<const volatile A> cvA{ new A };
-  REQUIRE(cvA);
-  REQUIRE(cvA.get());
+  CHECK(cvA);
+  CHECK(cvA.get());
 }
 
 TEST_CASE("unique_ptr derived class with const, volatile, initialised single object derived object",
   "[unique_ptr][unique_ptr::unique_ptr][const][volatile]")
 {
   const raii::unique_ptr<const A> constB{ new B };
-  REQUIRE(constB);
-  REQUIRE(constB.get());
+  CHECK(constB);
+  CHECK(constB.get());
 
   const raii::unique_ptr<volatile A> volatB{ new B };
-  REQUIRE(volatB);
-  REQUIRE(volatB.get());
+  CHECK(volatB);
+  CHECK(volatB.get());
 
   const raii::unique_ptr<const volatile A> cvB{ new B };
-  REQUIRE(cvB);
-  REQUIRE(cvB.get());
+  CHECK(cvB);
+  CHECK(cvB.get());
 }
 
 TEST_CASE("unique_ptr base class with const, volatile, move from default initialised base object",
@@ -90,18 +90,18 @@ TEST_CASE("unique_ptr base class array objects with const, volatile, initialised
 {
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
   const raii::unique_ptr<const A[]> constA{ new A[1] };
-  REQUIRE(constA);
-  REQUIRE(constA.get());
+  CHECK(constA);
+  CHECK(constA.get());
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
   const raii::unique_ptr<volatile A[]> volatA{ new A[1] };
-  REQUIRE(volatA);
-  REQUIRE(volatA.get());
+  CHECK(volatA);
+  CHECK(volatA.get());
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
   const raii::unique_ptr<const volatile A[]> cvA{ new A[1] };
-  REQUIRE(cvA);
-  REQUIRE(cvA.get());
+  CHECK(cvA);
+  CHECK(cvA.get());
 }
 
 TEST_CASE("unique_ptr base class with const, volatile, move from default initialised base array objects",

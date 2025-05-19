@@ -20,7 +20,7 @@ TEST_CASE("raii::make_unique array of objects", "[unique_ptr][make_unique]")
 {
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   raii::unique_ptr aptr = raii::make_unique<A[]>(constArraySize);
-  REQUIRE(aptr != nullptr);
+  CHECK(aptr != nullptr);
 
   for (std::size_t i = 0; i < constArraySize; i++) { CHECK(aptr[i].b); }
 }
