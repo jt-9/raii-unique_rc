@@ -339,7 +339,7 @@ template<class T>
 [[nodiscard]] raii_inline constexpr raii::unique_ptr<T> make_unique(const std::size_t size)
 {
   using Elem = std::remove_extent_t<T>;
-  return raii::unique_ptr<T>{ new Elem[size]() };
+  return raii::unique_ptr<T>{ new Elem[size]{} };
 }
 
 template<class T, class... Types>

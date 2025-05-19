@@ -40,7 +40,7 @@ template<typename T> constexpr bool ConstexprUPtrSingle(T const val1, T const va
 }
 
 // template<typename T>
-constexpr bool ConstexprUPtrValueArray(int const elem1, int const elem2, int const elem3, int const elem4) noexcept
+constexpr bool unique_ptr_value_array(int const elem1, int const elem2, int const elem3, int const elem4) noexcept
 {
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   raii::unique_ptr<int[]> ptra1;
@@ -67,7 +67,7 @@ constexpr bool ConstexprUPtrValueArray(int const elem1, int const elem2, int con
   return true;
 }
 
-template<typename T> constexpr bool ConstexprUPtrDefaultArray(std::size_t size) noexcept
+template<typename T> constexpr bool unique_ptr_default_array(std::size_t size) noexcept
 {
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   raii::unique_ptr<const T[]> ptra2;
@@ -91,6 +91,6 @@ template<typename T> constexpr bool ConstexprUPtrDefaultArray(std::size_t size) 
 TEST_CASE("constexpr unique_ptr::reset", "[unique_ptr][reset]")
 {
   STATIC_REQUIRE(ConstexprUPtrSingle(4, -2));
-  STATIC_REQUIRE(ConstexprUPtrValueArray('a', 'B', 'C', 'd'));
-  STATIC_REQUIRE(ConstexprUPtrDefaultArray<int>(7));
+  STATIC_REQUIRE(unique_ptr_value_array('a', 'B', 'C', 'd'));
+  STATIC_REQUIRE(unique_ptr_default_array<int>(7));
 }
