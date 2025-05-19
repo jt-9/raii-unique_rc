@@ -9,7 +9,8 @@
 
 
 namespace {
-template<typename T> constexpr bool ConstexprUPtrDefaultSingle() noexcept
+template<typename T>
+[[nodiscard]] constexpr bool unique_ptr_default_single() noexcept
 {
   raii::unique_ptr<T> ptr1;
   T *raw_ptr = ptr1.release();
@@ -19,7 +20,8 @@ template<typename T> constexpr bool ConstexprUPtrDefaultSingle() noexcept
   return true;
 }
 
-template<typename T> constexpr bool ConstexprUPtrValueSingle(T const val) noexcept
+template<typename T>
+[[nodiscard]] constexpr bool unique_ptr_value_single(T const val) noexcept
 {
   // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new)
   raii::unique_ptr<T> ptr2(new T{ val });
@@ -33,7 +35,8 @@ template<typename T> constexpr bool ConstexprUPtrValueSingle(T const val) noexce
   return true;
 }
 
-template<typename T> constexpr bool ConstexprUPtrDefaultArray() noexcept
+template<typename T>
+[[nodiscard]] constexpr bool unique_ptr_default_array() noexcept
 {
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   raii::unique_ptr<T[]> ptr1;
@@ -44,7 +47,7 @@ template<typename T> constexpr bool ConstexprUPtrDefaultArray() noexcept
   return true;
 }
 
-constexpr bool ConstexprUPtrValueArray(int const elem1, int const elem2, int const elem3) noexcept
+[[nodiscard]] constexpr bool unique_ptr_value_array(int const elem1, int const elem2, int const elem3) noexcept
 {
   // NOLINTNEXTLINE
   raii::unique_ptr<int[]> ptr2{ new int[]{ elem1, elem2, elem3 } };
@@ -67,8 +70,8 @@ constexpr bool ConstexprUPtrValueArray(int const elem1, int const elem2, int con
 
 TEST_CASE("constexpr unique_ptr::release", "[unique_ptr][release]")
 {
-  STATIC_REQUIRE(ConstexprUPtrDefaultSingle<int>());
-  STATIC_REQUIRE(ConstexprUPtrValueSingle('B'));
-  STATIC_REQUIRE(ConstexprUPtrDefaultArray<float>());
-  STATIC_REQUIRE(ConstexprUPtrValueArray(7, -3, 11));
+  STATIC_REQUIRE(unique_ptr_default_single<int>());
+  STATIC_REQUIRE(unique_ptr_value_single('B'));
+  STATIC_REQUIRE(unique_ptr_default_array<float>());
+  STATIC_REQUIRE(unique_ptr_value_array(7, -3, 11));
 }
