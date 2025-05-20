@@ -1,11 +1,13 @@
-#ifndef MOCK_GENERIC_DEALLOCATOR_NO_OP_HPP
-#define MOCK_GENERIC_DEALLOCATOR_NO_OP_HPP
+#ifndef RAII_TESTSUITE_NO_OP_DEALLOCATOR_HPP
+#define RAII_TESTSUITE_NO_OP_DEALLOCATOR_HPP
 
 #include "raii_defs.hpp"
 
 #include <concepts>
+#include <cstddef>// std::nullptr_t
 
-namespace mock_raii {
+
+namespace raii_test {
 
 template<typename Handle, typename InvalidHandle, InvalidHandle invalid_value>
   requires std::is_convertible_v<InvalidHandle, Handle>
@@ -24,6 +26,11 @@ struct mock_deallocator_no_op
   raii_inline constexpr void operator()(Handle) const noexcept { /* No op */ }
 };
 
-}// namespace mock_raii
 
-#endif// MOCK_GENERIC_DEALLOCATOR_NO_OP_HPP
+template<typename Ptr>
+  requires std::is_pointer_v<Ptr>
+using mock_pointer_no_op = mock_deallocator_no_op<Ptr, std::nullptr_t, {}>;
+
+}// namespace raii_test
+
+#endif// RAII_TESTSUITE_NO_OP_DEALLOCATOR_HPP

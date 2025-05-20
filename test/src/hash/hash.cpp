@@ -5,7 +5,7 @@
 // #include "unique_rc.hpp"
 
 #include <cstddef>// std::size_t
-#include <functional>
+#include <functional>// std::hash
 #include <type_traits>
 
 namespace {
@@ -21,7 +21,7 @@ struct is_callable<Func, Arg, decltype((void)(std::declval<Func &>()(std::declva
 template<typename Func, typename Arg> constexpr bool is_callable_v = is_callable<Func, Arg>::value;
 }// namespace
 
-TEST_CASE("Test hash for unique_ptr{new Empty{}}, and unique_ptr{new Empty[]]}", "[unique_ptr][hash]")
+TEST_CASE("std::hash for unique_ptr single value and array of type Empty", "[unique_ptr][hash]")
 {
   struct Empty
   {
@@ -42,7 +42,7 @@ TEST_CASE("Test hash for unique_ptr{new Empty{}}, and unique_ptr{new Empty[]]}",
   CHECK(hu1(ptr1) == hp1(ptr1.get()));
 }
 
-TEST_CASE("Test hash with empty pointer type", "[unique_ptr][hash]")
+TEST_CASE("std::hash with empty pointer type", "[unique_ptr][hash]")
 {
   struct D
   {

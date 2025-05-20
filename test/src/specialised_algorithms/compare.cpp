@@ -2,7 +2,7 @@
 
 
 #include "memory_delete.hpp"
-#include "mock_pointer_no_op.hpp"
+#include "testsuite_no_op_deallocator.hpp"
 #include "unique_ptr.hpp"
 #include "unique_rc.hpp"
 
@@ -54,7 +54,7 @@ TEST_CASE("Equality of value initialised unique_rc<double*, memory_delete<double
 
   SECTION("unique_rc::operator == to same, but non-owning unique_rc")
   {
-    const raii::unique_rc<double *, mock_raii::mock_pointer_no_op<double *>> noop_rc{ rc1.get() };
+    const raii::unique_rc<double *, raii_test::mock_pointer_no_op<double *>> noop_rc{ rc1.get() };
 
     CHECK(rc1 == noop_rc);
     CHECK_FALSE(rc1 != noop_rc);
@@ -89,7 +89,7 @@ TEST_CASE("Three-way value initialised unique_rc<int*, memory_delete<int*>>", "[
 
   SECTION("unique_rc::operator <=> with same, but non-owning unique_rc")
   {
-    const raii::unique_rc<int *, mock_raii::mock_pointer_no_op<int *>> noop_rc{ rc1.get() };
+    const raii::unique_rc<int *, raii_test::mock_pointer_no_op<int *>> noop_rc{ rc1.get() };
 
     CHECK((rc1 <=> noop_rc) == std::strong_ordering::equal);
 
@@ -128,7 +128,7 @@ TEST_CASE("Equality of value initialised unique_ptr", "[unique_ptr][operator ==]
 
   SECTION("unique_ptr::operator == to same, but non-owning unique_ptr")
   {
-    const raii::unique_ptr<double, mock_raii::mock_pointer_no_op<double *>> noop_ptr{ ptr1.get() };
+    const raii::unique_ptr<double, raii_test::mock_pointer_no_op<double *>> noop_ptr{ ptr1.get() };
 
     CHECK(ptr1 == noop_ptr);
     CHECK_FALSE(ptr1 != noop_ptr);
@@ -163,7 +163,7 @@ TEST_CASE("Three-way operator <=> with value initialised unique_ptr<int>", "[uni
 
   SECTION("With same, but non-owning unique_ptr")
   {
-    const raii::unique_ptr<int, mock_raii::mock_pointer_no_op<int *>> noop_ptr{ ptr1.get() };
+    const raii::unique_ptr<int, raii_test::mock_pointer_no_op<int *>> noop_ptr{ ptr1.get() };
 
     CHECK((ptr1 <=> noop_ptr) == std::strong_ordering::equal);
 

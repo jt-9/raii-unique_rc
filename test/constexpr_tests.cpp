@@ -3,7 +3,7 @@
 #include "memory_delete.hpp"
 #include "unique_rc.hpp"
 
-#include "mock_pointer_no_op.hpp"
+#include "testsuite_no_op_deallocator.hpp"
 
 #include <string_view>
 
@@ -56,7 +56,7 @@ TEST_CASE("Pointer initialised unique_rc<const char*, memory_mock_delete<const c
   constexpr auto str = "This is a test string"sv;
 
   // NOLINTBEGIN(bugprone-suspicious-stringview-data-usage)
-  constexpr raii::unique_rc<const char *, mock_raii::mock_pointer_no_op<const char *>> char_rc{ str.data() };
+  constexpr raii::unique_rc<const char *, raii_test::mock_pointer_no_op<const char *>> char_rc{ str.data() };
   // NOLINTEND(bugprone-suspicious-stringview-data-usage)
 
   STATIC_CHECK(char_rc.get() != nullptr);
@@ -70,8 +70,8 @@ TEST_CASE("Equality of initialised unique_rc<const char*, memory_mock_delete<con
   constexpr auto str = "This is a test string"sv;
 
   // NOLINTBEGIN(bugprone-suspicious-stringview-data-usage)
-  constexpr raii::unique_rc<const char *, mock_raii::mock_pointer_no_op<const char *>> char_rc1{ str.data() };
-  constexpr raii::unique_rc<const char *, mock_raii::mock_pointer_no_op<const char *>> char_rc2{ str.data() + 1 };
+  constexpr raii::unique_rc<const char *, raii_test::mock_pointer_no_op<const char *>> char_rc1{ str.data() };
+  constexpr raii::unique_rc<const char *, raii_test::mock_pointer_no_op<const char *>> char_rc2{ str.data() + 1 };
   // NOLINTEND(bugprone-suspicious-stringview-data-usage)
 
   SECTION("unique_rc::operator ==(unique_rc, unique_rc)")
@@ -94,8 +94,8 @@ TEST_CASE("Three-way comparison of initialised unique_rc<const char*, memory_moc
   constexpr auto str = "This is a test string"sv;
 
   // NOLINTBEGIN(bugprone-suspicious-stringview-data-usage)
-  constexpr raii::unique_rc<const char *, mock_raii::mock_pointer_no_op<const char *>> char_rc1{ str.data() };
-  constexpr raii::unique_rc<const char *, mock_raii::mock_pointer_no_op<const char *>> char_rc2{ str.data() + 4 };
+  constexpr raii::unique_rc<const char *, raii_test::mock_pointer_no_op<const char *>> char_rc1{ str.data() };
+  constexpr raii::unique_rc<const char *, raii_test::mock_pointer_no_op<const char *>> char_rc2{ str.data() + 4 };
   constexpr decltype(char_rc1) copy_rc1{ str.data() };
   // NOLINTEND(bugprone-suspicious-stringview-data-usage)
 
