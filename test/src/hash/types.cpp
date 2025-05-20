@@ -4,7 +4,7 @@
 #include "unique_ptr.hpp"
 // #include "unique_rc.hpp"
 
-#include <functional>
+#include <functional>// std::hash
 #include <type_traits>
 
 namespace {

@@ -33,8 +33,8 @@ set(TEST_HEADER_PREFIX inc)
 set(TEST_SOURCE_PREFIX src)
 
 set(TESTS_HEADERS 
-  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_HEADER_PREFIX}/mock_pointer_no_op.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_HEADER_PREFIX}/mock_generic_deallocator_no_op.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_HEADER_PREFIX}/testsuite_no_op_deallocator.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_HEADER_PREFIX}/testsuite_ptr.hpp
 )
 
 set(TESTS_SOURCES
@@ -59,6 +59,7 @@ set(TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/creation/array.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/creation/for_overwrite.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/creation/single.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/hash/constexpr_hash.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/hash/hash.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/hash/types.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/io/lwg2948.cpp
@@ -93,7 +94,7 @@ target_link_libraries(
           myproject::urc
           Catch2::Catch2WithMain)
 
-target_include_directories(tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/inc)
+target_include_directories(tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_HEADER_PREFIX})
 
 if (WIN32 AND BUILD_SHARED_LIBS)
   add_custom_command(
@@ -125,6 +126,7 @@ set(CONSTEXPR_TESTS_SOURCES
 
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/move_assign_neg.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/construct_move.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/hash/constexpr_hash.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_release.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_reset.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/observers/constexpr_observers.cpp
@@ -143,7 +145,7 @@ target_link_libraries(
           myproject::urc
           Catch2::Catch2WithMain)
 
-target_include_directories(constexpr_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/inc)
+target_include_directories(constexpr_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_HEADER_PREFIX})
 
 catch_discover_tests(
   constexpr_tests
@@ -168,7 +170,7 @@ target_link_libraries(
           myproject::urc
           Catch2::Catch2WithMain)
 target_compile_definitions(relaxed_constexpr_tests PRIVATE -DCATCH_CONFIG_RUNTIME_STATIC_REQUIRE)
-target_include_directories(relaxed_constexpr_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/inc)
+target_include_directories(relaxed_constexpr_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_HEADER_PREFIX})
 
 catch_discover_tests(
   relaxed_constexpr_tests
