@@ -214,7 +214,7 @@ struct unique_rc_holder<Handle, Deleter, TypeResolver, false, false>
 // because it is impossible to distinguish a pointer obtained from array and non - array forms of new.
 template<typename Handle, class Deleter, template<typename, typename> typename TypeResolver = resolve_handle_type>
   requires has_static_invalid_convertible_handle<std::remove_reference_t<Deleter>,
-    typename resolve_handle_type<std::decay_t<Handle>, std::remove_reference_t<Deleter>>::type>
+    typename TypeResolver<std::decay_t<Handle>, std::remove_reference_t<Deleter>>::type>
 class unique_rc
 {
   static_assert(!std::is_array_v<Handle>, "unique_rc does not work with array, use raii::unique_ptr");

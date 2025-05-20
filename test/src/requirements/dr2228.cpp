@@ -9,7 +9,7 @@
 
 struct do_nothing
 {
-  template<class T> void operator()([[maybe_unused]] T *ptr) const noexcept {}
+  template<class T> void operator()(T * /*unused*/) const noexcept {}
 };
 
 TEST_CASE("DR 2228 is not assignable unique_rc", "[unique_rc::operator=]")

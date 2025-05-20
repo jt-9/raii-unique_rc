@@ -31,16 +31,15 @@ template<typename> struct deleter
     constexpr pointer() = default;
     explicit pointer(std::nullptr_t) {}
     explicit operator bool() const { return false; }
-    bool operator==([[maybe_unused]] pointer ptr) const { return true; }
+    bool operator==(pointer /*unused*/) const { return true; }
   };
 
-  using handle = pointer;
 
   static constexpr pointer invalid() noexcept { return {}; }
 
-  static constexpr bool is_owned([[maybe_unused]] const pointer &ptr) noexcept { return false; }
+  static constexpr bool is_owned(pointer /*unused*/) noexcept { return false; }
 
-  void operator()([[maybe_unused]] pointer ptr) const {}
+  void operator()(pointer /*unused*/) const {}
 };
 
 
