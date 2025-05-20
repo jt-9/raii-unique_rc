@@ -18,7 +18,7 @@ struct B
   static constexpr std::nullptr_t invalid() noexcept;
   static constexpr bool is_owned(void *) noexcept;
 
-  void operator()([[maybe_unused]] void *ptr) const {}
+  void operator()(void * /*unused*/) const {}
 };
 // NOLINTEND(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
 
@@ -27,7 +27,7 @@ void swap(B &, B &) = delete;
 // NOLINTBEGIN(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
 struct C
 {
-  void operator()([[maybe_unused]] void *ptr) const {}
+  void operator()(void * /*unused*/) const {}
 };
 // NOLINTEND(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
 
@@ -38,7 +38,7 @@ struct D
 {
   D(D &&) = delete;
 
-  void operator()([[maybe_unused]] void *ptr) const {}
+  void operator()(void * /*unused*/) const {}
 };
 
 struct NoSwapPtr
@@ -62,7 +62,7 @@ struct NoSwapPtr
   static constexpr pointer invalid() noexcept;
   static constexpr bool is_owned(pointer) noexcept;
 
-  void operator()([[maybe_unused]] pointer ptr) const noexcept {}
+  void operator()(pointer /*unused*/) const noexcept {}
 };
 
 }// namespace

@@ -52,7 +52,7 @@ TEST_CASE("Test hash with empty pointer type", "[unique_ptr][hash]")
       // NOLINTNEXTLINE(hicpp-explicit-conversions)
       pointer(std::nullptr_t) {};
     };
-    void operator()([[maybe_unused]] pointer ptr) const noexcept {}
+    void operator()(pointer /*unused*/) const noexcept {}
   };
 
   STATIC_CHECK_FALSE(is_callable_v<std::hash<D::pointer> &, D::pointer>);
@@ -79,13 +79,12 @@ struct D
     bool operator!=(std::nullptr_t) const { return true; }
   };
 
-  using handle = pointer;
 
   [[nodiscard]] static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
 
-  [[nodiscard]] static constexpr bool is_owned([[maybe_unused]] pointer ptr) noexcept { return true; }
+  [[nodiscard]] static constexpr bool is_owned(pointer /*unused*/) noexcept { return true; }
 
-  void operator()([[maybe_unused]] pointer ptr) const noexcept {}
+  void operator()(pointer /*unused*/) const noexcept {}
 };
 
 struct F
@@ -96,13 +95,12 @@ struct F
     bool operator!=(std::nullptr_t) const { return true; }
   };
 
-  using handle = pointer;
 
   [[nodiscard]] static constexpr pointer invalid() noexcept { return {}; }
 
-  [[nodiscard]] static constexpr bool is_owned([[maybe_unused]] pointer ptr) noexcept { return true; }
+  [[nodiscard]] static constexpr bool is_owned(pointer /*unused*/) noexcept { return true; }
 
-  void operator()([[maybe_unused]] pointer ptr) const noexcept {}
+  void operator()(pointer /*unused*/) const noexcept {}
 };
 
 }// namespace
@@ -111,17 +109,17 @@ namespace std {
 template<> struct hash<D::pointer>
 {
   // NOLINTNEXTLINE(hicpp-exception-baseclass)
-  std::size_t operator()([[maybe_unused]] D::pointer ptr) const { throw 1; }
+  std::size_t operator()(D::pointer /*unused*/) const { throw 1; }
 };
 
 template<> struct hash<F::pointer>
 {
   // NOLINTNEXTLINE(hicpp-exception-baseclass)
-  std::size_t operator()([[maybe_unused]] F::pointer ptr) const { throw 3; }
+  std::size_t operator()(F::pointer /*unused*/) const { throw 3; }
 };
 }// namespace std
 
-TEST_CASE("Test hash operator() throw", "[unique_ptr][hash][throw]")
+TEST_CASE("hash::operator() throws with Deleter::pointer type", "[unique_ptr][hash][throw]")
 {
   using UP = raii::unique_ptr<int, D>;
   const UP ptr1;
