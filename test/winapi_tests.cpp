@@ -5,7 +5,7 @@
 #include "windows_dc_delete.hpp"
 #include "windows_delete_gdi_object.hpp"
 
-#include "mock_pointer_no_op.hpp"
+#include "testsuite_no_op_deallocator.hpp"
 
 #include <Windows.h>
 
@@ -85,7 +85,7 @@ TEST_CASE("Equality of value initialised unique_rc<HPEN, gdi_delete_object_nullp
 
   SECTION("unique_rc::operator == to same, but non-owning unique_rc")
   {
-    const raii::unique_rc<HPEN, mock_raii::mock_pointer_no_op<HPEN>> noop_pen_rc{ pen_rc.get() };
+    const raii::unique_rc<HPEN, raii_test::mock_pointer_no_op<HPEN>> noop_pen_rc{ pen_rc.get() };
 
     CHECK(pen_rc == noop_pen_rc);
     CHECK_FALSE(pen_rc != noop_pen_rc);
@@ -121,7 +121,7 @@ TEST_CASE("Three-way value initialised unique_rc<HPEN, gdi_delete_object_nullptr
 
   SECTION("unique_rc::operator <=> with same, but non-owning unique_rc")
   {
-    const raii::unique_rc<HPEN, mock_raii::mock_pointer_no_op<HPEN>> noop_pen_rc{ pen_rc.get() };
+    const raii::unique_rc<HPEN, raii_test::mock_pointer_no_op<HPEN>> noop_pen_rc{ pen_rc.get() };
 
     CHECK((pen_rc <=> noop_pen_rc) == std::strong_ordering::equal);
     // CHECK((pen_rc <=> noop_pen_rc) == 0); Catch2 generates error
@@ -205,7 +205,7 @@ TEST_CASE("Equality of value initialised unique_rc<HANDLE, close_handle_invalid_
 
   SECTION("unique_rc::operator == to same, but non-owning unique_rc")
   {
-    const raii::unique_rc<HANDLE, mock_raii::mock_pointer_no_op<HANDLE>> noop_pipe{ pipe.get() };
+    const raii::unique_rc<HANDLE, raii_test::mock_pointer_no_op<HANDLE>> noop_pipe{ pipe.get() };
 
     CHECK(pipe == noop_pipe);
     CHECK_FALSE(pipe != noop_pipe);
