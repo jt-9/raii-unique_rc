@@ -1,9 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 
 
-#include "memory_delete.hpp"
-#include "unique_ptr.hpp"
-// #include "unique_rc.hpp"
+#include "urc/deleter/memory_delete.hpp"
+#include "urc/unique_ptr.hpp"
 
 // LWG 2905 is_constructible_v<unique_ptr<P, D>, P, D const &> should be false when D is not copy constructible
 
@@ -24,15 +23,11 @@ TEST_CASE("LWG 2905 test is unique_ptr of int and int[] constructible from int* 
   "[unique_ptr][unique_ptr::unique_ptr][std::is_constructible_v]")
 {
   // Single int
-  STATIC_CHECK_FALSE(unique_ptr_is_constructible<int,
-    raii::deleter_class_wrapper<Del> &,
-    int *,
-    raii::deleter_class_wrapper<Del>>());
+  STATIC_CHECK_FALSE(
+    unique_ptr_is_constructible<int, raii::deleter_class_wrapper<Del> &, int *, raii::deleter_class_wrapper<Del>>());
 
-  STATIC_CHECK(unique_ptr_is_constructible<int,
-    raii::deleter_class_wrapper<Del> &,
-    int *,
-    raii::deleter_class_wrapper<Del> &>());
+  STATIC_CHECK(
+    unique_ptr_is_constructible<int, raii::deleter_class_wrapper<Del> &, int *, raii::deleter_class_wrapper<Del> &>());
 
   STATIC_CHECK(unique_ptr_is_constructible<int,
     raii::deleter_class_wrapper<Del> const &,
@@ -55,10 +50,8 @@ TEST_CASE("LWG 2905 test is unique_ptr of int and int[] constructible from int* 
 
   // Array of ints
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
-  STATIC_CHECK_FALSE(unique_ptr_is_constructible<int[],
-    raii::deleter_class_wrapper<Del> &,
-    int *,
-    raii::deleter_class_wrapper<Del>>());
+  STATIC_CHECK_FALSE(
+    unique_ptr_is_constructible<int[], raii::deleter_class_wrapper<Del> &, int *, raii::deleter_class_wrapper<Del>>());
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_CHECK(unique_ptr_is_constructible<int[],
@@ -85,10 +78,8 @@ TEST_CASE("LWG 2905 test is unique_ptr of int and int[] constructible from int* 
     raii::deleter_class_wrapper<Del> const &>());
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
-  STATIC_CHECK(unique_ptr_is_constructible<int[],
-    raii::deleter_class_wrapper<Del>,
-    int *,
-    raii::deleter_class_wrapper<Del>>());
+  STATIC_CHECK(
+    unique_ptr_is_constructible<int[], raii::deleter_class_wrapper<Del>, int *, raii::deleter_class_wrapper<Del>>());
 }
 
 namespace {
@@ -232,10 +223,8 @@ TEST_CASE("LWG 2905 test is unique_ptr of Base[] constructible from Base* and De
     Base *,
     raii::deleter_class_wrapper<Del> const &>());
 
-  STATIC_CHECK(unique_ptr_is_constructible<Base[],
-    raii::deleter_class_wrapper<Del>,
-    Base *,
-    raii::deleter_class_wrapper<Del>>());
+  STATIC_CHECK(
+    unique_ptr_is_constructible<Base[], raii::deleter_class_wrapper<Del>, Base *, raii::deleter_class_wrapper<Del>>());
 
 
   // From derived Derived*

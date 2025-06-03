@@ -1,31 +1,29 @@
-#ifndef WIN_GDI_SELECT_OBJECT_HPP
-#define WIN_GDI_SELECT_OBJECT_HPP
+#ifndef WIN_GDI_DC_RESTORE_HPP
+#define WIN_GDI_DC_RESTORE_HPP
 
-#include "raii_defs.hpp"
+#include "../raii_defs.hpp"
 
 #include <Windows.h>
 
-#include <concepts>// std::convertible_to
-#include <cstddef>// std::nullptr_t
+#include <concepts>
 
 
 RAII_NS_BEGIN
 
-// Selects GDI objects such as pen, brush, bitmap, etc.
-// nullptr indicates invalid object
-template<typename GdiObjHandle = HGDIOBJ>
-  requires std::convertible_to<GdiObjHandle, HGDIOBJ>
-struct gdi_select_object
+
+// Restores device context (DC) state obtained with SaveDC
+// nullptr indicates invalid dc
+struct gdi_restore_dc_nullptr
 {
   struct handle
   {
     HDC hdc;
-    GdiObjHandle hobj;
+    int state;
 
 
-    raii_inline constexpr handle(HDC dc, GdiObjHandle obj) noexcept : hdc{ dc }, hobj{ obj } {}
+    raii_inline constexpr handle(HDC dc, int nstate) noexcept : hdc{ dc }, state{ nstate } {}
 
-    raii_inline constexpr handle() noexcept : handle(nullptr, nullptr) {}
+    raii_inline constexpr handle() noexcept : handle(nullptr, 0) {}
 
     constexpr handle(const handle &) noexcept = default;
     constexpr handle(handle &&) noexcept = default;
@@ -39,13 +37,13 @@ struct gdi_select_object
 
     [[nodiscard]] friend raii_inline constexpr bool operator==(const handle &lhs, const handle &rhs) noexcept
     {
-      return (lhs.hobj == rhs.hobj) && (lhs.hdc == rhs.hdc);
+      return (lhs.state == rhs.state) && (lhs.hdc == rhs.hdc);
     }
 
     friend raii_inline constexpr void swap(handle &lhs, handle &rhs) noexcept
     {
       std::ranges::swap(lhs.hdc, rhs.hdc);
-      std::ranges::swap(lhs.hobj, rhs.hobj);
+      std::ranges::swap(lhs.state, rhs.state);
     }
   };
 
@@ -53,19 +51,21 @@ struct gdi_select_object
 
   [[nodiscard]] raii_inline static constexpr bool is_owned(const handle &h) noexcept
   {
-    return static_cast<bool>(h.hobj);
+    return static_cast<bool>(h.hdc) && (h.state != 0);
   }
 
+// constexpr generates error - constexpr function doesn't evaluate at compile time
 #ifdef __cpp_static_call_operator
   raii_inline static void operator()(const handle &h) noexcept
 #else
   raii_inline void operator()(const handle &h) const noexcept
 #endif
   {
-    SelectObject(h.hdc, h.hobj);
+    RestoreDC(h.hdc, h.state);
   }
 };
 
+
 RAII_NS_END
 
-#endif// WIN_GDI_SELECT_OBJECT_HPP
+#endif// WIN_GDI_DC_RESTORE_HPP

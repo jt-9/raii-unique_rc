@@ -1,14 +1,15 @@
 #include <catch2/catch_test_macros.hpp>
 
 
-#include "memory_delete.hpp"
-#include "unique_ptr.hpp"
-#include "unique_rc.hpp"
+#include "urc/deleter/memory_delete.hpp"
+#include "urc/unique_ptr.hpp"
+#include "urc/unique_rc.hpp"
 
 #include <cassert>
 #include <concepts>
 #include <cstddef>// std::nullptr_t
 #include <type_traits>// std::is_swappable_v
+
 
 namespace {
 

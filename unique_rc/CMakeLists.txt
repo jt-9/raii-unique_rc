@@ -1,64 +1,27 @@
 include(GenerateExportHeader)
 #include(CMakePrintHelpers)
 
-# function(add_headers VAR)
-#   set(headers ${${VAR}})
-#   foreach (header ${ARGN})
-#     set(headers ${headers} inc/${header})
-#   endforeach()
-#   set(${VAR} ${headers} PARENT_SCOPE)
-# endfunction()
+set(LIB_HEADER_PREFIX include)
 
-set(LIB_HEADER_PREFIX inc)
-set(LIB_SOURCE_PREFIX src)
-
-set(HEADERS 
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/raii_defs.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/concepts.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/unique_rc.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/unique_ptr.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/coroutine_destroy.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/memory_delete.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/stdio_fclose.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_com_release.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_com_file_dlg_unadvise.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_delete_gdi_object.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_select_gdi_object.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_dc_delete.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_dc_release.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_dc_restore.hpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_HEADER_PREFIX}/deleter/windows_close_handle.hpp
-)
-
-set(SOURCES
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_SOURCE_PREFIX}/unique_rc.cpp
-  ${CMAKE_CURRENT_LIST_DIR}/${LIB_SOURCE_PREFIX}/unique_ptr.cpp
-)
-
-function(add_mylib_statics lib_name)
-  add_library(${lib_name} STATIC ${HEADERS} ${SOURCES})
-  #target_compile_features(${lib_name} PUBLIC cxx_std_20)
-  target_link_libraries(${lib_name} PRIVATE 
+function(add_lib_interface lib_name)
+  add_library(${lib_name} INTERFACE)
+  
+  target_link_libraries(${lib_name} INTERFACE 
                 myproject::myproject_options 
                 myproject::myproject_warnings)
 
   #cmake_print_variables(PROJECT_SOURCE_DIR)
   #cmake_print_variables(CMAKE_CURRENT_LIST_DIR)
 
-  target_include_directories(${lib_name} ${WARNING_GUARD} PUBLIC 
+  target_include_directories(${lib_name} ${WARNING_GUARD} INTERFACE 
                                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${LIB_HEADER_PREFIX}>
-                                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${LIB_HEADER_PREFIX}/deleter>
+                                # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${LIB_HEADER_PREFIX}/deleter>
                                 $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
-
-set_target_properties(${lib_name} PROPERTIES
-                LINKER_LANGUAGE CXX 
-                VERSION ${PROJECT_VERSION}
-                DEBUG_POSTFIX "d")
 endfunction()
 
 
-add_mylib_statics(urc)
-add_library(myproject::urc ALIAS urc)
+add_lib_interface(urc)
+add_library(urc::urc ALIAS urc)
 
 #urc library uses c++ 20 which is set via myproject::myproject_options
 # target_compile_features(urc PUBLIC cxx_std_20)

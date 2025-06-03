@@ -1,7 +1,7 @@
 #ifndef WIN_GDI_DELETE_HANDLE_HPP
 #define WIN_GDI_DELETE_HANDLE_HPP
 
-#include "raii_defs.hpp"
+#include "../raii_defs.hpp"
 
 #include <Windows.h>
 

@@ -21,7 +21,7 @@ target_compile_features(${EXEC_TARGET} PUBLIC cxx_std_23)
 target_link_libraries(${EXEC_TARGET} PRIVATE 
                   myproject::myproject_options
                   myproject::myproject_warnings
-                  myproject::urc)
+                  urc::urc)
 
 target_link_system_libraries(${EXEC_TARGET} PRIVATE 
                                             CLI11::CLI11

@@ -1,7 +1,7 @@
 #ifndef WIN_COM_FILE_DLG_HPP
 #define WIN_COM_FILE_DLG_HPP
 
-#include "raii_defs.hpp"
+#include "../raii_defs.hpp"
 
 #include <Shobjidl.h>
 

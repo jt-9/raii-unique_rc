@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "unique_rc.hpp"
+#include "urc/unique_rc.hpp"
 #include "windows_close_handle.hpp"
 #include "windows_dc_delete.hpp"
 #include "windows_delete_gdi_object.hpp"

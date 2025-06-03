@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "memory_delete.hpp"
-#include "unique_ptr.hpp"
+#include "urc/deleter/memory_delete.hpp"
+#include "urc/unique_ptr.hpp"
 
 #include <memory>
 #include <type_traits>
