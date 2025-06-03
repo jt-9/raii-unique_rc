@@ -8,9 +8,9 @@
 #include "consteval_lambda_example.hpp"
 #include "coroutine_example.hpp"
 #include "test_deleter.hpp"
-#include "memory_delete.hpp"
-#include "unique_ptr.hpp"
-#include "unique_rc.hpp"
+#include "urc/deleter/memory_delete.hpp"
+#include "urc/unique_ptr.hpp"
+#include "urc/unique_rc.hpp"
 
 #include <fmt/base.h>
 #include <fmt/core.h>

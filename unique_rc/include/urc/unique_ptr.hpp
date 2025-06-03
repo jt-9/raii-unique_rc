@@ -4,7 +4,7 @@
 #include "raii_defs.hpp"
 
 #include "concepts.hpp"
-#include "memory_delete.hpp"
+#include "deleter/memory_delete.hpp"
 #include "unique_rc.hpp"
 
 #include <cassert>

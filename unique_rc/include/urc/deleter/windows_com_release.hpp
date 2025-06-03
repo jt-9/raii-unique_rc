@@ -1,7 +1,7 @@
 #ifndef WIN_COM_RELEASE_HPP
 #define WIN_COM_RELEASE_HPP
 
-#include "raii_defs.hpp"
+#include "../raii_defs.hpp"
 
 #include <concepts>
 #include <cstddef>

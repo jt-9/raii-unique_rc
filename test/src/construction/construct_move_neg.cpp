@@ -1,9 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 
 
-#include "memory_delete.hpp"
-#include "unique_ptr.hpp"
-// #include "unique_rc.hpp"
+#include "urc/deleter/memory_delete.hpp"
+#include "urc/unique_ptr.hpp"
 
 // LWG 2905 is_constructible_v<unique_ptr<P, D>, P, D const &> should be false when D is not copy constructible
 

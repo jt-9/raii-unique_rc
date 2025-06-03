@@ -91,7 +91,7 @@ target_link_libraries(
   tests
   PRIVATE myproject::myproject_warnings
           myproject::myproject_options
-          myproject::urc
+          urc::urc
           Catch2::Catch2WithMain)
 
 target_include_directories(tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_HEADER_PREFIX})
@@ -142,7 +142,7 @@ target_link_libraries(
   constexpr_tests
   PRIVATE myproject::myproject_warnings
           myproject::myproject_options
-          myproject::urc
+          urc::urc
           Catch2::Catch2WithMain)
 
 target_include_directories(constexpr_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_HEADER_PREFIX})
@@ -167,7 +167,7 @@ target_link_libraries(
   relaxed_constexpr_tests
   PRIVATE myproject::myproject_warnings
           myproject::myproject_options
-          myproject::urc
+          urc::urc
           Catch2::Catch2WithMain)
 target_compile_definitions(relaxed_constexpr_tests PRIVATE -DCATCH_CONFIG_RUNTIME_STATIC_REQUIRE)
 target_include_directories(relaxed_constexpr_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_HEADER_PREFIX})

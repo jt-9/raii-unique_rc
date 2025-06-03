@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "coroutine_destroy.hpp"
-#include "unique_rc.hpp"
+#include "urc/deleter/coroutine_destroy.hpp"
+#include "urc/unique_rc.hpp"
 
 #include <coroutine>
 #include <optional>
