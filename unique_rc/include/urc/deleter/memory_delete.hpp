@@ -4,8 +4,6 @@
 
 #include "../raii_defs.hpp"
 
-#include "../concepts.hpp"
-
 #include <concepts>
 #include <cstddef>
 #include <new>
@@ -45,65 +43,6 @@ struct memory_delete
   }
 };
 
-template<typename T> struct default_delete
-{
-  constexpr default_delete() noexcept = default;
-
-  template<typename U>
-    requires std::is_convertible_v<U *, T *>
-  // cppcheck-suppress noExplicitConstructor intended converting constructor
-  raii_inline constexpr default_delete(const default_delete<U> &) noexcept
-  {}
-
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-
-  [[nodiscard]] raii_inline static constexpr bool is_owned(T *h) noexcept { return h; }
-
-#ifdef __cpp_static_call_operator
-  // False poisitive, guarded by feature #ifdef __cpp_static_call_operator
-  // NOLINTNEXTLINE(clang-diagnostic-c++23-extensions)
-  raii_inline static constexpr void operator()(T *h) noexcept
-#else
-  raii_inline constexpr void operator()(T *h) const noexcept
-#endif
-  {
-    static_assert(!std::is_void_v<T>, "can't delete pointer to incomplete type");
-    static_assert(sizeof(T) > 0, "can't delete pointer to incomplete type");
-
-    delete h;
-  }
-};
-
-// Specialization of default_delete for arrays, used by 'unique_ptr<T[]>'
-template<typename T> struct default_delete<T[]>
-{
-  constexpr default_delete() noexcept = default;
-
-  template<typename U>
-    requires std::is_convertible_v<U (*)[], T (*)[]>
-  // cppcheck-suppress noExplicitConstructor intended converting constructor
-  raii_inline constexpr default_delete(const default_delete<U[]> &) noexcept
-  {}
-
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-
-  [[nodiscard]] raii_inline static constexpr bool is_owned(T *h) noexcept { return h; }
-
-  template<typename U>
-    requires std::is_convertible_v<U (*)[], T (*)[]>
-#ifdef __cpp_static_call_operator
-  // False poisitive, guarded by feature #ifdef __cpp_static_call_operator
-  // NOLINTNEXTLINE(clang-diagnostic-c++23-extensions)
-  raii_inline static constexpr void operator()(U *p) noexcept
-#else
-  raii_inline constexpr void operator()(U *p) const noexcept
-#endif
-  {
-    static_assert(sizeof(U) > 0, "can't delete pointer to incomplete type");
-
-    delete[] p;
-  }
-};
 
 template<typename Base>
 concept not_final = !std::is_final_v<Base>;
