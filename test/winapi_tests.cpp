@@ -1,9 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "urc/unique_rc.hpp"
-#include "windows_close_handle.hpp"
-#include "windows_dc_delete.hpp"
-#include "windows_delete_gdi_object.hpp"
+#include "urc/deleter/windows_close_handle.hpp"
+#include "urc/deleter/windows_dc_delete.hpp"
+#include "urc/deleter/windows_delete_gdi_object.hpp"
 
 #include "testsuite_no_op_deallocator.hpp"
 
