@@ -8,3 +8,6 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE="Debug" -G "Ninja"
 
 Generator Unix Makefiles
 cmake -S . -B build -DCMAKE_BUILD_TYPE="Debug" -G "Unix Makefiles"
+
+Build generated project with command or from IDE
+cmake --build build -j8
