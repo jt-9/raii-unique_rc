@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) noexcept
 
   //*/
   using raii::unique_rc;
-  
+
   {
     std::puts("=======================================================");
     const auto kTiedArg1 = -24;
@@ -161,7 +161,8 @@ int main(int argc, char *argv[]) noexcept
     rc1.reset();
     rc1.reset(rc1.get());
 
-    // std::cout << "Sizeof unique_rc<int*, raii::deleter_class_wrapper<int*> of long long is "sv << sizeof(rc1) << " bytes\n"sv;
+    // std::cout << "Sizeof unique_rc<int*, raii::deleter_class_wrapper<int*> of long long is "sv << sizeof(rc1) << "
+    // bytes\n"sv;
     fmt::println("Sizeof unique_rc<int*, raii::deleter_class_wrapper<int*> of long long is {} bytes"sv, sizeof(rc1));
   }
 
@@ -179,7 +180,7 @@ int main(int argc, char *argv[]) noexcept
     fmt::println(
       "After move assignment from unique_rc<int*, raii::deleter_class_wrapper<int*>> to unique_rc<std::int32_t*, "
       "raii::deleter_class_wrapper<std::int32_t*>> {}",
-      *rc2.get());
+      *rc2);
   }
 
   {
@@ -189,7 +190,7 @@ int main(int argc, char *argv[]) noexcept
     // NOLINTBEGIN(bugprone-unhandled-exception-at-new)
     unique_rc<std::int32_t *, raii::default_delete<std::int32_t>> rc1{ new std::int32_t{ kVal1 } };
     // NOLINTEND(bugprone-unhandled-exception-at-new)
-    fmt::println("Stored value {}", *rc1.get());
+    fmt::println("Stored value {}", *rc1);
 
     auto *temp = rc1.release();
     rc1.reset(temp);
@@ -216,6 +217,8 @@ int main(int argc, char *argv[]) noexcept
     const auto kSampleFloat = 3.864F;
     raii::unique_ptr<float> dynamicVal = raii::make_unique<float>(kSampleFloat);
     fmt::println("Value initialised unique_ptr<float> address: {}, value: {}", fmt::ptr(dynamicVal.get()), *dynamicVal);
+
+    // const auto failes_require_class_or_unit = dynamicVal.operator->();
   }
 
   {
@@ -227,6 +230,7 @@ int main(int argc, char *argv[]) noexcept
     arrayUniquePtr[1] = 4;
     arrayUniquePtr[2] = 7;
 
+    // const auto deleted_op = arrayUniquePtr.operator->();
     // cppcheck-suppress leakNoVarFunctionCall false positive
     arrayUniquePtr.reset(new int[2]);
     // NOLINTEND
@@ -264,7 +268,7 @@ int main(int argc, char *argv[]) noexcept
       *ptrB,
       ptrB.get_deleter().m_tag);
 
-    
+
     std::ranges::swap(ptrA, ptrB);
 
     // constexpr auto isDeleterSwappable = std::is_swappable_v<SwapTestDel>;
@@ -289,5 +293,6 @@ int main(int argc, char *argv[]) noexcept
     fmt::println("");
   }
   //*/
+
   return 0;
 }

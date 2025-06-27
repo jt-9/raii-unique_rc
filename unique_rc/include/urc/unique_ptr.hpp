@@ -180,13 +180,7 @@ public:
 
   using Base::get;
   using Base::operator->;
-
-  [[nodiscard]] raii_inline constexpr typename std::add_lvalue_reference_t<element_type> operator*() const
-    noexcept(noexcept(*std::declval<pointer>()))
-  {
-    assert(deleter_type::is_owned(get()) && "Cannot dereference invalid pointer");
-    return *get();
-  }
+  using Base::operator*;
 
   using Base::get_deleter;
   using Base::operator bool;
@@ -204,7 +198,6 @@ class unique_ptr<T[], Deleter> : public unique_rc<T *, Deleter, resolve_pointer_
 {
 private:
   using Base = unique_rc<T *, Deleter, resolve_pointer_type>;
-  using typename Base::handle;
 
   // template<typename _Up> using _DeleterConstraint = typename __uniq_ptr_impl<_T, _Up>::_DeleterConstraint::type;
   //  like is_base_of<_T, _Up> but false if unqualified types are the same
@@ -310,6 +303,9 @@ public:
 
   using Base::get;
 
+  // Not applicable for an array
+  constexpr pointer operator->() const noexcept(noexcept(get())) = delete;
+
   /// Access an element of owned array.
   raii_inline constexpr typename std::add_lvalue_reference_t<element_type> operator[](std::size_t i) const
   {
@@ -340,10 +336,6 @@ public:
   }
 
   using Base::swap;
-
-private:
-  // Not applicable for an array, equivalent to *p[0]
-  using Base::operator->;
 };// unique_ptr<T[], Deleter>
 
 

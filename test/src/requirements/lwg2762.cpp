@@ -29,7 +29,7 @@ template<bool B> struct TestDeleter
     bool operator!=(const pointer &) const noexcept;
   };
 
-  void operator()([[maybe_unused]] pointer ptr) const noexcept {}
+  void operator()(pointer /*unused*/) const noexcept {}
 };
 
 template<typename T, bool Nothrow> using UPtr = raii::unique_ptr<T, raii::deleter_class_wrapper<TestDeleter<Nothrow>>>;

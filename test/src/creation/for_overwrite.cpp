@@ -80,7 +80,7 @@ TEST_CASE("raii::make_unique_for_overwrite via malloc with memset non-trivial ty
     int uninit;
   };
 
-  raii::unique_ptr<NonTrivial> single_ptr = raii::make_unique_for_overwrite<NonTrivial>();
+  const raii::unique_ptr<NonTrivial> single_ptr = raii::make_unique_for_overwrite<NonTrivial>();
   CHECK(single_ptr->init == constInitMem);
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)

@@ -13,10 +13,11 @@
 #include <functional>
 #include <ostream>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 
 //----------------------------------------------------------------------
-// Encapsulates handles and performs resource release
+// Encapsulates handle unique holder and performs resource release
 // before going out of scope
 //----------------------------------------------------------------------
 
@@ -135,9 +136,9 @@ public:
     const handle old_h = std::exchange(get_handle(), h);
     // if (old_h != Deleter::invalid()) {
     if (get_deleter().is_owned(old_h)) {
-#ifdef UNIQUE_RC_ENABLE_SELF_RESET_ASSERT
+#ifdef RAII_ENABLE_SELF_RESET_ASSERT
       assert(old_h != h && "Failed self-reset check, like p.reset(p.get())");
-#endif// UNIQUE_RC_ENABLE_SELF_RESET_ASSERT
+#endif// RAII_ENABLE_SELF_RESET_ASSERT
       get_deleter()(old_h);
     }
 
@@ -217,7 +218,7 @@ template<typename Handle, class Deleter, template<typename, typename> typename T
     typename TypeResolver<std::decay_t<Handle>, std::remove_reference_t<Deleter>>::type>
 class unique_rc
 {
-  static_assert(!std::is_array_v<Handle>, "unique_rc does not work with array, use raii::unique_ptr");
+  static_assert(!std::is_array_v<Handle>, "raii::unique_rc is not specialised for plain array, use raii::unique_ptr");
 
 public:
   using handle = typename unique_rc_holder_impl<Handle, Deleter, TypeResolver>::handle;
@@ -265,11 +266,6 @@ public:
     requires std::conjunction_v<std::is_reference<D>, std::is_constructible<D, std::remove_reference_t<D>>>
   unique_rc(handle, std::remove_reference_t<Deleter> &&) = delete;
 
-  // template<class D>
-  // raii_inline constexpr unique_rc(handle h, D&& d) noexcept requires std::constructible_from<deleter_type, D>
-  //	: uh_{ h, std::forward<D>(d) }
-  //{}
-
   constexpr unique_rc(unique_rc &&) = default;
 
   // Converting constructor from another type
@@ -312,7 +308,28 @@ public:
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
   }
 
-  [[nodiscard]] raii_inline constexpr handle operator->() const noexcept(noexcept(get())) { return get(); }
+  [[nodiscard]] raii_inline constexpr handle operator->() const noexcept
+#ifndef RAII_NO_REQUIRE_CLASS_FOR_MEMBER_ACCESS_OPERATOR
+    requires is_class_or_union<std::remove_pointer_t<handle>>
+#endif// RAII_NO_REQUIRE_CLASS_FOR_MEMBER_ACCESS_OPERATOR
+  {
+    return get();
+  }
+
+  [[nodiscard]] raii_inline constexpr typename std::add_lvalue_reference_t<std::remove_pointer_t<element_type>>
+    operator*() const noexcept(noexcept(*std::declval<handle>()))
+    requires can_reference<handle>
+  {
+#ifdef __cpp_lib_reference_from_temporary
+    // 4148. unique_ptr::operator* should not allow dangling references
+    using ElemRefT = typename std::add_lvalue_reference_t<std::remove_pointer_t<element_type>>;
+    using DerefT = decltype(*get());
+    static_assert(
+      !std::reference_converts_from_temporary_v<ElemRefT, DerefT>, "operator* must not return a dangling reference");
+#endif
+    assert(get_deleter().is_owned(get()) && "Cannot dereference invalid pointer");
+    return *get();
+  }
 
   [[nodiscard]] raii_inline constexpr handle get() const noexcept { return uh_.get_handle(); }
 
