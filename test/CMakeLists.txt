@@ -72,6 +72,7 @@ set(TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/dr2228.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/dr2899.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/lwg2762.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/lwg4148.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/ptr_type_single.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/ptr_type_array.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/specialised_algorithms/compare.cpp
@@ -94,6 +95,8 @@ target_link_libraries(
           urc::urc
           Catch2::Catch2WithMain)
 
+target_compile_features(tests PUBLIC cxx_std_23)
+target_compile_definitions(tests PRIVATE -DRAII_NO_REQUIRE_CLASS_FOR_MEMBER_ACCESS_OPERATOR)
 target_include_directories(tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_HEADER_PREFIX})
 
 if (WIN32 AND BUILD_SHARED_LIBS)
@@ -130,6 +133,7 @@ set(CONSTEXPR_TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_release.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_reset.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/observers/constexpr_observers.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/lwg2762.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/specialised_algorithms/constexpr_compare.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/specialised_algorithms/constexpr_swap.cpp
 )
@@ -145,6 +149,8 @@ target_link_libraries(
           urc::urc
           Catch2::Catch2WithMain)
 
+target_compile_features(constexpr_tests PUBLIC cxx_std_23)
+target_compile_definitions(constexpr_tests PRIVATE -DRAII_NO_REQUIRE_CLASS_FOR_MEMBER_ACCESS_OPERATOR)
 target_include_directories(constexpr_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_HEADER_PREFIX})
 
 catch_discover_tests(
@@ -163,13 +169,16 @@ catch_discover_tests(
 # Disable the constexpr portion of the test, and build again this allows us to have an executable that we can debug when
 # things go wrong with the constexpr testing
 add_executable(relaxed_constexpr_tests ${TESTS_HEADERS} constexpr_tests.cpp)
+
 target_link_libraries(
   relaxed_constexpr_tests
   PRIVATE myproject::myproject_warnings
           myproject::myproject_options
           urc::urc
           Catch2::Catch2WithMain)
-target_compile_definitions(relaxed_constexpr_tests PRIVATE -DCATCH_CONFIG_RUNTIME_STATIC_REQUIRE)
+
+target_compile_features(relaxed_constexpr_tests PUBLIC cxx_std_23)
+target_compile_definitions(relaxed_constexpr_tests PRIVATE -DCATCH_CONFIG_RUNTIME_STATIC_REQUIRE -DRAII_NO_REQUIRE_CLASS_FOR_MEMBER_ACCESS_OPERATOR)
 target_include_directories(relaxed_constexpr_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_HEADER_PREFIX})
 
 catch_discover_tests(

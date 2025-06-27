@@ -62,7 +62,7 @@ struct deleter_class_wrapper : public Deleter
     requires std::is_pointer_v<Handle>
   [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept
   {
-    return h;
+    return static_cast<bool>(h);
   }
 };
 

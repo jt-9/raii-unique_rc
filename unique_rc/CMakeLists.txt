@@ -1,7 +1,6 @@
 include(GenerateExportHeader)
 #include(CMakePrintHelpers)
 
-set(LIB_HEADER_PREFIX include)
 
 function(add_lib_interface lib_name)
   add_library(${lib_name} INTERFACE)
@@ -14,9 +13,10 @@ function(add_lib_interface lib_name)
   #cmake_print_variables(CMAKE_CURRENT_LIST_DIR)
 
   target_include_directories(${lib_name} ${WARNING_GUARD} INTERFACE 
-                                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${LIB_HEADER_PREFIX}>
-                                # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${LIB_HEADER_PREFIX}/deleter>
-                                $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
+                                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                                # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/deleter>
+                                $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+                                $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR})
 endfunction()
 
 
