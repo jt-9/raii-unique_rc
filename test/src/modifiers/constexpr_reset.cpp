@@ -78,8 +78,10 @@ template<typename T> constexpr bool unique_ptr_default_array(std::size_t array_s
   ptra2.reset(new T[array_size]{});
 
   constexpr auto default_value = T{};
-  // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
-  for (std::size_t i = 0; i < array_size; i++) { assert(default_value == ptra2[i]); }
+  for (std::size_t i = 0; i < array_size; i++) {
+    // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
+    if (default_value != ptra2[i]) { return false; }
+  }
 
   ptra2.reset(nullptr);
   assert(!ptra2);

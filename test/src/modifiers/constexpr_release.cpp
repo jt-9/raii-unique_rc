@@ -16,7 +16,7 @@ template<typename T> [[nodiscard]] constexpr bool unique_ptr_default_single() no
   assert(raw_ptr == nullptr);
   assert(!ptr1);
 
-  return true;
+  return !raw_ptr;
 }
 
 template<typename T> [[nodiscard]] constexpr bool unique_ptr_value_single(T const val) noexcept
@@ -41,7 +41,7 @@ template<typename T> [[nodiscard]] constexpr bool unique_ptr_default_array() noe
   assert(raw_ptr == nullptr);
   assert(!ptr1);
 
-  return true;
+  return !raw_ptr;
 }
 
 [[nodiscard]] constexpr bool unique_ptr_value_array(int const elem1, int const elem2, int const elem3) noexcept

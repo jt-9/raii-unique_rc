@@ -9,17 +9,12 @@
 #include "concepts.hpp"
 
 #include <cassert>
-#include <concepts>
 #include <functional>
 #include <ostream>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 
-//----------------------------------------------------------------------
-// Encapsulates handle unique holder and performs resource release
-// before going out of scope
-//----------------------------------------------------------------------
 
 RAII_NS_BEGIN
 
@@ -73,11 +68,11 @@ struct resolve_handle_type<Handle, Del_noref>
 
 // deleter requirements
 template<typename T>
-using is_not_pointer_default_constructable =
+using not_pointer_and_is_default_constructable =
   std::conjunction<std::negation<std::is_pointer<T>>, std::is_default_constructible<T>>;
 
 template<typename T>
-concept is_not_pointer_default_constructable_v = is_not_pointer_default_constructable<T>::value;
+concept not_pointer_and_is_default_constructable_v = not_pointer_and_is_default_constructable<T>::value;
 
 template<class D, typename Hr>
 concept has_static_invalid_convertible_handle = requires {
@@ -208,11 +203,21 @@ struct unique_rc_holder<Handle, Deleter, TypeResolver, false, false>
   unique_rc_holder &operator=(unique_rc_holder &&) = delete;
 };
 
+/**
+ * @brief raii::unique_rc is a smart handle that owns (is responsible for) and manages another object via a handle
+ * and subsequently disposes of that object when the unique_rc goes out of scope.
+ *
+ * The object is disposed of, using the associated deleter, when either of the following happens:
 
-// unique_rc non-copyable handle to a resource, implements RAII
+  * the managing unique_rc object is destroyed.
+  * the managing unique_rc object is assigned another handle via operator= or reset().
 
-// There is no class template argument deduction from pointer type
-// because it is impossible to distinguish a pointer obtained from array and non - array forms of new.
+ * The object is disposed of, using a potentially user-supplied deleter, by calling get_deleter()(handle).
+ * @tparam Handle the type of the handle managed by this unique_rc
+ * @tparam Deleter the function object or lvalue reference to function object, to be called from the destructor
+ * @tparam TypeResolver std::remove_reference<Deleter>::type::handle if that type exists, otherwise Handle
+ * @note raii::unique_rc does not work with dynamically-allocated array of objects T[], raii::unique_ptr does
+ **/
 template<typename Handle, class Deleter, template<typename, typename> typename TypeResolver = resolve_handle_type>
   requires has_static_invalid_convertible_handle<std::remove_reference_t<Deleter>,
     typename TypeResolver<std::decay_t<Handle>, std::remove_reference_t<Deleter>>::type>
@@ -221,42 +226,55 @@ class unique_rc
   static_assert(!std::is_array_v<Handle>, "raii::unique_rc is not specialised for plain array, use raii::unique_ptr");
 
 public:
+  /// @brief std::remove_reference<Deleter>::type::handle if that type exists, otherwise T*. Must satisfy
+  /// NullablePointer
   using handle = typename unique_rc_holder_impl<Handle, Deleter, TypeResolver>::handle;
+
+  /// @brief Handle, the type of the resource managed by this unique_rc
   using element_type = Handle;
+
+  /// @brief Deleter, the function object or lvalue reference to function object, to be called from the destructor
   using deleter_type = Deleter;
+
+  /// @brief Represents invalid handle type, whose value is returned by Deleter::invalid()
+  /// is assigned to *this handle, when it goes out of scope, or upon reset()
   using invalid_handle_type = std::remove_cvref_t<decltype(std::remove_reference_t<Deleter>::invalid())>;
 
 private:
-  // helper template for detecting a safe conversion from another unique_rc
+  /// @brief Helper template for detecting a safe conversion from another unique_rc
   template<typename H, class D, template<typename, typename> class TR>
   using safe_conversion_from = std::conjunction<std::is_convertible<typename unique_rc<H, D, TR>::handle, handle>,
     std::negation<std::is_array<H>>>;
 
 public:
-  /// Default constructor, creates a unique_rc that owns nothing.
-  // template<class D = Deleter>
-  //   requires is_not_pointer_default_constructable_v<Deleter>
+  /// @brief Default constructor, creates a unique_rc that owns nothing
   raii_inline constexpr unique_rc() noexcept
-    requires is_not_pointer_default_constructable_v<Deleter>
+    requires not_pointer_and_is_default_constructable_v<Deleter>
     : uh_{ invalid() }
   {}
 
-  // template<class D = Deleter>
-  //   requires is_not_pointer_default_constructable_v<D>
+  /// @brief Constructs a unique_rc object which owns h, initialising the stored handle with h
+  /// and value - initialising the stored deleter.
+  /// @param h a handle to a resource to manage
+  /// @note Requires that Deleter is DefaultConstructible and that construction does not throw an exception
   raii_inline explicit constexpr unique_rc(handle h) noexcept
-    requires is_not_pointer_default_constructable_v<Deleter>
+    requires not_pointer_and_is_default_constructable_v<Deleter>
     : uh_{ h }
   {}
 
-  // template<class D = Deleter>
-  //   requires std::is_copy_constructible_v<D>
+  /// @brief Constructs a unique_rc object which owns h, initialising the stored handle with h
+  /// and initializing a Deleter d, requires that Deleter is nothrow-CopyConstructible
+  /// @param h a handle to a resource to manage
+  /// @param d a deleter to use to close/destroy the object
   raii_inline constexpr unique_rc(handle h, const Deleter &d) noexcept
     requires std::is_copy_constructible_v<Deleter>
     : uh_{ h, d }
   {}
 
-  // template<class D = Deleter>
-  //   requires std::conjunction_v<std::negation<std::is_reference<D>>, std::is_move_constructible<D>>
+  /// @brief Constructs a unique_rc object which owns h, initialising the stored handle with h
+  /// and initializing a Deleter d, requires that Deleter is nothrow-MoveConstructible
+  /// @param h a handle to a resource to manage
+  /// @param d a deleter to use to close/destroy the object
   raii_inline constexpr unique_rc(handle h, Deleter &&d) noexcept
     requires std::conjunction_v<std::negation<std::is_reference<Deleter>>, std::is_move_constructible<Deleter>>
     : uh_{ h, std::move(d) }
@@ -266,20 +284,38 @@ public:
     requires std::conjunction_v<std::is_reference<D>, std::is_constructible<D, std::remove_reference_t<D>>>
   unique_rc(handle, std::remove_reference_t<Deleter> &&) = delete;
 
-  constexpr unique_rc(unique_rc &&) = default;
+  /// @brief Constructs a unique_rc by transferring ownership from src to *this and stores the invalid handle in src
+  /// @param src other unique_rc transferring ownership from
+  constexpr unique_rc(unique_rc && /*src*/) noexcept = default;
 
-  // Converting constructor from another type
+  /// @brief Constructs a unique_rc by transferring ownership from u to *this, where u is constructed with a specified
+  /// deleter (D)
+  /// @tparam H type of a u's handle
+  /// @tparam D u's deleter type
+  /// @param u unique_rc transferring ownership from
+  /// @note Depends upon whether D is a reference type, as following: a) if D is a reference type, this deleter is
+  /// copy constructed from u's deleter (requires that this construction does not throw), b) if D is a non-reference
+  /// type, this deleter is move constructed from u's deleter (requires that this construction does not throw).
   template<typename H, class D, template<typename, typename> class TR>
     requires std::conjunction_v<safe_conversion_from<H, D, TR>,
       std::conditional_t<std::is_reference_v<Deleter>, std::is_same<D, Deleter>, std::is_convertible<D, Deleter>>>
   // cppcheck-suppress noExplicitConstructor intended converting constructor
-  raii_inline constexpr unique_rc(unique_rc<H, D, TR> &&src) noexcept
-    : uh_{ src.release(), std::forward<D>(src.get_deleter()) }
+  raii_inline constexpr unique_rc(unique_rc<H, D, TR> &&u) noexcept
+    : uh_{ u.release(), std::forward<D>(u.get_deleter()) }
   {}
 
-  constexpr unique_rc &operator=(unique_rc &&) = default;
+  /// @brief Move assignment operator. Transfers ownership from rhs to *this as if by calling reset(rhs.release())
+  /// followed by assigning get_deleter() from std::forward<Deleter>(rhs.get_deleter())
+  /// @param rhs unique_rc transferring ownership from
+  /// @return reference to *this unique_rc
+  constexpr unique_rc &operator=(unique_rc && /*rhs*/) noexcept = default;
 
-  // Assignment from another type
+  /// @brief Converting move assignment operator. Transfers ownership from rhs to *this as if by calling
+  /// reset(rhs.release()) followed by assigning get_deleter() from std::forward<D>(rhs.get_deleter())
+  /// @tparam H type of a rhs handle
+  /// @tparam D rhs deleter type
+  /// @param rhs unique_rc transfers ownership from
+  /// @return reference to *this unique_rc
   template<typename H, class D, template<typename, typename> class TR>
     requires std::conjunction_v<safe_conversion_from<H, D, TR>, std::is_assignable<deleter_type &, D &&>>
   raii_inline constexpr unique_rc &operator=(unique_rc<H, D, TR> &&rhs) noexcept
@@ -293,8 +329,9 @@ public:
   unique_rc(const unique_rc &) = delete;
   unique_rc &operator=(const unique_rc &) = delete;
 
-
-  // Destructor, invokes the deleter if the stored handle is valid
+  /// @brief If get_deleter().is_owned(h) is false there are no effects.
+  /// Otherwise, the owned object is destroyed via get_deleter()(h).
+  /// Requires that get_deleter()(h) does not throw exceptions.
   raii_inline constexpr ~unique_rc() noexcept
   {
     static_assert(std::is_invocable_v<deleter_type &, handle>, "unique_rc's deleter must be invocable with a handle");
@@ -308,6 +345,8 @@ public:
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
   }
 
+  /// @brief provides access to object owned by *this
+  /// @return handle to managed resource
   [[nodiscard]] raii_inline constexpr handle operator->() const noexcept
 #ifndef RAII_NO_REQUIRE_CLASS_FOR_MEMBER_ACCESS_OPERATOR
     requires is_class_or_union<std::remove_pointer_t<handle>>
@@ -316,12 +355,16 @@ public:
     return get();
   }
 
+  /// @brief operator* provides access to object owned by *this,
+  /// provided it can be dereferenced
+  /// @return dereferenced handle
+  /// @note If get() is invalid, the behaviour is undefined
   [[nodiscard]] raii_inline constexpr typename std::add_lvalue_reference_t<std::remove_pointer_t<element_type>>
     operator*() const noexcept(noexcept(*std::declval<handle>()))
     requires can_reference<handle>
   {
 #ifdef __cpp_lib_reference_from_temporary
-    // 4148. unique_ptr::operator* should not allow dangling references
+    // 4148. unique_rc::operator* should not allow dangling references
     using ElemRefT = typename std::add_lvalue_reference_t<std::remove_pointer_t<element_type>>;
     using DerefT = decltype(*get());
     static_assert(
@@ -331,32 +374,53 @@ public:
     return *get();
   }
 
+  /// @brief Returns a handle to the managed resource or invalid() if no resource is owned
+  /// @return handle to the managed resource or invalid() if no resource is owned
   [[nodiscard]] raii_inline constexpr handle get() const noexcept { return uh_.get_handle(); }
 
+  /// @brief Returns the deleter object which would be used for destruction of the managed resource
+  /// @return reference to deleter
   [[nodiscard]] raii_inline constexpr deleter_type &get_deleter() noexcept { return uh_.get_deleter(); }
 
+  /// @brief Returns the deleter object which would be used for destruction of the managed resource
+  /// @return const reference to deleter object
   [[nodiscard]] raii_inline constexpr const deleter_type &get_deleter() const noexcept { return uh_.get_deleter(); }
 
+  /// @brief Releases the ownership of the managed resource, if any. get() returns invalid after the call.
+  /// @return handle to the managed resource or invalid if there was no managed resource
+  /// @note The caller is responsible for cleaning up the object (e.g. by use of get_deleter())
   raii_inline constexpr handle release() noexcept { return uh_.release(); }
 
-  raii_inline constexpr void reset(handle new_h = invalid()) noexcept
+  /// @brief Replaces the managed resource.
+  /// To replace the managed resource while supplying a new deleter as well, move assignment operator may be used.
+  /// @param h handle to a new resource to manage
+  /// @note A test for self-reset, i.e. whether handle points to an object already managed by *this, is not performed,
+  /// except where provided as a compiler extension or as a debugging assert.
+  /// @note code such as p.reset(p.release()) does not involve self-reset, only code like p.reset(p.get()) does
+  raii_inline constexpr void reset(handle h = invalid()) noexcept
   {
     static_assert(std::is_invocable_v<deleter_type &, handle>, "unique_rc's deleter must be invocable with a handle");
-    uh_.reset(std::move(new_h));
+    uh_.reset(std::move(h));
   }
 
+  /// @brief Checks whether *this owns a resource, i.e. whether get_deleter().is_owned(get())
+  /// @return true if *this owns a resource, false otherwise
   [[nodiscard]] raii_inline constexpr explicit operator bool() const noexcept
   {
     // NOLINTNEXTLINE(clang-diagnostic-unused-result)
     return get_deleter().is_owned(get());
   }
 
+  /// @brief Represents invalid handle, may differ from handle, but must be assignable to one
+  /// @return invalid handle which is assignable to handle
   [[nodiscard]] raii_inline static constexpr invalid_handle_type invalid() noexcept(
     noexcept(std::remove_reference_t<Deleter>::invalid()))
   {
     return std::remove_reference_t<Deleter>::invalid();
   }
 
+  /// @brief Swaps the managed resource and associated deleters of *this and another unique_rc object other
+  /// @param other another unique_rc object to swap the managed resource and the deleter with
   raii_inline constexpr void swap(unique_rc &other) noexcept(
     std::is_nothrow_swappable_v<Handle> && std::is_nothrow_swappable_v<Deleter>)
     requires std::is_swappable_v<Handle> && std::is_swappable_v<Deleter>
@@ -381,7 +445,7 @@ template<typename H1,
   return lhs.get() == rhs.get();
 }
 
-// unique_ptr comparison with nullptr
+// unique_rc comparison with nullptr
 template<typename H, class D, template<typename, typename> class TR>
   requires std::same_as<typename unique_rc<H, D, TR>::invalid_handle_type, std::nullptr_t>
 [[nodiscard]] raii_inline constexpr bool operator==(const unique_rc<H, D, TR> &lhs, std::nullptr_t) noexcept

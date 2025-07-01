@@ -61,7 +61,7 @@ template<typename T> [[nodiscard]] constexpr bool unique_ptr_value_array_cast_to
   const auto owns_memory = static_cast<bool>(ptr);
   assert(owns_memory);
 
-  return true;
+  return owns_memory;
 }
 
 }// namespace
