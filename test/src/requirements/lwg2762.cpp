@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "urc/deleter/memory_delete.hpp"
+
 #include "urc/unique_ptr.hpp"
 #include "urc/unique_rc.hpp"
 
@@ -32,7 +32,7 @@ template<bool B> struct TestDeleter
   void operator()(pointer /*unused*/) const noexcept {}
 };
 
-template<typename T, bool Nothrow> using UPtr = raii::unique_ptr<T, raii::deleter_class_wrapper<TestDeleter<Nothrow>>>;
+template<typename T, bool Nothrow> using UPtr = raii::unique_ptr<T, TestDeleter<Nothrow>>;
 }// namespace
 
 TEST_CASE("LWG 2762 unique_ptr operator*() should be noexcept", "[unique_ptr::operator *]")
@@ -52,6 +52,5 @@ TEST_CASE("LWG 2762 unique_ptr operator*() should be noexcept", "[unique_ptr::op
 TEST_CASE("LWG 2762 unique_rc operator->() should be noexcept", "[unique_rc::operator ->]")
 {
   STATIC_CHECK(noexcept(std::declval<raii::unique_rc<long *, raii::default_delete<long>>>().operator->()));
-  STATIC_CHECK(
-    noexcept(std::declval<raii::unique_rc<int *, raii::deleter_class_wrapper<TestDeleter<false>>> &>().operator->()));
+  STATIC_CHECK(noexcept(std::declval<raii::unique_rc<int *, TestDeleter<false>> &>().operator->()));
 }
