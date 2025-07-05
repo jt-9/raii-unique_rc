@@ -101,7 +101,6 @@ concept has_static_invalid_convertible_handle = requires {
 template<typename Handle,
   class Deleter,
   template<typename, typename> typename TypeResolver,
-  typename InvalidHandle,
   typename InvalidHandlePolicy>
 class unique_rc_holder_impl
 {
@@ -182,13 +181,12 @@ private:
 template<typename Handle,
   class Deleter,
   template<typename, typename> class TypeResolver,
-  typename InvalidHandle,
   typename InvalidHandlePolicy,
   bool = std::is_move_constructible_v<Deleter>,
   bool = std::is_move_assignable_v<Deleter>>
-struct unique_rc_holder : unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy>
+struct unique_rc_holder : unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandlePolicy>
 {
-  using unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy>::unique_rc_holder_impl;
+  using unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandlePolicy>::unique_rc_holder_impl;
 
   unique_rc_holder(unique_rc_holder &&) = default;
   unique_rc_holder &operator=(unique_rc_holder &&) = default;
@@ -197,22 +195,21 @@ struct unique_rc_holder : unique_rc_holder_impl<Handle, Deleter, TypeResolver, I
 template<typename Handle,
   class Deleter,
   template<typename, typename> typename TypeResolver,
-  typename InvalidHandle,
   typename InvalidHandlePolicy>
-struct unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy, true, false>
-  : unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy>
+struct unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandlePolicy, true, false>
+  : unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandlePolicy>
 {
-  using unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy>::unique_rc_holder_impl;
+  using unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandlePolicy>::unique_rc_holder_impl;
 
   unique_rc_holder(unique_rc_holder &&) = default;
   unique_rc_holder &operator=(unique_rc_holder &&) = delete;
 };
 
-template<typename Handle, class Deleter, template<typename, typename> typename TypeResolver, typename InvalidHandle, typename InvalidHandlePolicy>
-struct unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy, false, true>
-  : unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy>
+template<typename Handle, class Deleter, template<typename, typename> typename TypeResolver, typename InvalidHandlePolicy>
+struct unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandlePolicy, false, true>
+  : unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandlePolicy>
 {
-  using unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy>::unique_rc_holder_impl;
+  using unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandlePolicy>::unique_rc_holder_impl;
 
   unique_rc_holder(unique_rc_holder &&) = delete;
   unique_rc_holder &operator=(unique_rc_holder &&) = default;
@@ -221,12 +218,11 @@ struct unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHan
 template<typename Handle,
   class Deleter,
   template<typename, typename> typename TypeResolver,
-  typename InvalidHandle,
   typename InvalidHandlePolicy>
-struct unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy, false, false>
-  : unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy>
+struct unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandlePolicy, false, false>
+  : unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandlePolicy>
 {
-  using unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy>::unique_rc_holder_impl;
+  using unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandlePolicy>::unique_rc_holder_impl;
 
   unique_rc_holder(unique_rc_holder &&) = delete;
   unique_rc_holder &operator=(unique_rc_holder &&) = delete;
@@ -261,7 +257,7 @@ class unique_rc
 
 public:
   /// @brief std::remove_reference<Deleter>::type::handle if that type exists, otherwise T
-  using handle = typename unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy>::handle;
+  using handle = typename unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandlePolicy>::handle;
 
   /// @brief Handle, the type of the resource managed by this unique_rc
   using element_type = Handle;
@@ -461,7 +457,7 @@ public:
   }
 
 private:
-  unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy> uh_;
+  unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandlePolicy> uh_;
 };
 
 template<typename H1,
