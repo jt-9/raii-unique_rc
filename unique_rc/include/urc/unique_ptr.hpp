@@ -88,17 +88,17 @@ struct resolve_pointer_type<Pointer, Del_noref>
 /**
  * @brief raii::unique_ptr is a smart pointer that owns (is responsible for) and manages another object via a pointer
  * and subsequently disposes of that object when the unique_ptr goes out of scope.
- * 
+ *
  * The object is disposed of, using the associated deleter, when either of the following happens:
 
   * the managing unique_ptr object is destroyed.
   * the managing unique_ptr object is assigned another pointer via operator= or reset().
 
  * The object is disposed of, using a potentially user-supplied deleter, by calling get_deleter()(ptr).
- * The default deleter (raii::default_delete) uses the delete operator, which destroys the object and deallocates the 
+ * The default deleter (raii::default_delete) uses the delete operator, which destroys the object and deallocates the
  * memory.
  * @tparam T the type of the object managed by this unique_ptr
- * @tparam Deleter the function object or lvalue reference to function object, to be called from the destructor 
+ * @tparam Deleter the function object or lvalue reference to function object, to be called from the destructor
  * @note This manages single object (e.g., allocated with new).
  * @note There is no class template argument deduction from pointer type
  * because it is impossible to distinguish a pointer obtained from array and single forms of new.
@@ -112,7 +112,8 @@ private:
   using typename Base::handle;
 
 public:
-  /// @brief std::remove_reference<Deleter>::type::pointer if that type exists, otherwise T*. Must satisfy `NullablePointer`
+  /// @brief std::remove_reference<Deleter>::type::pointer if that type exists, otherwise T*. Must satisfy
+  /// `NullablePointer`
   using pointer = typename Base::handle;
 
   /// @brief T, the type of the object managed by this unique_ptr
@@ -123,9 +124,9 @@ public:
 
   /// @brief Represents invalid handle type, whose value is returned by Deleter::invalid()
   /// is assigned to *this handle, when it goes out of scope, or upon reset(), usually std::nullptr_t
-  using invalid_pointer_type = Base::invalid_handle_type;
+  using invalid_pointer = Base::invalid_handle;
 
-  /// @brief static method returns invalid pointer of type `invalid_pointer_type`, usually `nullptr`
+  /// @brief static method returns invalid pointer of type `invalid_pointer`, usually `nullptr`
   using Base::invalid;
 
 private:
@@ -192,7 +193,7 @@ public:
   }
 
   raii_inline constexpr unique_ptr &operator=(std::nullptr_t) noexcept
-    requires std::is_same_v<invalid_pointer_type, std::nullptr_t>
+    requires std::is_same_v<invalid_pointer, std::nullptr_t>
   {
     reset();
     return *this;
@@ -216,13 +217,13 @@ public:
   using Base::swap;
 };
 
-/** 
+/**
  * @brief raii::unique_ptr is a smart pointer that owns (is responsible for) and manages another object via a pointer
  * and subsequently disposes of that object when the unique_ptr goes out of scope.
  * @tparam T the type of the object, array of which is managed by this unique_ptr
- * @tparam Deleter the function object or lvalue reference to function object, to be called from the destructor 
+ * @tparam Deleter the function object or lvalue reference to function object, to be called from the destructor
  * @note This specialisation manages dynamically-allocated array of objects (e.g., allocated with new[]).
-**/
+ **/
 template<typename T, class Deleter>
 class unique_ptr<T[], Deleter> : public unique_rc<T *, Deleter, resolve_pointer_type, std::nullptr_t>
 {
@@ -234,7 +235,8 @@ private:
     std::conjunction<std::is_base_of<T, U>, std::negation<std::is_same<std::remove_cv_t<T>, std::remove_cv_t<U>>>>;
 
 public:
-  /// @brief std::remove_reference<Deleter>::type::pointer if that type exists, otherwise T*. Must satisfy `NullablePointer`
+  /// @brief std::remove_reference<Deleter>::type::pointer if that type exists, otherwise T*. Must satisfy
+  /// `NullablePointer`
   using pointer = typename Base::handle;
 
   /// @brief T, the type of the object managed by this unique_ptr
@@ -245,9 +247,9 @@ public:
 
   /// @brief Represents invalid handle type, whose value is returned by Deleter::invalid()
   /// is assigned to *this handle, when it goes out of scope, or upon reset(), usually std::nullptr_t
-  using invalid_pointer_type = Base::invalid_handle_type;
+  using invalid_pointer = Base::invalid_handle;
 
-  /// @brief static method returns invalid pointer of type `invalid_pointer_type`, usually `nullptr`
+  /// @brief static method returns invalid pointer of type `invalid_pointer`, usually `nullptr`
   using Base::invalid;
 
   /// @brief helper template for detecting a safe conversion from a raw pointer
@@ -325,7 +327,7 @@ public:
   }
 
   raii_inline constexpr unique_ptr &operator=(std::nullptr_t) noexcept
-    requires std::is_same_v<invalid_pointer_type, std::nullptr_t>
+    requires std::is_same_v<invalid_pointer, std::nullptr_t>
   {
     reset();
     return *this;
@@ -375,7 +377,7 @@ public:
   /// @brief Replaces the managed array. Equivalent to `reset(pointer())`
   /// @param nullptr or none
   raii_inline constexpr void reset(std::nullptr_t = nullptr) noexcept
-    requires std::is_same_v<invalid_pointer_type, std::nullptr_t>
+    requires std::is_same_v<invalid_pointer, std::nullptr_t>
   {
     Base::reset(invalid());
   }
