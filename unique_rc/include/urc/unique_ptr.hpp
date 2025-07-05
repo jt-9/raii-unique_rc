@@ -105,10 +105,10 @@ struct resolve_pointer_type<Pointer, Del_noref>
  **/
 template<typename T, class Deleter = raii::default_delete<T>>
   requires can_form_pointer<T>
-class unique_ptr : public unique_rc<T *, Deleter, resolve_pointer_type>
+class unique_ptr : public unique_rc<T *, Deleter, resolve_pointer_type, std::nullptr_t>
 {
 private:
-  using Base = unique_rc<T *, Deleter, resolve_pointer_type>;
+  using Base = unique_rc<T *, Deleter, resolve_pointer_type, std::nullptr_t>;
   using typename Base::handle;
 
 public:
@@ -224,10 +224,10 @@ public:
  * @note This specialisation manages dynamically-allocated array of objects (e.g., allocated with new[]).
 **/
 template<typename T, class Deleter>
-class unique_ptr<T[], Deleter> : public unique_rc<T *, Deleter, resolve_pointer_type>
+class unique_ptr<T[], Deleter> : public unique_rc<T *, Deleter, resolve_pointer_type, std::nullptr_t>
 {
 private:
-  using Base = unique_rc<T *, Deleter, resolve_pointer_type>;
+  using Base = unique_rc<T *, Deleter, resolve_pointer_type, std::nullptr_t>;
 
   template<typename U>
   using is_derived_T =

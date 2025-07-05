@@ -24,10 +24,6 @@ struct memory_delete
   raii_inline constexpr memory_delete(const memory_delete<U> &) noexcept
   {}
 
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-
-  [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept { return h; }
-
 #ifdef __cpp_static_call_operator
   // False poisitive, guarded by feature #ifdef __cpp_static_call_operator
   // NOLINTNEXTLINE(clang-diagnostic-c++23-extensions)
