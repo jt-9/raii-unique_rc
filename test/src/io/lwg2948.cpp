@@ -29,6 +29,9 @@ template<typename> struct deleter
   struct pointer
   {
     constexpr pointer() = default;
+    // Implicit 1 argument constructor to support NullablePointer requirement
+    // cppcheck-suppress noExplicitConstructor
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
     pointer(std::nullptr_t) {}
     explicit operator bool() const { return false; }
     bool operator==(pointer /*unused*/) const { return true; }

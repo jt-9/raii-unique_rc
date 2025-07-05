@@ -1,7 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
 
-#include "urc/deleter/memory_delete.hpp"
 #include "urc/unique_ptr.hpp"
 // #include "urc/unique_rc.hpp"
 
@@ -82,10 +81,8 @@ struct DeleterArray : public Deleter
 
 TEST_CASE("unique_ptr<int> is swappable with non move-assignable deleter", "[unique_ptr][unique_ptr::swap][swap]")
 {
-  raii::unique_ptr<int, raii::deleter_class_wrapper<Deleter>> ptr1{ new int{ 1 },
-    raii::deleter_class_wrapper<Deleter>{ -1 } };
-  raii::unique_ptr<int, raii::deleter_class_wrapper<Deleter>> ptr2{ new int{ 2 },
-    raii::deleter_class_wrapper<Deleter>{ -2 } };
+  raii::unique_ptr<int, Deleter> ptr1{ new int{ 1 }, Deleter{ -1 } };
+  raii::unique_ptr<int, Deleter> ptr2{ new int{ 2 }, Deleter{ -2 } };
 
   int const *const pi1 = ptr1.get();
   int const *const pi2 = ptr2.get();
@@ -102,11 +99,9 @@ TEST_CASE("unique_ptr<int> is swappable with non move-assignable deleter", "[uni
 TEST_CASE("unique_ptr<int[]> is swappable with non move-assignable deleter", "[unique_ptr][unique_ptr::swap][swap]")
 {
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
-  raii::unique_ptr<int[], raii::deleter_class_wrapper<DeleterArray>> ptr1{ new int[1]{ 1 },
-    raii::deleter_class_wrapper<DeleterArray>{ -1 } };
+  raii::unique_ptr<int[], DeleterArray> ptr1{ new int[1]{ 1 }, DeleterArray{ -1 } };
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
-  raii::unique_ptr<int[], raii::deleter_class_wrapper<DeleterArray>> ptr2{ new int[2]{ 2, 2 },
-    raii::deleter_class_wrapper<DeleterArray>{ -2 } };
+  raii::unique_ptr<int[], DeleterArray> ptr2{ new int[2]{ 2, 2 }, DeleterArray{ -2 } };
 
   int const *const pi1 = ptr1.get();
   int const *const pi2 = ptr2.get();

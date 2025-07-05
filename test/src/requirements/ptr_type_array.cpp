@@ -1,7 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
 
-#include "urc/deleter/memory_delete.hpp"
 #include "urc/unique_ptr.hpp"
 
 #include <type_traits>
@@ -24,10 +23,10 @@ TEST_CASE("Array objects unique_ptr::pointer type deduction", "[unique_ptr][uniq
 {
   // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   using up = raii::unique_ptr<int[]>;
-  using upA = raii::unique_ptr<int[], raii::deleter_class_wrapper<A>>;
-  using upB = raii::unique_ptr<int[], raii::deleter_class_wrapper<B>>;
-  using upAr = raii::unique_ptr<int[], raii::deleter_class_wrapper<A> &>;
-  using upBr = raii::unique_ptr<int[], raii::deleter_class_wrapper<B> &>;
+  using upA = raii::unique_ptr<int[], A>;
+  using upB = raii::unique_ptr<int[], B>;
+  using upAr = raii::unique_ptr<int[], A &>;
+  using upBr = raii::unique_ptr<int[], B &>;
   // NOLINTEND(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 
   STATIC_CHECK(std::is_same_v<up::pointer, int *>);

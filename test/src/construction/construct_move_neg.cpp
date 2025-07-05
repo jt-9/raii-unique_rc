@@ -1,7 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
 
-#include "urc/deleter/memory_delete.hpp"
 #include "urc/unique_ptr.hpp"
 
 // LWG 2905 is_constructible_v<unique_ptr<P, D>, P, D const &> should be false when D is not copy constructible
@@ -47,12 +46,8 @@ TEST_CASE("is_constructible unique_ptr of array of base objects from unique_ptr 
   "[unique_ptr][unique_ptr::unique_ptr][std::is_constructible_v]")
 {
   // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
-  STATIC_CHECK_FALSE(unique_ptr_is_constructible<Base[],
-    raii::deleter_class_wrapper<DelArray>,
-    raii::unique_ptr<Derived[], raii::deleter_class_wrapper<DelArray>> &&>());
-  STATIC_CHECK_FALSE(unique_ptr_is_assignable<Base[],
-    raii::deleter_class_wrapper<DelArray>,
-    raii::unique_ptr<Derived[], raii::deleter_class_wrapper<DelArray>> &&>());
+  STATIC_CHECK_FALSE(unique_ptr_is_constructible<Base[], DelArray, raii::unique_ptr<Derived[], DelArray> &&>());
+  STATIC_CHECK_FALSE(unique_ptr_is_assignable<Base[], DelArray, raii::unique_ptr<Derived[], DelArray> &&>());
   // NOLINTEND(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 }
 

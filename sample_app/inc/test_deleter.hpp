@@ -33,9 +33,6 @@ public:
 
   constexpr void operator()(Handle h) const noexcept { delete h; }
 
-  [[nodiscard]] static constexpr auto invalid() noexcept { return nullptr; }
-  [[nodiscard]] static constexpr bool is_owned(Handle h) noexcept { return h != invalid(); }
-
 protected:
   Dummy1 d1;
 };
@@ -51,9 +48,6 @@ public:
   constexpr PointerWithDummy2(Dummy1 nd1, Dummy2 nd2) noexcept : d1{ nd1 }, d2{ nd2 } {}
 
   constexpr void operator()(Handle h) const noexcept { delete h; }
-
-  [[nodiscard]] static constexpr auto invalid() noexcept { return nullptr; }
-  [[nodiscard]] static constexpr bool is_owned(Handle h) noexcept { return h; }
 
 protected:
   Dummy1 d1;

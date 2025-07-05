@@ -69,9 +69,9 @@ struct resolve_handle_type<Handle, Del_noref>
 
 template<typename Handle, typename Invalid> struct default_invalid_handle_policy
 {
-  using invalid_handle = Invalid;
+  using invalid_type = Invalid;
 
-  [[nodiscard]] raii_inline static constexpr invalid_handle invalid() noexcept { return {}; }
+  [[nodiscard]] raii_inline static constexpr invalid_type invalid() noexcept { return {}; }
 
   [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept { return h != invalid(); }
 
@@ -90,11 +90,12 @@ using not_pointer_and_is_default_constructable =
 template<typename T>
 concept not_pointer_and_is_default_constructable_v = not_pointer_and_is_default_constructable<T>::value;
 
-template<class D, typename Hr>
-concept has_static_invalid_convertible_handle = requires {
-  { D::invalid() } noexcept -> std::convertible_to<Hr>;
-} || requires {
-  { D::invalid() } noexcept -> std::same_as<Hr>;
+template<typename Handle, typename Invalid, template<typename, typename> class InvalidHandlePolicy>
+concept has_static_is_owned_and_invalid = requires {
+  {
+    InvalidHandlePolicy<Handle, Invalid>::invalid()
+  } noexcept -> std::same_as<typename InvalidHandlePolicy<Handle, Invalid>::invalid_type>;
+  { InvalidHandlePolicy<Handle, Invalid>::is_owned(std::declval<Handle>()) } noexcept -> std::same_as<bool>;
 };
 
 
@@ -113,7 +114,7 @@ public:
   using handle = typename TypeResolver<Handle, std::remove_reference_t<Deleter>>::type;
 
   using invalid_handle_policy = InvalidHandlePolicy<handle, InvalidHandle>;
-  using invalid_handle = typename invalid_handle_policy::invalid_handle;
+  using invalid_handle = typename invalid_handle_policy::invalid_type;
 
   static_assert(!std::is_rvalue_reference_v<Deleter>,
     "unique_rc's deleter type must be a function object type"
@@ -199,8 +200,8 @@ struct unique_rc_holder : unique_rc_holder_impl<Handle, Deleter, TypeResolver, I
 
 template<typename Handle,
   class Deleter,
-  template<typename, typename> typename TypeResolver, 
-  typename InvalidHandle, 
+  template<typename, typename> typename TypeResolver,
+  typename InvalidHandle,
   template<typename, typename> class InvalidHandlePolicy>
 struct unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy, true, false>
   : unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy>
@@ -259,8 +260,10 @@ template<typename Handle,
   template<typename, typename> typename TypeResolver = resolve_handle_type,
   typename InvalidHandle = typename TypeResolver<std::decay_t<Handle>, std::remove_reference_t<Deleter>>::type,
   template<typename, typename> typename InvalidHandlePolicy = default_invalid_handle_policy>
-// requires has_static_invalid_convertible_handle<InvalidHandlePolicy<
-//   typename TypeResolver<std::decay_t<Handle>, std::remove_reference_t<Deleter>>::type>
+requires has_static_is_owned_and_invalid<
+    typename TypeResolver<std::decay_t<Handle>, std::remove_reference_t<Deleter>>::type,
+    InvalidHandle,
+    InvalidHandlePolicy>
 class unique_rc
 {
   static_assert(!std::is_array_v<Handle>, "raii::unique_rc is not specialised for plain array, use raii::unique_ptr");

@@ -5,7 +5,7 @@
 
 // #include "test_deleter.hpp"
 
-#include "consteval_lambda_example.hpp"
+// #include "consteval_lambda_example.hpp"
 #include "coroutine_example.hpp"
 #include "test_deleter.hpp"
 #include "urc/deleter/memory_delete.hpp"
@@ -39,8 +39,6 @@ void measureAndPrintUniquePtrSize() noexcept
   // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new)
   const std::unique_ptr<int, raii::memory_delete<int *>> ptr1{ new int(1001) };
 
-  // std::cout << "Sizeof 'std::unique_ptr<int, raii::memory_delete<int*>>' is "sv << sizeof(ptr1) << "bytes\n"sv;
-  // std::println("Sizeof 'std::unique_ptr<int, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(ptr1));
   fmt::println("Sizeof 'std::unique_ptr<int, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(ptr1));
 
   // std::_Compressed_pair<raii::memory_delete<int*>, int*> cp{ std::_Zero_then_variadic_args_t{} };
@@ -122,7 +120,8 @@ int main(int argc, char *argv[]) noexcept
     return 0;
   }
 
-  raii_sample::testTypeConstructAssignWithConsteval();
+  // raii_sample::testTypeConstructAssignWithConsteval();
+  std::puts("=======================================================");
   measureAndPrintUniquePtrSize();
 
   //*/
@@ -161,9 +160,9 @@ int main(int argc, char *argv[]) noexcept
     rc1.reset();
     rc1.reset(rc1.get());
 
-    // std::cout << "Sizeof unique_rc<int*, raii::deleter_class_wrapper<int*> of long long is "sv << sizeof(rc1) << "
+    // std::cout << "Sizeof unique_rc<int*, raii::memory_delete<int*> of long long is "sv << sizeof(rc1) << "
     // bytes\n"sv;
-    fmt::println("Sizeof unique_rc<int*, raii::deleter_class_wrapper<int*> of long long is {} bytes"sv, sizeof(rc1));
+    fmt::println("Sizeof unique_rc<int*, raii::memory_delete<int*> of long long is {} bytes"sv, sizeof(rc1));
   }
 
   {
@@ -178,22 +177,9 @@ int main(int argc, char *argv[]) noexcept
     rc2 = std::move(rc1);
 
     fmt::println(
-      "After move assignment from unique_rc<int*, raii::deleter_class_wrapper<int*>> to unique_rc<std::int32_t*, "
-      "raii::deleter_class_wrapper<std::int32_t*>> {}",
+      "After move assignment from unique_rc<int*, raii::memory_delete<int*>> to unique_rc<std::int32_t*, "
+      "raii::memory_delete<std::int32_t*>> {}",
       *rc2);
-  }
-
-  {
-    std::puts("=======================================================");
-    fmt::println("unique_rc with default_delete");
-    const auto kVal1 = 11;
-    // NOLINTBEGIN(bugprone-unhandled-exception-at-new)
-    unique_rc<std::int32_t *, raii::default_delete<std::int32_t>> rc1{ new std::int32_t{ kVal1 } };
-    // NOLINTEND(bugprone-unhandled-exception-at-new)
-    fmt::println("Stored value {}", *rc1);
-
-    auto *temp = rc1.release();
-    rc1.reset(temp);
   }
 
   {
@@ -203,83 +189,79 @@ int main(int argc, char *argv[]) noexcept
     raii::unique_ptr<int> ptr1{ new int{ kVal1 } };
     // NOLINTEND(bugprone-unhandled-exception-at-new)
 
-    fmt::println("Value initialised unique_ptr<int, raii::deleter_class_wrapper<int *>> address: {}, value: {}",
-      fmt::ptr(ptr1.get()),
-      *ptr1.get());
+    fmt::println("Value initialised unique_ptr<int> address: {}, value: {}", fmt::ptr(ptr1.get()), *ptr1.get());
 
     ptr1.reset();
 
     if (nullptr == ptr1) { fmt::println("ptr1 is empty"); }
   }
 
-  {
-    std::puts("=======================================================");
-    const auto kSampleFloat = 3.864F;
-    raii::unique_ptr<float> dynamicVal = raii::make_unique<float>(kSampleFloat);
-    fmt::println("Value initialised unique_ptr<float> address: {}, value: {}", fmt::ptr(dynamicVal.get()), *dynamicVal);
-
-    // const auto failes_require_class_or_unit = dynamicVal.operator->();
-  }
-
-  {
-    std::puts("=======================================================");
-    const auto kArraySize = 4;
-    // NOLINTBEGIN
-    raii::unique_ptr<int[]> arrayUniquePtr = raii::make_unique_for_overwrite<int[]>(kArraySize);
-    arrayUniquePtr[0] = -1;
-    arrayUniquePtr[1] = 4;
-    arrayUniquePtr[2] = 7;
-
-    // const auto deleted_op = arrayUniquePtr.operator->();
-    // cppcheck-suppress leakNoVarFunctionCall false positive
-    arrayUniquePtr.reset(new int[2]);
-    // NOLINTEND
-  }
-
-  {
-    std::puts("=======================================================");
-    const auto kArraySize = 4;
-    // NOLINTBEGIN
-    raii::unique_ptr<int[], raii::deleter_class_wrapper<std::default_delete<int[]>>> arrayWithStdDeleter{
-      new int[kArraySize]
-    };
-    arrayWithStdDeleter[0] = -1;
-    arrayWithStdDeleter[1] = 4;
-    arrayWithStdDeleter[2] = 7;
-
-    // cppcheck-suppress leakNoVarFunctionCall false positive
-    arrayWithStdDeleter.reset(new int[2]);
-    // NOLINTEND
-  }
-
-  {
-    std::puts("=======================================================");
-    // NOLINTNEXTLINE
-    int initA = 2, initB = -7;
-
-    raii::unique_ptr<int, raii::deleter_class_wrapper<SwapTestDel>> ptrA{ &initA,
-      raii::deleter_class_wrapper<SwapTestDel>{ initA } };
-    raii::unique_ptr<int, raii::deleter_class_wrapper<SwapTestDel>> ptrB{ &initB,
-      raii::deleter_class_wrapper<SwapTestDel>{ initB } };
-
-    fmt::println("Before swap ptrA {{v:{}, tag:{}}}, ptrB {{v:{}, tag:{}}}",
-      *ptrA,
-      ptrA.get_deleter().m_tag,
-      *ptrB,
-      ptrB.get_deleter().m_tag);
-
-
-    std::ranges::swap(ptrA, ptrB);
-
-    // constexpr auto isDeleterSwappable = std::is_swappable_v<SwapTestDel>;
-
-    fmt::println("After swap ptrA {{v:{}, tag:{}}}, ptrB {{v:{}, tag:{}}}",
-      *ptrA,
-      ptrA.get_deleter().m_tag,
-      *ptrB,
-      ptrB.get_deleter().m_tag);
-  }
   //*/
+    {
+      std::puts("=======================================================");
+      const auto kSampleFloat = 3.864F;
+      raii::unique_ptr<float> dynamicVal = raii::make_unique<float>(kSampleFloat);
+      fmt::println("Value initialised unique_ptr<float> address: {}, value: {}", fmt::ptr(dynamicVal.get()),
+    *dynamicVal);
+
+      // const auto failes_require_class_or_unit = dynamicVal.operator->();
+    }
+
+    {
+      std::puts("=======================================================");
+      const auto kArraySize = 4;
+      // NOLINTBEGIN
+      raii::unique_ptr<int[]> arrayUniquePtr = raii::make_unique_for_overwrite<int[]>(kArraySize);
+      arrayUniquePtr[0] = -1;
+      arrayUniquePtr[1] = 4;
+      arrayUniquePtr[2] = 7;
+
+      // const auto deleted_op = arrayUniquePtr.operator->();
+      // cppcheck-suppress leakNoVarFunctionCall false positive
+      arrayUniquePtr.reset(new int[2]);
+      // NOLINTEND
+    }
+
+    {
+      std::puts("=======================================================");
+      const auto kArraySize = 4;
+      // NOLINTBEGIN
+      raii::unique_ptr<int[], std::default_delete<int[]>> arrayWithStdDeleter{ new int[kArraySize] };
+      arrayWithStdDeleter[0] = -1;
+      arrayWithStdDeleter[1] = 4;
+      arrayWithStdDeleter[2] = 7;
+
+      // cppcheck-suppress leakNoVarFunctionCall false positive
+      arrayWithStdDeleter.reset(new int[2]);
+      // NOLINTEND
+    }
+
+    {
+      std::puts("=======================================================");
+      // NOLINTNEXTLINE
+      int initA = 2, initB = -7;
+
+      raii::unique_ptr<int, SwapTestDel> ptrA{ &initA, SwapTestDel{ initA } };
+      raii::unique_ptr<int, SwapTestDel> ptrB{ &initB, SwapTestDel{ initB } };
+
+      fmt::println("Before swap ptrA {{v:{}, tag:{}}}, ptrB {{v:{}, tag:{}}}",
+        *ptrA,
+        ptrA.get_deleter().m_tag,
+        *ptrB,
+        ptrB.get_deleter().m_tag);
+
+
+      std::ranges::swap(ptrA, ptrB);
+
+      // constexpr auto isDeleterSwappable = std::is_swappable_v<SwapTestDel>;
+
+      fmt::println("After swap ptrA {{v:{}, tag:{}}}, ptrB {{v:{}, tag:{}}}",
+        *ptrA,
+        ptrA.get_deleter().m_tag,
+        *ptrB,
+        ptrB.get_deleter().m_tag);
+    }
+    //*/
 
   //*/
   {

@@ -1,6 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "urc/deleter/memory_delete.hpp"
 #include "urc/unique_ptr.hpp"
 // #include "urc/unique_rc.hpp"
 
@@ -58,7 +57,7 @@ TEST_CASE("std::hash with empty pointer type", "[unique_ptr][hash]")
 
   STATIC_CHECK_FALSE(is_callable_v<std::hash<D::pointer> &, D::pointer>);
 
-  using UP = raii::unique_ptr<int, raii::deleter_class_wrapper<D>>;
+  using UP = raii::unique_ptr<int, D>;
 
   // Disabled specializations of hash are not function object types
   STATIC_CHECK_FALSE(is_callable_v<std::hash<UP> &, UP>);

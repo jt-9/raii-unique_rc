@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "urc/deleter/memory_delete.hpp"
+
 #include "urc/unique_ptr.hpp"
 
 #include <type_traits>
@@ -22,10 +22,10 @@ struct B
 TEST_CASE("Single object unique_ptr::pointer type deduction", "[unique_ptr][unique_ptr::pointer]")
 {
   using up = raii::unique_ptr<int>;
-  using upA = raii::unique_ptr<int, raii::deleter_class_wrapper<A>>;
-  using upB = raii::unique_ptr<int, raii::deleter_class_wrapper<B>>;
-  using upAr = raii::unique_ptr<int, raii::deleter_class_wrapper<A> &>;
-  using upBr = raii::unique_ptr<int, raii::deleter_class_wrapper<B> &>;
+  using upA = raii::unique_ptr<int, A>;
+  using upB = raii::unique_ptr<int, B>;
+  using upAr = raii::unique_ptr<int, A &>;
+  using upBr = raii::unique_ptr<int, B &>;
 
   STATIC_CHECK(std::is_same_v<up::pointer, int *>);
   STATIC_CHECK(std::is_same_v<upA::pointer, int *>);

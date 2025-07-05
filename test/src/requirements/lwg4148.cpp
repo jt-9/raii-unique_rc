@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "urc/deleter/memory_delete.hpp"
+
 #include "urc/unique_ptr.hpp"
 // #include "urc/unique_rc.hpp"
 
@@ -13,7 +13,7 @@ struct deleter
   void operator()(pointer /*unused*/) const {}
 };
 
-using UPtr = raii::unique_ptr<const int, raii::deleter_class_wrapper<deleter>>;
+using UPtr = raii::unique_ptr<const int, deleter>;
 }// namespace
 
 #ifdef __cpp_lib_reference_from_temporary

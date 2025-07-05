@@ -150,7 +150,7 @@ int D2::count = 0;
 
 TEST_CASE("Test deleter operator() is called as expected", "[unique_ptr][reset]")
 {
-  raii::unique_ptr<int, raii::deleter_class_wrapper<D2>> iptr;
+  raii::unique_ptr<int, D2> iptr;
 
   iptr.reset();
   CHECK(D2::count == 0);
