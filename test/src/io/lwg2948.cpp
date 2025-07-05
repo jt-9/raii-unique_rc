@@ -10,12 +10,12 @@
 
 namespace {
 template<typename S, typename T>
-concept streamable = requires(S &ost, const T &ptr) { ost << ptr; };
+concept streamable = requires(S &ost, const T &ptr) { ost << ptr.get(); };
 
 template<typename T, typename D> bool check(const raii::unique_ptr<T, D> &ptr) noexcept
 {
   std::ostringstream ss1;
-  ss1 << ptr;
+  ss1 << ptr.get();
 
   std::ostringstream ss2;
   ss2 << ptr.get();
@@ -29,7 +29,7 @@ template<typename> struct deleter
   struct pointer
   {
     constexpr pointer() = default;
-    explicit pointer(std::nullptr_t) {}
+    pointer(std::nullptr_t) {}
     explicit operator bool() const { return false; }
     bool operator==(pointer /*unused*/) const { return true; }
   };

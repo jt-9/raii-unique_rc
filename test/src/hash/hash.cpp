@@ -80,11 +80,6 @@ struct D
     bool operator!=(std::nullptr_t) const { return true; }
   };
 
-
-  [[nodiscard]] static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-
-  [[nodiscard]] static constexpr bool is_owned(pointer /*unused*/) noexcept { return true; }
-
   void operator()(pointer /*unused*/) const noexcept {}
 };
 
@@ -92,14 +87,13 @@ struct F
 {
   struct pointer
   {
+    // cppcheck-suppress noExplicitConstructor intended behaviour
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
+    constexpr pointer(std::nullptr_t = nullptr) {};
+
     bool operator==(std::nullptr_t) const { return false; }
     bool operator!=(std::nullptr_t) const { return true; }
   };
-
-
-  [[nodiscard]] static constexpr pointer invalid() noexcept { return {}; }
-
-  [[nodiscard]] static constexpr bool is_owned(pointer /*unused*/) noexcept { return true; }
 
   void operator()(pointer /*unused*/) const noexcept {}
 };
