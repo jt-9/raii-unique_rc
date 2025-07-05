@@ -69,9 +69,9 @@ struct resolve_handle_type<Handle, Del_noref>
 
 template<typename Handle, typename Invalid> struct default_invalid_handle_policy
 {
-  using invalid_handle = Invalid;
+  using invalid_type = Invalid;
 
-  [[nodiscard]] raii_inline static constexpr invalid_handle invalid() noexcept { return {}; }
+  [[nodiscard]] raii_inline static constexpr invalid_type invalid() noexcept { return {}; }
 
   [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept { return h != invalid(); }
 
@@ -90,11 +90,12 @@ using not_pointer_and_is_default_constructable =
 template<typename T>
 concept not_pointer_and_is_default_constructable_v = not_pointer_and_is_default_constructable<T>::value;
 
-template<class D, typename Hr>
-concept has_static_invalid_convertible_handle = requires {
-  { D::invalid() } noexcept -> std::convertible_to<Hr>;
-} || requires {
-  { D::invalid() } noexcept -> std::same_as<Hr>;
+template<typename Handle, typename Invalid, template<typename, typename> class InvalidHandlePolicy>
+concept has_static_is_owned_and_invalid = requires {
+  {
+    InvalidHandlePolicy<Handle, Invalid>::invalid()
+  } noexcept -> std::same_as<typename InvalidHandlePolicy<Handle, Invalid>::invalid_type>;
+  { InvalidHandlePolicy<Handle, Invalid>::is_owned(std::declval<Handle>()) } noexcept -> std::same_as<bool>;
 };
 
 
@@ -113,7 +114,7 @@ public:
   using handle = typename TypeResolver<Handle, std::remove_reference_t<Deleter>>::type;
 
   using invalid_handle_policy = InvalidHandlePolicy<handle, InvalidHandle>;
-  using invalid_handle = typename invalid_handle_policy::invalid_handle;
+  using invalid_handle = typename invalid_handle_policy::invalid_type;
 
   static_assert(!std::is_rvalue_reference_v<Deleter>,
     "unique_rc's deleter type must be a function object type"
@@ -199,8 +200,8 @@ struct unique_rc_holder : unique_rc_holder_impl<Handle, Deleter, TypeResolver, I
 
 template<typename Handle,
   class Deleter,
-  template<typename, typename> typename TypeResolver, 
-  typename InvalidHandle, 
+  template<typename, typename> typename TypeResolver,
+  typename InvalidHandle,
   template<typename, typename> class InvalidHandlePolicy>
 struct unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy, true, false>
   : unique_rc_holder_impl<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy>
@@ -252,6 +253,9 @@ struct unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHan
  * @tparam Handle the type of the handle managed by this unique_rc
  * @tparam Deleter the function object or lvalue reference to function object, to be called from the destructor
  * @tparam TypeResolver std::remove_reference<Deleter>::type::handle if that type exists, otherwise Handle
+ * @tparam InvalidHandle represents invalid handle which is assigned when resource is released or empty constructed
+ unique_rc
+ * @tparam InvalidHandlePolicy provides static methods `is_owned(handle)` and `invalid()`
  * @note raii::unique_rc does not work with dynamically-allocated array of objects T[], raii::unique_ptr does
  **/
 template<typename Handle,
@@ -259,19 +263,21 @@ template<typename Handle,
   template<typename, typename> typename TypeResolver = resolve_handle_type,
   typename InvalidHandle = typename TypeResolver<std::decay_t<Handle>, std::remove_reference_t<Deleter>>::type,
   template<typename, typename> typename InvalidHandlePolicy = default_invalid_handle_policy>
-// requires has_static_invalid_convertible_handle<InvalidHandlePolicy<
-//   typename TypeResolver<std::decay_t<Handle>, std::remove_reference_t<Deleter>>::type>
+  requires has_static_is_owned_and_invalid<
+    typename TypeResolver<std::decay_t<Handle>, std::remove_reference_t<Deleter>>::type,
+    InvalidHandle,
+    InvalidHandlePolicy>
 class unique_rc
 {
   static_assert(!std::is_array_v<Handle>, "raii::unique_rc is not specialised for plain array, use raii::unique_ptr");
 
-  using storage_t = unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy>;
+  using storage_type = unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy>;
 
 public:
-  using invalid_handle_policy = typename storage_t::invalid_handle_policy;
+  using invalid_handle_policy = typename storage_type::invalid_handle_policy;
 
   /// @brief std::remove_reference<Deleter>::type::handle if that type exists, otherwise T
-  using handle = typename storage_t::handle;
+  using handle = typename storage_type::handle;
 
   /// @brief Handle, the type of the resource managed by this unique_rc
   using element_type = Handle;
@@ -281,7 +287,7 @@ public:
 
   /// @brief Represents invalid handle type, whose value is returned by invalid_handle_policy::invalid()
   /// is assigned to *this handle, when it goes out of scope, or upon reset()
-  using invalid_handle = typename storage_t::invalid_handle;
+  using invalid_handle = typename storage_type::invalid_handle;
 
 private:
   /// @brief Helper template for detecting a safe conversion from another unique_rc
@@ -382,7 +388,10 @@ public:
     return *this;
   }
 
+  /// @brief Since unique_rc is move only type, copy constructor is explicitly deleted
   unique_rc(const unique_rc &) = delete;
+
+  /// @brief Since unique_rc is move only type, copy assignment operator is explicitly deleted
   unique_rc &operator=(const unique_rc &) = delete;
 
   /// @brief If invalid_handle_policy::is_owned(h) is false there are no effects.
@@ -487,6 +496,23 @@ private:
   unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHandlePolicy> uh_;
 };
 
+
+/// @brief Compares if two unique_rc are equal, by comparing stored handles. Conditionally noexcept, provided operator==
+/// for handles is itself noexcept
+/// @tparam H1 the type of the object managed by lhs
+/// @tparam D1 lhs' function object or lvalue reference to function or to function object, to be called from the
+/// destructor
+/// @tparam TR1 type which resolves lhs' handle
+/// @tparam IH1 lhs' invalid handle type
+/// @tparam IHPolicy1 lhs' invalid handle policy, provides is_owned(handle) and invalid() static methods
+/// @tparam H2 the type of the object managed by rhs
+/// @tparam D2 rhs' function object or lvalue reference to function or to function object, to be called from the
+/// destructor
+/// @tparam TR2 type which resolves rhs' handle
+/// @tparam IH2 rhs' invalid handle type
+/// @tparam IHPolicy2 rhs' invalid handle policy, provides is_owned(handle) and invalid() static methods
+/// @param lhs left hand side unique_rc
+/// @param rhs right hand side unique_rc
 template<typename H1,
   class D1,
   template<typename, typename> class TR1,
@@ -497,7 +523,8 @@ template<typename H1,
   template<typename, typename> class TR2,
   typename IH2,
   template<typename, typename> class IHPolicy2>
-  requires std::equality_comparable_with<H1, H2>
+  requires std::equality_comparable_with<typename unique_rc<H1, D1, TR1, IH1, IHPolicy1>::handle,
+    typename unique_rc<H2, D2, TR2, IH2, IHPolicy2>::handle>
 [[nodiscard]] raii_inline constexpr bool operator==(const unique_rc<H1, D1, TR1, IH1, IHPolicy1> &lhs,
   const unique_rc<H2, D2, TR2, IH2, IHPolicy2> &rhs) noexcept(noexcept(lhs.get() == rhs.get()))
 {
@@ -517,6 +544,23 @@ template<typename H,
   return !lhs;
 }
 
+
+/// @brief Performs three-way-comparison of two unique_rc, by three-way-comparing stored handles. Conditionally
+/// noexcept, provided operator<=> for handles is itself noexcept
+/// @tparam H1 the type of the object managed by lhs
+/// @tparam D1 lhs' function object or lvalue reference to function or to function object, to be called from the
+/// destructor
+/// @tparam TR1 type which resolves lhs' handle
+/// @tparam IH1 lhs' invalid handle type
+/// @tparam IHPolicy1 lhs' invalid handle policy, provides is_owned(handle) and invalid() static methods
+/// @tparam H2 the type of the object managed by rhs
+/// @tparam D2 rhs' function object or lvalue reference to function or to function object, to be called from the
+/// destructor
+/// @tparam TR2 type which resolves rhs' handle
+/// @tparam IH2 rhs' invalid handle type
+/// @tparam IHPolicy2 rhs' invalid handle policy, provides is_owned(handle) and invalid() static methods
+/// @param lhs left hand side unique_rc
+/// @param rhs right hand side unique_rc
 template<typename H1,
   class D1,
   template<typename, typename> class TR1,
@@ -577,7 +621,13 @@ RAII_NS_END
 
 namespace std {
 
-// std::hash specialization for unique_rc.
+/// @brief std::hash specialization for unique_rc.
+/// @tparam H the type of the object managed by unique_rc
+/// @tparam D function object or lvalue reference to function or to function object, to be called from the
+/// destructor
+/// @tparam TR type which resolves handle
+/// @tparam IH invalid handle type, assignable to `handle`
+/// @tparam IHPolicy invalid handle policy, provides is_owned(handle) and invalid() static methods
 template<typename H,
   class D,
   template<typename, typename> class TR,

@@ -7,6 +7,7 @@
 #include "unique_rc.hpp"
 
 #include <cassert>
+#include <cstddef>//std::nullptr_t
 
 
 RAII_NS_BEGIN
@@ -20,10 +21,6 @@ template<typename T> struct default_delete
   // cppcheck-suppress noExplicitConstructor intended converting constructor
   raii_inline constexpr default_delete(const default_delete<U> &) noexcept
   {}
-
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-
-  [[nodiscard]] raii_inline static constexpr bool is_owned(T *h) noexcept { return h; }
 
 #ifdef __cpp_static_call_operator
   // False poisitive, guarded by feature #ifdef __cpp_static_call_operator
@@ -50,10 +47,6 @@ template<typename T> struct default_delete<T[]>
   // cppcheck-suppress noExplicitConstructor intended converting constructor
   raii_inline constexpr default_delete(const default_delete<U[]> &) noexcept
   {}
-
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-
-  [[nodiscard]] raii_inline static constexpr bool is_owned(T *h) noexcept { return h; }
 
   template<typename U>
     requires std::is_convertible_v<U (*)[], T (*)[]>
@@ -112,6 +105,8 @@ private:
   using typename Base::handle;
 
 public:
+  using invalid_pointer_policy = typename Base::invalid_handle_policy;
+
   /// @brief std::remove_reference<Deleter>::type::pointer if that type exists, otherwise T*. Must satisfy
   /// `NullablePointer`
   using pointer = typename Base::handle;
@@ -124,7 +119,7 @@ public:
 
   /// @brief Represents invalid handle type, whose value is returned by Deleter::invalid()
   /// is assigned to *this handle, when it goes out of scope, or upon reset(), usually std::nullptr_t
-  using invalid_pointer = Base::invalid_handle;
+  using invalid_pointer = typename Base::invalid_handle;
 
   /// @brief static method returns invalid pointer of type `invalid_pointer`, usually `nullptr`
   using Base::invalid;
@@ -136,6 +131,10 @@ private:
     std::conjunction<std::is_convertible<typename unique_ptr<U, D>::pointer, pointer>, std::negation<std::is_array<U>>>;
 
 public:
+  // False positive while calling base class constructor, it interprets as new function with the same name which hides
+  // implementation in base class
+  // cppcheck-suppress-begin [functionStatic, missingReturn, duplInheritedMember]
+
   raii_inline constexpr unique_ptr() noexcept
     requires not_pointer_and_is_default_constructable_v<Deleter>
     : Base()
@@ -160,15 +159,11 @@ public:
     requires std::conjunction_v<std::negation<std::is_reference<Deleter>>, std::is_move_constructible<Deleter>>
     : Base(p, std::move(d))
   {}
+  // cppcheck-suppress-end [functionStatic, missingReturn, duplInheritedMember]
 
   template<class D = Deleter>
     requires std::conjunction_v<std::is_reference<D>, std::is_constructible<D, std::remove_reference_t<D>>>
   unique_ptr(pointer, std::remove_reference_t<Deleter> &&) = delete;
-
-  // template<class D>
-  // raii_inline constexpr unique_ptr(pointer h, D&& d) noexcept requires std::constructible_from<deleter_type, D>
-  //	: uh_{ h, std::forward<D>(d) }
-  //{}
 
   constexpr unique_ptr(unique_ptr && /*src*/) noexcept = default;
 
@@ -217,6 +212,7 @@ public:
   using Base::swap;
 };
 
+
 /**
  * @brief raii::unique_ptr is a smart pointer that owns (is responsible for) and manages another object via a pointer
  * and subsequently disposes of that object when the unique_ptr goes out of scope.
@@ -235,6 +231,8 @@ private:
     std::conjunction<std::is_base_of<T, U>, std::negation<std::is_same<std::remove_cv_t<T>, std::remove_cv_t<U>>>>;
 
 public:
+  using invalid_pointer_policy = typename Base::invalid_handle_policy;
+
   /// @brief std::remove_reference<Deleter>::type::pointer if that type exists, otherwise T*. Must satisfy
   /// `NullablePointer`
   using pointer = typename Base::handle;
@@ -247,7 +245,7 @@ public:
 
   /// @brief Represents invalid handle type, whose value is returned by Deleter::invalid()
   /// is assigned to *this handle, when it goes out of scope, or upon reset(), usually std::nullptr_t
-  using invalid_pointer = Base::invalid_handle;
+  using invalid_pointer = typename Base::invalid_handle;
 
   /// @brief static method returns invalid pointer of type `invalid_pointer`, usually `nullptr`
   using Base::invalid;
@@ -270,6 +268,10 @@ public:
     std::is_same<pointer, element_type *>,
     std::is_same<UP_pointer, UP_element_type *>,
     std::is_convertible<UP_element_type (*)[], element_type (*)[]>>;
+
+  // False positive while calling base class constructor, it interprets as new function with the same name which hides
+  // implementation in base class
+  // cppcheck-suppress-begin [functionStatic, missingReturn, duplInheritedMember]
 
   // Constructors
   raii_inline constexpr unique_ptr() noexcept
@@ -294,6 +296,7 @@ public:
     requires std::conjunction_v<safe_conversion_raw<U>, std::is_move_constructible<D>>
     : Base(std::move(p), std::move(d))
   {}
+  // cppcheck-suppress-end [functionStatic, missingReturn, duplInheritedMember]
 
   template<typename U, class D = deleter_type>
     requires std::conjunction_v<safe_conversion_raw<U>, std::is_lvalue_reference<D>>
@@ -352,7 +355,7 @@ public:
   /// @return lvalue reference the element at index i, i.e. get()[i]
   raii_inline constexpr typename std::add_lvalue_reference_t<element_type> operator[](std::size_t i) const
   {
-    assert(deleter_type::is_owned(get()) && "Error subscript operator on nullptr");
+    assert(invalid_pointer_policy::is_owned(get()) && "Error subscript operator on nullptr");
     return get()[i];
   }
 

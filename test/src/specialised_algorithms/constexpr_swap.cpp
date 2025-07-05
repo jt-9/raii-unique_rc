@@ -1,7 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
 
-#include "urc/deleter/memory_delete.hpp"
 #include "urc/unique_ptr.hpp"
 #include "urc/unique_rc.hpp"
 
@@ -74,16 +73,16 @@ TEST_CASE("unique_ptr not swappable via std::swap with deleted swap",
 {
   // Not swappable, and unique_ptr not swappable via the generic std::swap.
   STATIC_CHECK_FALSE(std::is_swappable_v<raii::unique_ptr<int, B>>);
-  STATIC_CHECK_FALSE(std::is_swappable_v<raii::unique_ptr<int, raii::deleter_class_wrapper<C>>>);
-  STATIC_CHECK_FALSE(std::is_swappable_v<raii::unique_ptr<int, raii::deleter_class_wrapper<D>>>);
+  STATIC_CHECK_FALSE(std::is_swappable_v<raii::unique_ptr<int, C>>);
+  STATIC_CHECK_FALSE(std::is_swappable_v<raii::unique_ptr<int, D>>);
 }
 
 TEST_CASE("unique_rc not swappable via std::swap with deleted swap", "[unique_rc][std::is_swappable][swap][constexpr]")
 {
   // Not swappable, and unique_ptr not swappable via the generic std::swap.
   STATIC_CHECK_FALSE(std::is_swappable_v<raii::unique_rc<int *, B>>);
-  STATIC_CHECK_FALSE(std::is_swappable_v<raii::unique_rc<int *, raii::deleter_class_wrapper<C>>>);
-  STATIC_CHECK_FALSE(std::is_swappable_v<raii::unique_rc<int *, raii::deleter_class_wrapper<D>>>);
+  STATIC_CHECK_FALSE(std::is_swappable_v<raii::unique_rc<int *, C>>);
+  STATIC_CHECK_FALSE(std::is_swappable_v<raii::unique_rc<int *, D>>);
 
   /* The following code doesn't even compile
 
