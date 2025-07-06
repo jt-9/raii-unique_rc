@@ -282,7 +282,7 @@ public:
   /// @brief Handle, the type of the resource managed by this unique_rc
   using element_type = Handle;
 
-  /// @brief Deleter, the function object or lvalue reference to function object, to be called from the destructor
+  /// @brief Deleter, the function object or lvalue reference to function or to function object, to be called from the destructor
   using deleter_type = Deleter;
 
   /// @brief Represents invalid handle type, whose value is returned by invalid_handle_policy::invalid()
