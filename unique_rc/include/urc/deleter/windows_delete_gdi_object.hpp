@@ -24,10 +24,6 @@ struct gdi_delete_object_nullptr
     requires std::is_convertible_v<U, GdiObjHandle>
   {}
 
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return {}; }
-
-  [[nodiscard]] raii_inline static constexpr bool is_owned(GdiObjHandle h) noexcept { return static_cast<bool>(h); }
-
 #ifdef __cpp_static_call_operator
   raii_inline static void operator()(GdiObjHandle h) noexcept
 #else
