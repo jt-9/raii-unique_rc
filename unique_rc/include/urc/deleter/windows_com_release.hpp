@@ -21,9 +21,6 @@ struct com_object_release_nullptr
     requires std::is_convertible_v<std::remove_pointer_t<U>, std::remove_pointer_t<Handle>>
   {}
 
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return {}; }
-  [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept { return h; }
-
   raii_inline void operator()(Handle h) const noexcept { h->Release(); }
 };
 

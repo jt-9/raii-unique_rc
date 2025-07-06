@@ -251,7 +251,7 @@ struct unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHan
 
  * The object is disposed of, using a potentially user-supplied deleter, by calling get_deleter()(handle).
  * @tparam Handle the type of the handle managed by this unique_rc
- * @tparam Deleter the function object or lvalue reference to function object, to be called from the destructor
+ * @tparam Deleter the function object or lvalue reference to function or to function object, to be called from the destructor
  * @tparam TypeResolver std::remove_reference<Deleter>::type::handle if that type exists, otherwise Handle
  * @tparam InvalidHandle represents invalid handle which is assigned when resource is released or empty constructed
  unique_rc

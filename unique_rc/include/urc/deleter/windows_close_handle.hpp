@@ -24,9 +24,6 @@ struct close_handle_nullptr
     requires std::is_convertible_v<U, Handle>
   {}
 
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-  [[nodiscard]] raii_inline static constexpr bool is_owned(Handle h) noexcept { return h; }
-
   raii_inline constexpr void operator()(Handle h) const noexcept { CloseHandle(h); }
 };
 

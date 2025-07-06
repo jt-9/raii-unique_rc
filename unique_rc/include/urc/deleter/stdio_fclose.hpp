@@ -14,9 +14,6 @@ struct stdio_fclose
 {
   constexpr stdio_fclose() noexcept = default;
 
-  [[nodiscard]] raii_inline static constexpr std::nullptr_t invalid() noexcept { return nullptr; }
-  [[nodiscard]] raii_inline static constexpr bool is_owned(FILE *h) noexcept { return h; }
-
 #ifdef __cpp_static_call_operator
   // False poisitive, guarded by feature #ifdef __cpp_static_call_operator
   // NOLINTNEXTLINE(clang-diagnostic-c++23-extensions)
