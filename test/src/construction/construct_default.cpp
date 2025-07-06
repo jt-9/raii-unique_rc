@@ -2,6 +2,7 @@
 
 #include "urc/unique_ptr.hpp"
 
+#include <cstddef>// std::nullptr_t
 #include <memory>
 #include <type_traits>
 
@@ -24,25 +25,25 @@ TEST_CASE(
 {
   STATIC_CHECK_FALSE(unique_ptr_is_default_constructible<int, std::default_delete<int> &>());
   STATIC_CHECK_FALSE(unique_ptr_is_default_constructible<int, raii::default_delete<int> &>());
-
-  // static_assert(!std::is_default_constructible<std::unique_ptr<int,
-  //         void(*)(int*)>>::value, "");
+  STATIC_CHECK_FALSE(unique_ptr_is_default_constructible<int, void (*)(int *)>());
 
   STATIC_CHECK_FALSE(unique_ptr_is_constructible<int, std::default_delete<int> &, int *>());
   STATIC_CHECK_FALSE(unique_ptr_is_constructible<int, raii::default_delete<int> &, int *>());
+  STATIC_CHECK_FALSE(unique_ptr_is_constructible<int, void (*)(int *), int *>());
 
-  // static_assert(!std::is_constructible<std::unique_ptr<int,
-  //         void(*)(int*)>, int*>::value, "");
+  // Similar to gcc unique_ptr test ptr_deleter_neg.cc
+  STATIC_CHECK_FALSE(unique_ptr_is_constructible<int, void (*)(int *), std::nullptr_t>());
 
   // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   STATIC_CHECK_FALSE(unique_ptr_is_default_constructible<int[], std::default_delete<int[]> &>());
   STATIC_CHECK_FALSE(unique_ptr_is_default_constructible<int[], raii::default_delete<int[]> &>());
+  STATIC_CHECK_FALSE(unique_ptr_is_default_constructible<int[], void (*)(int *)>());
 
-  // static_assert(!std::is_default_constructible<std::unique_ptr<int[],
-  //         void(*)(int*)>>::value, "");
   STATIC_CHECK_FALSE(unique_ptr_is_constructible<int[], std::default_delete<int[]> &, int *>());
   STATIC_CHECK_FALSE(unique_ptr_is_constructible<int[], raii::default_delete<int[]> &, int *>());
-  // static_assert(!std::is_constructible<std::unique_ptr<int[],
-  //         void(*)(int*)>, int*>::value, "");
+  STATIC_CHECK_FALSE(unique_ptr_is_constructible<int[], void (*)(int *), int *>());
+
+  // Similar to gcc unique_ptr test ptr_deleter_neg.cc
+  STATIC_CHECK_FALSE(unique_ptr_is_constructible<int[], void (*)(int *), std::nullptr_t>());
   // NOLINTEND(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 }
