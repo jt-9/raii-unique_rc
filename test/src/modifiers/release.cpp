@@ -1,9 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 
-
+#include "urc/memory_delete.hpp"
 #include "urc/unique_rc.hpp"
 // #include "urc/unique_ptr.hpp"
-#include "urc/deleter/memory_delete.hpp"
 
 
 TEST_CASE("Release value initialised unique_rc<float*, memory_delete<float*>>", "[unique_rc][release]")

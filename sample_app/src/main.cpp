@@ -8,7 +8,7 @@
 // #include "consteval_lambda_example.hpp"
 #include "coroutine_example.hpp"
 #include "test_deleter.hpp"
-#include "urc/deleter/memory_delete.hpp"
+#include "urc/memory_delete.hpp"
 #include "urc/unique_ptr.hpp"
 #include "urc/unique_rc.hpp"
 

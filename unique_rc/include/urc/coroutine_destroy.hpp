@@ -1,14 +1,28 @@
 #ifndef COROUTINE_DESTROY_HPP
 #define COROUTINE_DESTROY_HPP
 
-#include "../raii_defs.hpp"
+#include "raii_defs.hpp"
 
 #include <coroutine>
 
 
 RAII_NS_BEGIN
 
-template<typename Promise> struct coroutine_destroy
+template<typename CoroHandle, typename Invalid> struct coro_invalid_handle_policy
+{
+  using invalid_type = Invalid;
+
+  [[nodiscard]] raii_inline static constexpr invalid_type invalid() noexcept { return {}; }
+
+  [[nodiscard]] raii_inline static constexpr bool is_owned(CoroHandle h) noexcept { return static_cast<bool>(h); }
+
+
+  /// @brief Disabled because policy provides only typedefs and static methods
+  constexpr coro_invalid_handle_policy() = delete;
+  constexpr ~coro_invalid_handle_policy() = delete;
+};
+
+struct coroutine_destroy
 {
   constexpr coroutine_destroy() noexcept = default;
 
@@ -18,13 +32,7 @@ template<typename Promise> struct coroutine_destroy
   // raii_inline constexpr coroutine_destroy(const coroutine_destroy<std::coroutine_handle<P>> &) noexcept
   // {}
 
-  [[nodiscard]] raii_inline static constexpr std::coroutine_handle<Promise> invalid() noexcept { return {}; }
-
-  [[nodiscard]] raii_inline static constexpr bool is_owned(std::coroutine_handle<Promise> h) noexcept
-  {
-    return static_cast<bool>(h);
-  }
-
+  template<typename Promise>
 #ifdef __cpp_static_call_operator
   // False poisitive, guarded by feature #ifdef __cpp_static_call_operator
   // NOLINTNEXTLINE(clang-diagnostic-c++23-extensions)
