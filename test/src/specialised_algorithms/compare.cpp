@@ -1,8 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
-
 #include "testsuite_no_op_deallocator.hpp"
-#include "urc/deleter/memory_delete.hpp"
+#include "urc/memory_delete.hpp"
 #include "urc/unique_ptr.hpp"
 #include "urc/unique_rc.hpp"
 
