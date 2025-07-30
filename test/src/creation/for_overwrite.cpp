@@ -27,9 +27,9 @@ void *operator new(std::size_t size)
 void *operator new[](std::size_t size)
 {
   void *ptr = std::malloc(size);
-  std::memset(ptr, constFillValue, size);
   assert(ptr != nullptr);
 
+  std::memset(ptr, constFillValue, size);
   return ptr;
 }
 
