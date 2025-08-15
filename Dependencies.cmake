@@ -17,7 +17,7 @@ function(myproject_setup_dependencies)
   #     NAME
   #     spdlog
   #     VERSION
-  #     1.15.1
+  #     1.15.3
   #     GITHUB_REPOSITORY
   #     "gabime/spdlog"
   #     OPTIONS
@@ -25,7 +25,7 @@ function(myproject_setup_dependencies)
   # endif()
 
   if(NOT TARGET Catch2::Catch2WithMain)
-    cpmaddpackage("gh:catchorg/Catch2@3.8.1")
+    cpmaddpackage("gh:catchorg/Catch2@3.9.1")
   endif()
 
   if(NOT TARGET CLI11::CLI11)
