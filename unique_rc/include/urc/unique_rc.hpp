@@ -10,6 +10,7 @@
 
 #include <cassert>
 #include <functional>
+#include <iosfwd>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -251,7 +252,8 @@ struct unique_rc_holder<Handle, Deleter, TypeResolver, InvalidHandle, InvalidHan
 
  * The object is disposed of, using a potentially user-supplied deleter, by calling get_deleter()(handle).
  * @tparam Handle the type of the handle managed by this unique_rc
- * @tparam Deleter the function object or lvalue reference to function or to function object, to be called from the destructor
+ * @tparam Deleter the function object or lvalue reference to function or to function object, to be called from the
+ destructor
  * @tparam TypeResolver std::remove_reference<Deleter>::type::handle if that type exists, otherwise Handle
  * @tparam InvalidHandle represents invalid handle which is assigned when resource is released or empty constructed
  unique_rc
@@ -282,7 +284,8 @@ public:
   /// @brief Handle, the type of the resource managed by this unique_rc
   using element_type = Handle;
 
-  /// @brief Deleter, the function object or lvalue reference to function or to function object, to be called from the destructor
+  /// @brief Deleter, the function object or lvalue reference to function or to function object, to be called from the
+  /// destructor
   using deleter_type = Deleter;
 
   /// @brief Represents invalid handle type, whose value is returned by invalid_handle_policy::invalid()
@@ -615,6 +618,27 @@ template<typename H,
   template<typename, typename> class IHPolicy>
   requires(!std::is_swappable_v<H> || !std::is_swappable_v<D>)
 void swap(unique_rc<H, D, TR, IH, IHPolicy> &lhs, unique_rc<H, D, TR, IH, IHPolicy> &rhs) = delete;
+
+
+template<typename Elem,
+  class Traits,
+  typename H,
+  class D,
+  template<typename, typename> class TR,
+  typename IH,
+  template<typename, typename> class IHPolicy>
+  requires requires {
+    std::declval<std::basic_ostream<Elem, Traits> &>()
+      << std::declval<const unique_rc<H, D, TR, IH, IHPolicy> &>().get();
+  }
+std::basic_ostream<Elem, Traits> &
+  operator<<(std::basic_ostream<Elem, Traits> &out, const unique_rc<H, D, TR, IH, IHPolicy> &urc) noexcept(
+    noexcept(std::declval<std::basic_ostream<Elem, Traits> &>()
+             << std::declval<const unique_rc<H, D, TR, IH, IHPolicy> &>().get()))
+{
+  out << urc.get();
+  return out;
+}
 
 
 RAII_NS_END

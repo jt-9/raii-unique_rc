@@ -29,7 +29,7 @@
 #include <tuple>
 
 // #include <print>
-// #include <iostream>
+#include <iostream>
 
 namespace {
 void measureAndPrintUniquePtrSize() noexcept
@@ -216,9 +216,17 @@ int main(int argc, char *argv[]) noexcept
       arrayUniquePtr[1] = 4;
       arrayUniquePtr[2] = 7;
 
+      std::cout << "Array of arrayUniquePtr: " << arrayUniquePtr << '\n';
       // const auto deleted_op = arrayUniquePtr.operator->();
       // cppcheck-suppress leakNoVarFunctionCall false positive
       arrayUniquePtr.reset(new int[2]);
+
+      //const auto stdUniquePtr = std::make_unique_for_overwrite<int[]>(kArraySize);
+      //stdUniquePtr[0] = 5;
+      //stdUniquePtr[1] = 9;
+
+      //std::cout << "Array of stdUniquePtr: " << stdUniquePtr << '\n';
+
       // NOLINTEND
     }
 
