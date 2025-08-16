@@ -10,12 +10,12 @@
 
 namespace {
 template<typename S, typename T>
-concept streamable = requires(S &ost, const T &ptr) { ost << ptr.get(); };
+concept streamable = requires(S &ost, const T &ptr) { ost << ptr; };
 
 template<typename T, typename D> bool check(const raii::unique_ptr<T, D> &ptr) noexcept
 {
   std::ostringstream ss1;
-  ss1 << ptr.get();
+  ss1 << ptr;
 
   std::ostringstream ss2;
   ss2 << ptr.get();
