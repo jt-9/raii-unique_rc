@@ -9,7 +9,7 @@ function(myproject_setup_dependencies)
   # already been provided to us by a parent project
 
   if(NOT TARGET fmtlib::fmtlib)
-    cpmaddpackage("gh:fmtlib/fmt#12.0.0")
+    cpmaddpackage("gh:fmtlib/fmt#12.1.0")
   endif()
 
   # if(NOT TARGET spdlog::spdlog)
@@ -29,7 +29,7 @@ function(myproject_setup_dependencies)
   endif()
 
   if(NOT TARGET CLI11::CLI11)
-    cpmaddpackage("gh:CLIUtils/CLI11@2.5.0")
+    cpmaddpackage("gh:CLIUtils/CLI11@2.6.1")
   endif()
 
 endfunction()
