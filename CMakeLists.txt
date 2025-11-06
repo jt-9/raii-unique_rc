@@ -41,7 +41,16 @@ add_subdirectory(configured_files)
 
 # Adding the src:
 add_subdirectory(unique_rc)
-add_subdirectory(sample_app)
+
+if(myproject_BUILD_EXAMPLE)
+  add_subdirectory(sample_app)
+endif()
+
+# Don't even look at tests if we're not top level
+if(NOT PROJECT_IS_TOP_LEVEL)
+  return()
+endif()
+
 
 # Adding the tests:
 include(CTest)
@@ -68,6 +77,6 @@ if(MSVC)
 endif()
 
 # set the startup project for the "play" button in MSVC
-if (MSVC)
+if (myproject_BUILD_EXAMPLE AND MSVC)
   set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT sample_app)
 endif()

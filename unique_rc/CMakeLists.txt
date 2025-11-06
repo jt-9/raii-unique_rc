@@ -15,7 +15,7 @@ function(add_lib_interface lib_name)
   target_include_directories(${lib_name} ${WARNING_GUARD} INTERFACE 
                                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                                 $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-                                $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR})
+                                $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 endfunction()
 
 

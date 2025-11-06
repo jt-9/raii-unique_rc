@@ -80,6 +80,7 @@ macro(myproject_setup_options)
     option(myproject_ENABLE_CPPCHECK "Enable cpp-check analysis" OFF)
     option(myproject_ENABLE_PCH "Enable precompiled headers" OFF)
     option(myproject_ENABLE_CACHE "Enable ccache" OFF)
+    option(myproject_BUILD_EXAMPLE "Build example application" OFF)
   else()
     option(myproject_ENABLE_IPO "Enable IPO/LTO" ON)
     option(myproject_WARNINGS_AS_ERRORS "Treat Warnings As Errors" ON)
@@ -94,6 +95,7 @@ macro(myproject_setup_options)
     option(myproject_ENABLE_CPPCHECK "Enable cpp-check analysis" ON)
     option(myproject_ENABLE_PCH "Enable precompiled headers" OFF)
     option(myproject_ENABLE_CACHE "Enable ccache" ON)
+    option(myproject_BUILD_EXAMPLE "Build example application" ON)
   endif()
 
   if(NOT PROJECT_IS_TOP_LEVEL)
@@ -111,7 +113,8 @@ macro(myproject_setup_options)
       myproject_ENABLE_CPPCHECK
       myproject_ENABLE_COVERAGE
       myproject_ENABLE_PCH
-      myproject_ENABLE_CACHE)
+      myproject_ENABLE_CACHE
+      )
   endif()
 
   myproject_check_libfuzzer_support(LIBFUZZER_SUPPORTED)
