@@ -12,7 +12,7 @@ namespace {
 template<typename T> [[nodiscard]] constexpr bool unique_ptr_default_single() noexcept
 {
   raii::unique_ptr<T> ptr1;
-  T *raw_ptr = ptr1.release();
+  auto *const raw_ptr = ptr1.release();
   assert(raw_ptr == nullptr);
   assert(!ptr1);
 

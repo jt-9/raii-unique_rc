@@ -69,10 +69,10 @@ TEST_CASE("Equality of initialised unique_rc<const char*, memory_mock_delete<con
 
   constexpr auto str = "This is a test string"sv;
 
-  // NOLINTBEGIN(bugprone-suspicious-stringview-data-usage)
+  // NOLINTBEGIN(bugprone-suspicious-stringview-data-usage, cppcoreguidelines-pro-bounds-pointer-arithmetic)
   constexpr raii::unique_rc<const char *, raii_test::mock_pointer_no_op<const char *>> char_rc1{ str.data() };
   constexpr raii::unique_rc<const char *, raii_test::mock_pointer_no_op<const char *>> char_rc2{ str.data() + 1 };
-  // NOLINTEND(bugprone-suspicious-stringview-data-usage)
+  // NOLINTEND(bugprone-suspicious-stringview-data-usage, cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
   SECTION("unique_rc::operator ==(unique_rc, unique_rc)")
   {
@@ -93,11 +93,11 @@ TEST_CASE("Three-way comparison of initialised unique_rc<const char*, memory_moc
 
   constexpr auto str = "This is a test string"sv;
 
-  // NOLINTBEGIN(bugprone-suspicious-stringview-data-usage)
+  // NOLINTBEGIN(bugprone-suspicious-stringview-data-usage, cppcoreguidelines-pro-bounds-pointer-arithmetic)
   constexpr raii::unique_rc<const char *, raii_test::mock_pointer_no_op<const char *>> char_rc1{ str.data() };
   constexpr raii::unique_rc<const char *, raii_test::mock_pointer_no_op<const char *>> char_rc2{ str.data() + 4 };
   constexpr decltype(char_rc1) copy_rc1{ str.data() };
-  // NOLINTEND(bugprone-suspicious-stringview-data-usage)
+  // NOLINTEND(bugprone-suspicious-stringview-data-usage, cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
   STATIC_CHECK(char_rc1);
   STATIC_CHECK(char_rc2);
