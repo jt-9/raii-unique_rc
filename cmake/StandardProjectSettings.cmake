@@ -17,6 +17,11 @@ endif()
 # Generate compile_commands.json to make it easier to work with clang based tools
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Get implicit includes when gcc installed from non-cannonical repository, e.g. from sources
+if(CMAKE_EXPORT_COMPILE_COMMANDS)
+  set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
+endif()
+
 # Enhance error reporting and compiler messages
 if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
   if(WIN32)

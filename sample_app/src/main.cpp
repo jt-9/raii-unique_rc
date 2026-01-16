@@ -28,10 +28,11 @@
 #include <string_view>
 #include <tuple>
 
-//#include <print>
 #include <iostream>
+#include <print>
 
 namespace {
+// NOLINTNEXTLINE(bugprone-exception-escape)
 void measureAndPrintUniquePtrSize() noexcept
 {
   using namespace std::literals;
@@ -39,7 +40,7 @@ void measureAndPrintUniquePtrSize() noexcept
   // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new)
   const std::unique_ptr<int, raii::memory_delete<int *>> ptr1{ new int(1001) };
 
-  fmt::println("Sizeof 'std::unique_ptr<int, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(ptr1));
+  std::println("Sizeof 'std::unique_ptr<int, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(ptr1));
 
   // std::_Compressed_pair<raii::memory_delete<int*>, int*> cp{ std::_Zero_then_variadic_args_t{} };
   // std::cout << "Sizeof 'std::_Compressed_pair<raii::memory_delete<int*>, int*>' is "sv << sizeof(cp) << " bytes\n"sv;
@@ -47,7 +48,7 @@ void measureAndPrintUniquePtrSize() noexcept
   const std::tuple<int *, raii::memory_delete<int *>> tp_ptr_to_deleter{ nullptr, raii::memory_delete<int *>{} };
   //		std::cout << "Sizeof 'std::tuple<int*, raii::memory_delete<int*>>' is "sv << sizeof(tp) << " bytes\n"sv;
   //		std::println("Sizeof 'std::tuple<int*, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(tp));
-  fmt::println("Sizeof 'std::tuple<int*, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(tp_ptr_to_deleter));
+  std::println("Sizeof 'std::tuple<int*, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(tp_ptr_to_deleter));
 }
 
 void printLibVersion(std::string_view lib_name) noexcept
@@ -217,7 +218,7 @@ int main(int argc, char **argv) noexcept
 
     std::cout << "Array of arrayUniquePtr: " << arrayUniquePtr << '\n';
     // const auto deleted_op = arrayUniquePtr.operator->();
-    // cppcheck-suppress leakNoVarFunctionCall false positive
+    // cppcheck-suppress leakNoVarFunctionCall; false positive
     arrayUniquePtr.reset(new int[2]);
 
     // const auto stdUniquePtr = std::make_unique_for_overwrite<int[]>(kArraySize);
@@ -238,7 +239,7 @@ int main(int argc, char **argv) noexcept
     arrayWithStdDeleter[1] = 4;
     arrayWithStdDeleter[2] = 7;
 
-    // cppcheck-suppress leakNoVarFunctionCall false positive
+    // cppcheck-suppress leakNoVarFunctionCall; false positive
     arrayWithStdDeleter.reset(new int[2]);
     // NOLINTEND
   }
