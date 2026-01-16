@@ -21,7 +21,7 @@ struct memory_delete
 
   template<typename U>
     requires std::is_convertible_v<U, Handle>
-  // cppcheck-suppress noExplicitConstructor intended converting constructor
+  // cppcheck-suppress noExplicitConstructor; intended converting constructor
   raii_inline constexpr memory_delete(const memory_delete<U> &) noexcept
   {}
 

@@ -360,7 +360,7 @@ public:
     template<typename, typename> class IHPolicy>
     requires std::conjunction_v<safe_conversion_from<H, D, TR, IH, IHPolicy>,
       std::conditional_t<std::is_reference_v<Deleter>, std::is_same<D, Deleter>, std::is_convertible<D, Deleter>>>
-  // cppcheck-suppress noExplicitConstructor intended converting constructor
+  // cppcheck-suppress noExplicitConstructor; intended converting constructor
   raii_inline constexpr unique_rc(unique_rc<H, D, TR, IH, IHPolicy> &&u) noexcept
     : uh_{ u.release(), std::forward<D>(u.get_deleter()) }
   {}

@@ -18,7 +18,7 @@ template<typename T> struct default_delete
 
   template<typename U>
     requires std::is_convertible_v<U *, T *>
-  // cppcheck-suppress noExplicitConstructor intended converting constructor
+  // cppcheck-suppress noExplicitConstructor; intended converting constructor
   raii_inline constexpr default_delete(const default_delete<U> &) noexcept
   {}
 
@@ -44,7 +44,7 @@ template<typename T> struct default_delete<T[]>
 
   template<typename U>
     requires std::is_convertible_v<U (*)[], T (*)[]>
-  // cppcheck-suppress noExplicitConstructor intended converting constructor
+  // cppcheck-suppress noExplicitConstructor; intended converting constructor
   raii_inline constexpr default_delete(const default_delete<U[]> &) noexcept
   {}
 
@@ -171,7 +171,7 @@ public:
   template<typename U, class D>
     requires std::conjunction_v<safe_conversion_from<U, D>,
       std::conditional_t<std::is_reference_v<Deleter>, std::is_same<D, Deleter>, std::is_convertible<D, Deleter>>>
-  // cppcheck-suppress noExplicitConstructor intended converting constructor
+  // cppcheck-suppress noExplicitConstructor; intended converting constructor
   raii_inline constexpr unique_ptr(unique_ptr<U, D> &&u) noexcept : Base(u.release(), std::forward<D>(u.get_deleter()))
   {}
 
@@ -302,7 +302,7 @@ public:
     requires std::conjunction_v<safe_conversion_raw<U>, std::is_lvalue_reference<D>>
   unique_ptr(U, std::remove_reference_t<D> &&) = delete;
 
-  // cppcheck-suppress noExplicitConstructor false positive on move constructor
+  // cppcheck-suppress noExplicitConstructor; false positive on move constructor
   constexpr unique_ptr(unique_ptr && /*src*/) noexcept = default;
 
   /// Creates a unique_ptr that owns nothing.
@@ -315,7 +315,7 @@ public:
   template<typename U, class D>
     requires std::conjunction_v<safe_conversion_from<U, D>,
       std::conditional_t<std::is_reference_v<Deleter>, std::is_same<D, Deleter>, std::is_convertible<D, Deleter>>>
-  // cppcheck-suppress noExplicitConstructor intended converting constructor
+  // cppcheck-suppress noExplicitConstructor; intended converting constructor
   raii_inline constexpr unique_ptr(unique_ptr<U, D> &&u) noexcept : Base(u.release(), std::forward<D>(u.get_deleter()))
   {}
 

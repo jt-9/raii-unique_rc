@@ -36,7 +36,11 @@ public:
   };// promise_type
 
   using CoroHandle = std::coroutine_handle<promise_type>;
-  using CoroutineHolder = raii::unique_rc<CoroHandle, raii::coroutine_destroy, raii::resolve_handle_type, CoroHandle, raii::coro_invalid_handle_policy>;
+  using CoroutineHolder = raii::unique_rc<CoroHandle,
+    raii::coroutine_destroy,
+    raii::resolve_handle_type,
+    CoroHandle,
+    raii::coro_invalid_handle_policy>;
 
   explicit Generator(const CoroHandle coroutine) noexcept : m_coroutine{ coroutine } {}
 
@@ -69,8 +73,7 @@ public:
     const T &operator*() const { return *m_coroutine.promise().current_value; }
     bool operator==(std::default_sentinel_t) const { return !m_coroutine || m_coroutine.done(); }
 
-    // cppcheck-suppress passedByValueCallback pass a copy to coroutine
-    explicit Iter(const CoroHandle coroutine) noexcept : m_coroutine{ coroutine } {}
+    explicit Iter(const CoroHandle &coroutine) noexcept : m_coroutine{ coroutine } {}
 
   private:
     CoroHandle m_coroutine;
