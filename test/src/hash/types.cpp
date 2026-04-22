@@ -10,8 +10,8 @@
 namespace {
 // Check for presence/absence of nested types.
 
-template<typename T> using res_type = typename std::hash<T>::result_type;
-template<typename T> using arg_type = typename std::hash<T>::argument_type;
+template<typename T> using res_type = std::hash<T>::result_type;
+template<typename T> using arg_type = std::hash<T>::argument_type;
 
 template<typename UniqPtr, typename = void, typename... Args> constexpr bool has_res_type(Args &&.../*unused*/) noexcept
 {
@@ -19,7 +19,7 @@ template<typename UniqPtr, typename = void, typename... Args> constexpr bool has
 }
 
 template<typename UniqPtr>
-constexpr typename std::is_void<res_type<UniqPtr>>::value_type// i.e. bool
+constexpr std::is_void<res_type<UniqPtr>>::value_type// i.e. bool
   has_res_type() noexcept
 {
   return true;
@@ -31,7 +31,7 @@ template<typename UniqPtr, typename = void, typename... Args> constexpr bool has
 }
 
 template<typename UniqPtr>
-constexpr typename std::is_void<arg_type<UniqPtr>>::value_type// i.e. bool
+constexpr std::is_void<arg_type<UniqPtr>>::value_type// i.e. bool
   has_arg_type()
 {
   return true;
@@ -48,7 +48,7 @@ struct S
 
 }// namespace
 
-// NOLINTNEXTLINE(cert-dcl58-cpp, cppcoreguidelines-special-member-functions, hicpp-special-member-functions) // disabled specialization for tests
+// NOLINTNEXTLINE(bugprone-std-namespace-modification, cert-dcl58-cpp, cppcoreguidelines-special-member-functions, hicpp-special-member-functions) // disabled specialization for tests
 template<> struct std::hash<S *>
 {
   hash(hash &&) = delete;

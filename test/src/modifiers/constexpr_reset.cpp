@@ -51,16 +51,18 @@ constexpr bool unique_ptr_value_array(int const elem1, int const elem2, int cons
   ptra1.reset(nullptr);
   assert(!ptra1);
 
-  // cppcheck-suppress leakNoVarFunctionCall false positive
   // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new, cppcoreguidelines-owning-memory)
   ptra1.reset(new int[]{ elem1, elem2 });
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
   assert(elem1 == ptra1[0]);
 
-  // cppcheck-suppress leakNoVarFunctionCall false positive
   // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new, cppcoreguidelines-owning-memory)
   ptra1.reset(new int[]{ elem1, elem2, elem3, elem4 });
+
+  // NOLINTBEGIN(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
   assert(elem2 == ptra1[1]);
   assert(elem4 == ptra1[3]);
+  // NOLINTEND(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
 
   ptra1.reset(nullptr);
   assert(!ptra1);
@@ -73,13 +75,12 @@ template<typename T> constexpr bool unique_ptr_default_array(std::size_t array_s
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   raii::unique_ptr<const T[]> ptra2;
 
-  // cppcheck-suppress leakNoVarFunctionCall false positive
   // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new, cppcoreguidelines-owning-memory)
   ptra2.reset(new T[array_size]{});
 
   constexpr auto default_value = T{};
   for (std::size_t i = 0; i < array_size; i++) {
-    // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access, clang-analyzer-core.UndefinedBinaryOperatorResult)
     if (default_value != ptra2[i]) { return false; }
   }
 

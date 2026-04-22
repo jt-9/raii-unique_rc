@@ -57,6 +57,7 @@ TEST_CASE("Reset unique_ptr<C[]> to new C[1]", "[unique_ptr][reset]")
 
   // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
   d.c.reset(new C[1]);
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
   d.c[0].d = &d;
 }
 

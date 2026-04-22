@@ -20,7 +20,7 @@ template<bool B> struct TestDeleter
     // Needed for NullablePointer requirements
     explicit pointer(int * = nullptr);
 
-    // cppcheck-suppress noExplicitConstructor intended behaviour
+    // cppcheck-suppress noExplicitConstructor
     // NOLINTNEXTLINE(hicpp-explicit-conversions)
     pointer(std::nullptr_t);
 

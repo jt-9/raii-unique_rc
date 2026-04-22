@@ -23,7 +23,7 @@ TEST_CASE("LWG 4148 unique_ptr::operator* should not allow dangling references",
   // NOLINTNEXTLINE(misc-const-correctness)
   UPtr iptr{ &lvar };
 
-  using ElemRefT = typename std::add_lvalue_reference_t<UPtr::element_type>;
+  using ElemRefT = std::add_lvalue_reference_t<UPtr::element_type>;
   using DerefT = decltype(*iptr.get());
   STATIC_REQUIRE(std::reference_converts_from_temporary_v<ElemRefT, DerefT>);
 

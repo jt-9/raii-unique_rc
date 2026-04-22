@@ -134,7 +134,6 @@ public:
   // False positive while calling base class constructor, it interprets as new function with the same name which hides
   // implementation in base class
   // cppcheck-suppress-begin [functionStatic, missingReturn, duplInheritedMember]
-
   raii_inline constexpr unique_ptr() noexcept
     requires not_pointer_and_is_default_constructable_v<Deleter>
     : Base()
@@ -302,7 +301,8 @@ public:
     requires std::conjunction_v<safe_conversion_raw<U>, std::is_lvalue_reference<D>>
   unique_ptr(U, std::remove_reference_t<D> &&) = delete;
 
-  // cppcheck-suppress noExplicitConstructor; false positive on move constructor
+  // False positive on move constructor
+  // cppcheck-suppress noExplicitConstructor
   constexpr unique_ptr(unique_ptr && /*src*/) noexcept = default;
 
   /// Creates a unique_ptr that owns nothing.

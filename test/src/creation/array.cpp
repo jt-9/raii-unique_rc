@@ -22,5 +22,6 @@ TEST_CASE("raii::make_unique array of objects", "[unique_ptr][make_unique]")
   raii::unique_ptr aptr = raii::make_unique<A[]>(constArraySize);
   CHECK(aptr != nullptr);
 
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
   for (std::size_t i = 0; i < constArraySize; i++) { CHECK(aptr[i].b); }
 }

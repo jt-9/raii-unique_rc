@@ -119,12 +119,14 @@ TEST_CASE("Swap array constructed unique_ptr", "[unique_ptr][std::ranges::swap][
   raii::unique_ptr<int[]> ptr_a3{ new int[]{ 3 } };
 
   std::ranges::swap(ptr_a1, ptr_a3);
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
   CHECK(ptr_a1[0] == 3);
 
   // NOLINTNEXTLINE
   raii::unique_ptr<int[]> ptr_a4{ new int[]{ 4, 5 } };
 
   std::ranges::swap(ptr_a1, ptr_a4);
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
   CHECK(ptr_a1[1] == 5);
 
   // False positive resources are released in raii::unique_ptr destructor

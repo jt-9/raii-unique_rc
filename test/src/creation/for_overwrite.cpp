@@ -85,5 +85,7 @@ TEST_CASE("raii::make_unique_for_overwrite via malloc with memset non-trivial ty
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   const raii::unique_ptr<NonTrivial[]> array_ptr = raii::make_unique_for_overwrite<NonTrivial[]>(constArraySize);
+
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
   for (std::size_t i = 0; i < constArraySize; i++) { CHECK(array_ptr[i].init == constInitMem); }
 }

@@ -134,7 +134,7 @@ TEST_CASE("Array subscript operator unique_ptr<int[]>", "[unique_ptr]")
   CHECK(ptr1.get() != nullptr);
   CHECK(ptr1);
 
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index, cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
   for (std::size_t i = 0; i < input.size(); i++) { ptr1[i] = input[i]; }
 
   CHECK(std::equal(std::cbegin(input), std::cend(input), ptr1.get()));
