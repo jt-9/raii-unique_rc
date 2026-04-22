@@ -218,8 +218,7 @@ int main(int argc, char **argv) noexcept
 
     std::cout << "Array of arrayUniquePtr: " << arrayUniquePtr << '\n';
     // const auto deleted_op = arrayUniquePtr.operator->();
-    // cppcheck-suppress leakNoVarFunctionCall; false positive
-    arrayUniquePtr.reset(new int[2]);
+        arrayUniquePtr.reset(new int[2]);
 
     // const auto stdUniquePtr = std::make_unique_for_overwrite<int[]>(kArraySize);
     // stdUniquePtr[0] = 5;
@@ -239,7 +238,6 @@ int main(int argc, char **argv) noexcept
     arrayWithStdDeleter[1] = 4;
     arrayWithStdDeleter[2] = 7;
 
-    // cppcheck-suppress leakNoVarFunctionCall; false positive
     arrayWithStdDeleter.reset(new int[2]);
     // NOLINTEND
   }

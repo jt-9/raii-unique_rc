@@ -27,10 +27,12 @@ template<typename T>
   auto ptr = raii::unique_ptr<T[]>{ new T[array_size]{} };
   assert(ptr.get() != nullptr);
 
+  // NOLINTBEGIN(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
   ptr[0] = first_element;
   assert(ptr[0] == first_element);
 
   assert(ptr[array_size - 1] == T{});
+  // NOLINTEND(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
 
   return true;
 }

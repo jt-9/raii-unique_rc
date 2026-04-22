@@ -131,15 +131,13 @@ public:
     other.get_handle() = invalid_handle_policy::invalid();
   }
 
-  // cppcheck-suppress operatorEqVarError - false positive, member variable is assigned indirectly via get_handle() in
-  // reset(), and get_deleter()
+  //False positive, member variable is assigned indirectly via get_handle() in reset(), and get_deleter()
+  // cppcheck-suppress operatorEqVarError 
   raii_inline constexpr unique_rc_holder_impl &operator=(unique_rc_holder_impl &&other) noexcept
   {
     reset(other.release());
     get_deleter() = std::forward<Deleter>(other.get_deleter());
 
-    // This is false positive, since reset(other.release()) calls deleter, and acquires ownership of other.release()
-    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     return *this;
   }
 

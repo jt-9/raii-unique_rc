@@ -29,14 +29,14 @@ TEST_CASE("std::hash for unique_ptr single value and array of type Empty", "[uni
 
   const raii::unique_ptr<Empty> ptr0{ new Empty{} };
   const std::hash<raii::unique_ptr<Empty>> hu0;
-  const std::hash<typename raii::unique_ptr<Empty>::pointer> hp0;
+  const std::hash<raii::unique_ptr<Empty>::pointer> hp0;
 
   CHECK(hu0(ptr0) == hp0(ptr0.get()));
 
   // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   const raii::unique_ptr<Empty[]> ptr1{ new Empty[10] };
   const std::hash<raii::unique_ptr<Empty[]>> hu1;
-  const std::hash<typename raii::unique_ptr<Empty[]>::pointer> hp1;
+  const std::hash<raii::unique_ptr<Empty[]>::pointer> hp1;
   // NOLINTEND(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 
   CHECK(hu1(ptr1) == hp1(ptr1.get()));
@@ -48,9 +48,9 @@ TEST_CASE("std::hash with empty pointer type", "[unique_ptr][hash]")
   {
     struct pointer
     {
-      // cppcheck-suppress noExplicitConstructor intended behaviour
+      // cppcheck-suppress noExplicitConstructor
       // NOLINTNEXTLINE(hicpp-explicit-conversions)
-      pointer(std::nullptr_t) {};
+      pointer(std::nullptr_t /*unused*/) {};
     };
     void operator()(pointer /*unused*/) const noexcept {}
   };
@@ -71,7 +71,7 @@ struct D
 {
   struct pointer
   {
-    // cppcheck-suppress noExplicitConstructor intended behaviour
+    // cppcheck-suppress noExplicitConstructor
     // NOLINTNEXTLINE(hicpp-explicit-conversions)
     constexpr pointer(std::nullptr_t = nullptr) {};
 
@@ -86,7 +86,7 @@ struct F
 {
   struct pointer
   {
-    // cppcheck-suppress noExplicitConstructor intended behaviour
+    // cppcheck-suppress noExplicitConstructor
     // NOLINTNEXTLINE(hicpp-explicit-conversions)
     constexpr pointer(std::nullptr_t = nullptr) {};
 

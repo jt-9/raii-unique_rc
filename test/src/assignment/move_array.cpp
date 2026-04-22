@@ -42,7 +42,7 @@ TEST_CASE("Move assign array objects unique_ptr to default initialised unique_pt
 
   ptr2 = std::move(ptr1);
 
-  // cppcheck-suppress accessMoved only in test to make sure the pointer is nullptr
+  // cppcheck-suppress accessMoved //Only for test case
   CHECK_FALSE(ptr1);
   CHECK(ptr2.get() == raw_d);
   CHECK(ptr2);

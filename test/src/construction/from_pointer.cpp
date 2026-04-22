@@ -32,9 +32,9 @@ struct B : A
   B &operator=(const B &) = default;
   B &operator=(B &&) = default;
 
-  // cppcheck-suppress duplInheritedMember it's okay in tests, but generally a bad practice
+  // cppcheck-suppress duplInheritedMember //it's okay in tests, but generally a bad practice
   static long ctor_count;
-  // cppcheck-suppress duplInheritedMember it's okay in tests, but generally a bad practice
+  // cppcheck-suppress duplInheritedMember //it's okay in tests, but generally a bad practice
   static long dtor_count;
 };
 long B::ctor_count = 0;

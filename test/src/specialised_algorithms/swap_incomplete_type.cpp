@@ -66,6 +66,7 @@ struct DeleterArray : public Deleter
   using Deleter::operator=;
 
   // cppcheck-suppress duplInheritedMember
+  // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
   void operator()(int const *ptr) const noexcept
   {
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
