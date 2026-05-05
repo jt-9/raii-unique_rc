@@ -93,7 +93,7 @@ TEST_CASE("Three-way value initialised unique_rc<int*, memory_delete<int*>>", "[
 
     CHECK((rc1 <=> noop_rc) == std::strong_ordering::equal);
 
-    const auto equal_to_zero = (rc1 <=> noop_rc) == 0;
+    const auto equal_to_zero = (rc1 <=> noop_rc) == std::strong_ordering::equal;
     CHECK(equal_to_zero);
   }
 
@@ -167,7 +167,7 @@ TEST_CASE("Three-way operator <=> with value initialised unique_ptr<int>", "[uni
 
     CHECK((ptr1 <=> noop_ptr) == std::strong_ordering::equal);
 
-    const auto equals_to_zero = (ptr1 <=> noop_ptr) == 0;
+    const auto equals_to_zero = (ptr1 <=> noop_ptr) == std::strong_ordering::equal;
     CHECK(equals_to_zero);
   }
 

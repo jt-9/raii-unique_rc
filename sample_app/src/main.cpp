@@ -35,11 +35,12 @@ namespace {
 // NOLINTNEXTLINE(bugprone-exception-escape)
 void measureAndPrintUniquePtrSize() noexcept
 {
-  using namespace std::literals;
+  using namespace std::string_view_literals;
 
   // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new)
   const std::unique_ptr<int, raii::memory_delete<int *>> ptr1{ new int(1001) };
 
+  // NOLINTNEXTLINE(misc-include-cleaner)
   std::println("Sizeof 'std::unique_ptr<int, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(ptr1));
 
   // std::_Compressed_pair<raii::memory_delete<int*>, int*> cp{ std::_Zero_then_variadic_args_t{} };
@@ -48,6 +49,8 @@ void measureAndPrintUniquePtrSize() noexcept
   const std::tuple<int *, raii::memory_delete<int *>> tp_ptr_to_deleter{ nullptr, raii::memory_delete<int *>{} };
   //		std::cout << "Sizeof 'std::tuple<int*, raii::memory_delete<int*>>' is "sv << sizeof(tp) << " bytes\n"sv;
   //		std::println("Sizeof 'std::tuple<int*, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(tp));
+
+  // NOLINTNEXTLINE(misc-include-cleaner)
   std::println("Sizeof 'std::tuple<int*, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(tp_ptr_to_deleter));
 }
 
