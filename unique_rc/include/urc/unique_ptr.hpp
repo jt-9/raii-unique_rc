@@ -7,7 +7,11 @@
 #include "unique_rc.hpp"
 
 #include <cassert>
-#include <cstddef>//std::nullptr_t
+#include <compare>// std::equality_comparable_with
+#include <concepts>// std::swappable
+#include <cstddef>// std::nullptr_t
+#include <functional>// std::hash
+#include <type_traits>// std::conjunction
 
 
 RAII_NS_BEGIN
@@ -19,48 +23,57 @@ template<typename T> struct default_delete
   template<typename U>
     requires std::is_convertible_v<U *, T *>
   // cppcheck-suppress noExplicitConstructor; intended converting constructor
-  raii_inline constexpr default_delete(const default_delete<U> &) noexcept
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
+  raii_inline constexpr default_delete(const default_delete<U> & /*src*/) noexcept
   {}
 
 #ifdef __cpp_static_call_operator
   // False poisitive, guarded by feature #ifdef __cpp_static_call_operator
   // NOLINTNEXTLINE(clang-diagnostic-c++23-extensions)
-  raii_inline static constexpr void operator()(T *h) noexcept
+  raii_inline static constexpr void operator()(T *ptr) noexcept
 #else
-  raii_inline constexpr void operator()(T *h) const noexcept
+  raii_inline constexpr void operator()(T *ptr) const noexcept
 #endif
   {
     static_assert(!std::is_void_v<T>, "can't delete pointer to incomplete type");
+    // NOLINTNEXTLINE(bugprone-sizeof-expression)
     static_assert(sizeof(T) > 0, "can't delete pointer to incomplete type");
 
-    delete h;
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+    delete ptr;
   }
 };
 
 // Specialization of default_delete for arrays, used by 'unique_ptr<T[]>'
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays)
 template<typename T> struct default_delete<T[]>
 {
   constexpr default_delete() noexcept = default;
 
   template<typename U>
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays)
     requires std::is_convertible_v<U (*)[], T (*)[]>
   // cppcheck-suppress noExplicitConstructor; intended converting constructor
-  raii_inline constexpr default_delete(const default_delete<U[]> &) noexcept
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, hicpp-explicit-conversions)
+  raii_inline constexpr default_delete(const default_delete<U[]> & /*src*/) noexcept
   {}
 
   template<typename U>
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays)
     requires std::is_convertible_v<U (*)[], T (*)[]>
 #ifdef __cpp_static_call_operator
   // False poisitive, guarded by feature #ifdef __cpp_static_call_operator
   // NOLINTNEXTLINE(clang-diagnostic-c++23-extensions)
-  raii_inline static constexpr void operator()(U *p) noexcept
+  raii_inline static constexpr void operator()(U *ptr) noexcept
 #else
-  raii_inline constexpr void operator()(U *p) const noexcept
+  raii_inline constexpr void operator()(U *ptr) const noexcept
 #endif
   {
+    // NOLINTNEXTLINE(bugprone-sizeof-expression)
     static_assert(sizeof(U) > 0, "can't delete pointer to incomplete type");
 
-    delete[] p;
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+    delete[] ptr;
   }
 };
 
@@ -74,7 +87,7 @@ template<typename Pointer, class Del_noref>
   requires has_pointer_type<Del_noref>
 struct resolve_pointer_type<Pointer, Del_noref>
 {
-  using type = typename Del_noref::pointer;
+  using type = Del_noref::pointer;
 };
 
 
@@ -105,11 +118,11 @@ private:
   using typename Base::handle;
 
 public:
-  using invalid_pointer_policy = typename Base::invalid_handle_policy;
+  using invalid_pointer_policy = Base::invalid_handle_policy;
 
   /// @brief std::remove_reference<Deleter>::type::pointer if that type exists, otherwise T*. Must satisfy
   /// `NullablePointer`
-  using pointer = typename Base::handle;
+  using pointer = Base::handle;
 
   /// @brief T, the type of the object managed by this unique_ptr
   using element_type = T;
@@ -119,7 +132,7 @@ public:
 
   /// @brief Represents invalid handle type, whose value is returned by Deleter::invalid()
   /// is assigned to *this handle, when it goes out of scope, or upon reset(), usually std::nullptr_t
-  using invalid_pointer = typename Base::invalid_handle;
+  using invalid_pointer = Base::invalid_handle;
 
   /// @brief static method returns invalid pointer of type `invalid_pointer`, usually `nullptr`
   using Base::invalid;
@@ -139,24 +152,19 @@ public:
     : Base()
   {}
 
-  // template<class D = Deleter>
-  raii_inline explicit constexpr unique_ptr(pointer p) noexcept
+  raii_inline explicit constexpr unique_ptr(pointer ptr) noexcept
     requires not_pointer_and_is_default_constructable_v<Deleter>
-    : Base(p)
+    : Base(ptr)
   {}
 
-  // template<class D = Deleter>
-  //   requires std::is_copy_constructible_v<D>
-  raii_inline constexpr unique_ptr(pointer p, const Deleter &d) noexcept
+  raii_inline constexpr unique_ptr(pointer ptr, const Deleter &del) noexcept
     requires std::is_copy_constructible_v<Deleter>
-    : Base(p, d)
+    : Base(ptr, del)
   {}
 
-  // template<class D = Deleter>
-  //   requires std::conjunction_v<std::negation<std::is_reference<D>>, std::is_move_constructible<D>>
-  raii_inline constexpr unique_ptr(pointer p, Deleter &&d) noexcept
+  raii_inline constexpr unique_ptr(pointer ptr, Deleter &&del) noexcept
     requires std::conjunction_v<std::negation<std::is_reference<Deleter>>, std::is_move_constructible<Deleter>>
-    : Base(p, std::move(d))
+    : Base(ptr, std::move(del))
   {}
   // cppcheck-suppress-end [functionStatic, missingReturn, duplInheritedMember]
 
@@ -171,7 +179,7 @@ public:
     requires std::conjunction_v<safe_conversion_from<U, D>,
       std::conditional_t<std::is_reference_v<Deleter>, std::is_same<D, Deleter>, std::is_convertible<D, Deleter>>>
   // cppcheck-suppress noExplicitConstructor; intended converting constructor
-  raii_inline constexpr unique_ptr(unique_ptr<U, D> &&u) noexcept : Base(u.release(), std::forward<D>(u.get_deleter()))
+  raii_inline constexpr unique_ptr(unique_ptr<U, D> &&ptr) noexcept : Base(std::move(ptr))
   {}
 
   constexpr unique_ptr &operator=(unique_ptr && /*rhs*/) noexcept = default;
@@ -220,6 +228,7 @@ public:
  * @note This specialisation manages dynamically-allocated array of objects (e.g., allocated with new[]).
  **/
 template<typename T, class Deleter>
+// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions, hicpp-special-member-functions, cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays)
 class unique_ptr<T[], Deleter> : public unique_rc<T *, Deleter, resolve_pointer_type, std::nullptr_t>
 {
 private:
@@ -230,11 +239,11 @@ private:
     std::conjunction<std::is_base_of<T, U>, std::negation<std::is_same<std::remove_cv_t<T>, std::remove_cv_t<U>>>>;
 
 public:
-  using invalid_pointer_policy = typename Base::invalid_handle_policy;
+  using invalid_pointer_policy = Base::invalid_handle_policy;
 
   /// @brief std::remove_reference<Deleter>::type::pointer if that type exists, otherwise T*. Must satisfy
   /// `NullablePointer`
-  using pointer = typename Base::handle;
+  using pointer = Base::handle;
 
   /// @brief T, the type of the object managed by this unique_ptr
   using element_type = T;
@@ -244,7 +253,7 @@ public:
 
   /// @brief Represents invalid handle type, whose value is returned by Deleter::invalid()
   /// is assigned to *this handle, when it goes out of scope, or upon reset(), usually std::nullptr_t
-  using invalid_pointer = typename Base::invalid_handle;
+  using invalid_pointer = Base::invalid_handle;
 
   /// @brief static method returns invalid pointer of type `invalid_pointer`, usually `nullptr`
   using Base::invalid;
@@ -255,17 +264,19 @@ public:
     std::conjunction<std::disjunction<std::disjunction<std::is_same<U, pointer>, std::is_same<U, std::nullptr_t>>,
       std::conjunction<std::is_pointer<U>,
         std::is_same<pointer, element_type *>,
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays)
         std::is_convertible<typename std::remove_pointer_t<U> (*)[], element_type (*)[]>>>>;
 
   /// @brief helper template for detecting a safe conversion from another unique_ptr
   template<typename U,
     class D,
     typename UP = unique_ptr<U, D>,
-    typename UP_pointer = typename UP::pointer,
-    typename UP_element_type = typename UP::element_type>
+    typename UP_pointer = UP::pointer,
+    typename UP_element_type = UP::element_type>
   using safe_conversion_from = std::conjunction<std::is_array<U>,
     std::is_same<pointer, element_type *>,
     std::is_same<UP_pointer, UP_element_type *>,
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays)
     std::is_convertible<UP_element_type (*)[], element_type (*)[]>>;
 
   // False positive while calling base class constructor, it interprets as new function with the same name which hides
@@ -279,21 +290,21 @@ public:
   {}
 
   template<typename U>
-  raii_inline constexpr explicit unique_ptr(U p) noexcept
+  raii_inline constexpr explicit unique_ptr(U ptr) noexcept
     requires std::conjunction_v<not_pointer_and_is_default_constructable<Deleter>, safe_conversion_raw<U>>
-    : Base(p)
+    : Base(ptr)
   {}
 
   template<typename U>
-  raii_inline constexpr unique_ptr(U p, const deleter_type &d) noexcept
+  raii_inline constexpr unique_ptr(U ptr, const deleter_type &del) noexcept
     requires std::conjunction_v<safe_conversion_raw<U>, std::is_copy_constructible<deleter_type>>
-    : Base(p, d)
+    : Base(ptr, del)
   {}
 
   template<typename U, class D = deleter_type>
-  raii_inline constexpr unique_ptr(U p, std::enable_if_t<!std::is_lvalue_reference_v<D>, D &&> d) noexcept
+  raii_inline constexpr unique_ptr(U ptr, std::enable_if_t<!std::is_lvalue_reference_v<D>, D &&> del) noexcept
     requires std::conjunction_v<safe_conversion_raw<U>, std::is_move_constructible<D>>
-    : Base(std::move(p), std::move(d))
+    : Base(std::move(ptr), std::move(del))
   {}
   // cppcheck-suppress-end [functionStatic, missingReturn, duplInheritedMember]
 
@@ -316,16 +327,16 @@ public:
     requires std::conjunction_v<safe_conversion_from<U, D>,
       std::conditional_t<std::is_reference_v<Deleter>, std::is_same<D, Deleter>, std::is_convertible<D, Deleter>>>
   // cppcheck-suppress noExplicitConstructor; intended converting constructor
-  raii_inline constexpr unique_ptr(unique_ptr<U, D> &&u) noexcept : Base(u.release(), std::forward<D>(u.get_deleter()))
+  raii_inline constexpr unique_ptr(unique_ptr<U, D> &&ptr) noexcept : Base(std::move(ptr))
   {}
 
   constexpr unique_ptr &operator=(unique_ptr && /*rhs*/) noexcept = default;
 
   template<typename U, class D>
     requires std::conjunction_v<safe_conversion_from<U, D>, std::is_assignable<deleter_type &, D &&>>
-  raii_inline constexpr unique_ptr &operator=(unique_ptr<U, D> &&u) noexcept
+  raii_inline constexpr unique_ptr &operator=(unique_ptr<U, D> &&rhs) noexcept
   {
-    Base::operator=(std::move(u));
+    Base::operator=(std::move(rhs));
     return *this;
   }
 
@@ -345,18 +356,18 @@ public:
   constexpr pointer operator->() const noexcept(noexcept(get())) = delete;
 
   /// @brief deleted for array specialisation, single object version only
-  constexpr typename std::add_lvalue_reference_t<element_type> operator*() const
+  constexpr std::add_lvalue_reference_t<element_type> operator*() const
     noexcept(noexcept(*std::declval<pointer>())) = delete;
 
   /// @brief Provides access to elements of an array managed by a unique_ptr.
-  /// @note Parameter i shall be less than the number of elements in the array;
+  /// @note Parameter index shall be less than the number of elements in the array;
   /// otherwise, the behavior is undefined.
-  /// @param i the index of the element to be returned
-  /// @return lvalue reference the element at index i, i.e. get()[i]
-  raii_inline constexpr typename std::add_lvalue_reference_t<element_type> operator[](std::size_t i) const
+  /// @param index the index of the element to be returned
+  /// @return lvalue reference the element at index, i.e. get()[index]
+  raii_inline constexpr std::add_lvalue_reference_t<element_type> operator[](std::size_t index) const
   {
-    assert(invalid_pointer_policy::is_owned(get()) && "Error subscript operator on nullptr");
-    return get()[i];
+    assert(invalid_pointer_policy::is_owned(get()) && "Error subscript operator on invalid pointer");
+    return get()[index];
   }
 
   using Base::get_deleter;
@@ -368,22 +379,19 @@ public:
     requires std::disjunction_v<std::is_same<U, pointer>,
       std::conjunction<std::is_same<pointer, element_type *>,
         std::is_pointer<U>,
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays)
         std::is_convertible<typename std::remove_pointer_t<U> (*)[], element_type (*)[]>>>
   /// @brief Replaces the managed array, delegates to `unique_rc::reset`
-  /// @param p pointer to a new array to manage
+  /// @param ptr pointer to a new array to manage
   /// @note To replace the managed object while supplying a new deleter as well, move assignment operator may be used
-  raii_inline constexpr void reset(U p) noexcept
-  {
-    Base::reset(std::move(p));
-  }
+  raii_inline constexpr void reset(U ptr) noexcept
+  { Base::reset(std::move(ptr)); }
 
   /// @brief Replaces the managed array. Equivalent to `reset(pointer())`
   /// @param nullptr or none
   raii_inline constexpr void reset(std::nullptr_t = nullptr) noexcept
     requires std::is_same_v<invalid_pointer, std::nullptr_t>
-  {
-    Base::reset(invalid());
-  }
+  { Base::reset(invalid()); }
 
   using Base::swap;
 };// unique_ptr<T[], Deleter>
@@ -401,9 +409,7 @@ template<typename T1, class D1, typename T2, class D2>
 // unique_ptr comparison with nullptr
 template<typename T, class D>
 [[nodiscard]] raii_inline constexpr bool operator==(const unique_ptr<T, D> &lhs, std::nullptr_t) noexcept
-{
-  return !lhs;
-}
+{ return !lhs; }
 
 template<typename T1, class D1, typename T2, class D2>
   requires std::three_way_comparable_with<typename unique_ptr<T1, D1>::pointer, typename unique_ptr<T2, D2>::pointer>
@@ -420,7 +426,7 @@ template<typename T, class D>
 [[nodiscard]] raii_inline constexpr std::compare_three_way_result_t<typename unique_ptr<T, D>::pointer>
   operator<=>(const unique_ptr<T, D> &lhs, std::nullptr_t) noexcept(noexcept(lhs.get()))
 {
-  using pointer = typename unique_ptr<T, D>::pointer;
+  using pointer = unique_ptr<T, D>::pointer;
   return lhs.get() <=> static_cast<pointer>(nullptr);
 }
 
@@ -428,9 +434,7 @@ template<typename H, class D>
   requires /*std::is_swappable_v<D> ||*/ std::swappable<D>
 raii_inline constexpr void swap(unique_ptr<H, D> &lhs, unique_ptr<H, D> &rhs) noexcept(
   noexcept(std::is_nothrow_swappable_v<D>))
-{
-  lhs.swap(rhs);
-}
+{ lhs.swap(rhs); }
 
 template<typename H, class D>
   requires std::negation_v<std::is_swappable<D>>
@@ -483,15 +487,13 @@ void make_unique_for_overwrite(Types &&...) = delete;
 
 RAII_NS_END
 
-namespace std {
 
 // std::hash specialization for unique_rc.
 template<typename H, class D>
-struct hash<raii::unique_ptr<H, D>>
+// NOLINTNEXTLINE(bugprone-std-namespace-modification, cert-dcl58-cpp)
+struct std::hash<raii::unique_ptr<H, D>>
   : public raii::detail::unique_rc_hash_base<raii::unique_ptr<H, D>, typename raii::unique_ptr<H, D>::pointer>
 {
 };
-
-}// namespace std
 
 #endif// UNIQUE_PTR_HPP

@@ -98,6 +98,7 @@ target_link_libraries(
 
 target_compile_features(tests PUBLIC cxx_std_23)
 target_compile_definitions(tests PRIVATE -DRAII_NO_REQUIRE_CLASS_FOR_MEMBER_ACCESS_OPERATOR)
+target_compile_definitions(tests PRIVATE -DRAII_DISABLE_SELF_RESET_CHECK)
 target_include_directories(tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_HEADER_PREFIX})
 
 if (WIN32 AND BUILD_SHARED_LIBS)
