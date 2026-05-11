@@ -3,12 +3,12 @@
 
 #include "raii_defs.hpp"
 
-#include <stdio.h>
+#include <cstdio>
 
 
 RAII_NS_BEGIN
 
-// Calls fclose() which flushes the stream pointed to by h and closes the underlying file descriptor.
+// Calls fclose() which flushes the stream pointed to by stream and closes the underlying file descriptor.
 struct stdio_fclose
 {
   constexpr stdio_fclose() noexcept = default;
@@ -16,12 +16,13 @@ struct stdio_fclose
 #ifdef __cpp_static_call_operator
   // False poisitive, guarded by feature #ifdef __cpp_static_call_operator
   // NOLINTNEXTLINE(clang-diagnostic-c++23-extensions)
-  raii_inline static void operator()(FILE *h) noexcept
+  raii_inline static void operator()(FILE *stream) noexcept
 #else
-  raii_inline void operator()(FILE *h) const noexcept
+  raii_inline void operator()(FILE *stream) const noexcept
 #endif
   {
-    fclose(h);
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+    static_cast<void>(fclose(stream));
   }
 };
 

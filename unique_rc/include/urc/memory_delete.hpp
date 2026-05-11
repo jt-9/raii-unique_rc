@@ -4,11 +4,7 @@
 
 #include "raii_defs.hpp"
 
-#include <concepts>
-#include <cstddef>
-#include <new>
-#include <type_traits>
-#include <utility>//std::forward
+#include <type_traits>// std::is_pointer_v
 
 
 RAII_NS_BEGIN
@@ -21,22 +17,24 @@ struct memory_delete
 
   template<typename U>
     requires std::is_convertible_v<U, Handle>
-  // cppcheck-suppress noExplicitConstructor; intended converting constructor
-  raii_inline constexpr memory_delete(const memory_delete<U> &) noexcept
+  
+  raii_inline explicit constexpr memory_delete(const memory_delete<U> & /*unused*/) noexcept
   {}
 
 #ifdef __cpp_static_call_operator
   // False poisitive, guarded by feature #ifdef __cpp_static_call_operator
   // NOLINTNEXTLINE(clang-diagnostic-c++23-extensions)
-  raii_inline static constexpr void operator()(Handle h) noexcept
+  raii_inline static constexpr void operator()(Handle ptr) noexcept
 #else
-  raii_inline constexpr void operator()(Handle h) const noexcept
+  raii_inline constexpr void operator()(Handle ptr) const noexcept
 #endif
   {
     static_assert(!std::is_void_v<std::remove_pointer_t<Handle>>, "can't delete pointer to incomplete type");
+    // NOLINTNEXTLINE(bugprone-sizeof-expression)
     static_assert(sizeof(std::remove_pointer_t<Handle>) > 0, "can't delete pointer to incomplete type");
 
-    delete h;
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+    delete ptr;
   }
 };
 
