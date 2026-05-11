@@ -46,7 +46,7 @@ template<typename T> struct hash_not_enabled
   constexpr hash_not_enabled &operator=(hash_not_enabled &) = delete;
   constexpr hash_not_enabled &operator=(hash_not_enabled &&) = delete;
 
-  // Cannot mark deleted, cause vc 19.50 generates warning of implicitly deleted destructor, 
+  // Cannot mark deleted, cause vc 19.50 generates warning of implicitly deleted destructor,
   // when hash is not implemented for a user type
   constexpr ~hash_not_enabled() = default;
 };
@@ -165,9 +165,9 @@ public:
   {
     const handle old_h = std::exchange(get_handle(), hnd);
     if (invalid_handle_policy::is_owned(old_h)) {
-#ifndef RAII_DISABLE_SELF_RESET_CHECK
+#ifndef RAII_URC_DISABLE_SELF_RESET_CHECK
       assert(old_h != hnd && "Failed self-reset check, like r.reset(r.get())");
-#endif// RAII_DISABLE_SELF_RESET_CHECK
+#endif
       get_deleter()(old_h);
     }
 
@@ -375,9 +375,12 @@ public:
     template<typename, typename> class IHPolicy>
     requires std::conjunction_v<safe_conversion_from<H, D, TR, IH, IHPolicy>,
       std::conditional_t<std::is_reference_v<Deleter>, std::is_same<D, Deleter>, std::is_convertible<D, Deleter>>>
-  // cppcheck-suppress noExplicitConstructor; intended converting constructor
-  // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
-  raii_inline constexpr unique_rc(unique_rc<H, D, TR, IH, IHPolicy> &&res) noexcept
+  raii_inline
+#ifndef RAII_URC_ENABLE_IMPLICIT_CONVERTING_CONSTRUCTOR
+    explicit
+#endif
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+    constexpr unique_rc(unique_rc<H, D, TR, IH, IHPolicy> &&res) noexcept
     : uh_{ res.release(), std::forward<D>(res.get_deleter()) }
   {}
 
@@ -432,9 +435,9 @@ public:
   /// @brief provides access to object owned by *this
   /// @return handle to managed resource
   [[nodiscard]] raii_inline constexpr handle operator->() const noexcept
-#ifndef RAII_NO_REQUIRE_CLASS_FOR_MEMBER_ACCESS_OPERATOR
+#ifndef RAII_URC_NO_REQUIRE_CLASS_FOR_MEMBER_ACCESS_OPERATOR
     requires is_class_or_union<std::remove_pointer_t<handle>>
-#endif// RAII_NO_REQUIRE_CLASS_FOR_MEMBER_ACCESS_OPERATOR
+#endif
   { return get(); }
 
   /// @brief operator* provides access to object owned by *this,
