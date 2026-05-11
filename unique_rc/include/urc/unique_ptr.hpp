@@ -178,8 +178,12 @@ public:
   template<typename U, class D>
     requires std::conjunction_v<safe_conversion_from<U, D>,
       std::conditional_t<std::is_reference_v<Deleter>, std::is_same<D, Deleter>, std::is_convertible<D, Deleter>>>
-  // cppcheck-suppress noExplicitConstructor; intended converting constructor
-  raii_inline constexpr unique_ptr(unique_ptr<U, D> &&ptr) noexcept : Base(std::move(ptr))
+  raii_inline
+#ifndef RAII_URC_ENABLE_IMPLICIT_CONVERTING_CONSTRUCTOR
+    explicit
+#endif
+    constexpr unique_ptr(unique_ptr<U, D> &&ptr) noexcept
+    : Base(std::move(ptr))
   {}
 
   constexpr unique_ptr &operator=(unique_ptr && /*rhs*/) noexcept = default;
@@ -326,8 +330,12 @@ public:
   template<typename U, class D>
     requires std::conjunction_v<safe_conversion_from<U, D>,
       std::conditional_t<std::is_reference_v<Deleter>, std::is_same<D, Deleter>, std::is_convertible<D, Deleter>>>
-  // cppcheck-suppress noExplicitConstructor; intended converting constructor
-  raii_inline constexpr unique_ptr(unique_ptr<U, D> &&ptr) noexcept : Base(std::move(ptr))
+  raii_inline
+#ifndef RAII_URC_ENABLE_IMPLICIT_CONVERTING_CONSTRUCTOR
+    explicit
+#endif
+    constexpr unique_ptr(unique_ptr<U, D> &&ptr) noexcept
+    : Base(std::move(ptr))
   {}
 
   constexpr unique_ptr &operator=(unique_ptr && /*rhs*/) noexcept = default;
