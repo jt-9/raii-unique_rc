@@ -6,8 +6,7 @@
 
 #include "raii_defs.hpp"
 
-#include <concepts>
-#include <type_traits>
+#include <type_traits>// std::is_class and std::is_union
 
 
 RAII_NS_BEGIN
