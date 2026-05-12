@@ -25,7 +25,7 @@ concept is_class_or_union = std::disjunction_v<std::is_class<T>, std::is_union<T
 
 template<typename T>
 concept can_reference = requires {
-  noexcept(*std::declval<T>());
+  *std::declval<T>();
 };
 
 RAII_NS_END
