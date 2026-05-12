@@ -74,6 +74,7 @@ set(TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/dr2899.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/lwg2762.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/lwg4148.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/lwg4324.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/ptr_type_single.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/ptr_type_array.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/specialised_algorithms/compare.cpp
@@ -136,6 +137,8 @@ set(CONSTEXPR_TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_reset.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/observers/constexpr_observers.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/lwg2762.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/lwg4148.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/lwg4324.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/specialised_algorithms/constexpr_compare.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/specialised_algorithms/constexpr_swap.cpp
 )

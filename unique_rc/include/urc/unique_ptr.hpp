@@ -36,6 +36,7 @@ template<typename T> struct default_delete
 #endif
   {
     static_assert(!std::is_void_v<T>, "can't delete pointer to incomplete type");
+    // cppcheck-suppress sizeofVoid;
     // NOLINTNEXTLINE(bugprone-sizeof-expression)
     static_assert(sizeof(T) > 0, "can't delete pointer to incomplete type");
 
@@ -69,6 +70,7 @@ template<typename T> struct default_delete<T[]>
   raii_inline constexpr void operator()(U *ptr) const noexcept
 #endif
   {
+    // cppcheck-suppress sizeofVoid;
     // NOLINTNEXTLINE(bugprone-sizeof-expression)
     static_assert(sizeof(U) > 0, "can't delete pointer to incomplete type");
 
@@ -364,8 +366,7 @@ public:
   constexpr pointer operator->() const noexcept(noexcept(get())) = delete;
 
   /// @brief deleted for array specialisation, single object version only
-  constexpr std::add_lvalue_reference_t<element_type> operator*() const
-    noexcept(noexcept(*std::declval<pointer>())) = delete;
+  constexpr std::add_lvalue_reference_t<element_type> operator*() const = delete;
 
   /// @brief Provides access to elements of an array managed by a unique_ptr.
   /// @note Parameter index shall be less than the number of elements in the array;

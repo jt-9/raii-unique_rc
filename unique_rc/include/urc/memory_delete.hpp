@@ -30,6 +30,7 @@ struct memory_delete
 #endif
   {
     static_assert(!std::is_void_v<std::remove_pointer_t<Handle>>, "can't delete pointer to incomplete type");
+    // cppcheck-suppress sizeofVoid;
     // NOLINTNEXTLINE(bugprone-sizeof-expression)
     static_assert(sizeof(std::remove_pointer_t<Handle>) > 0, "can't delete pointer to incomplete type");
 
