@@ -113,9 +113,9 @@ TEST_CASE("unique_ptr<int> is swappable with non move-assignable deleter", "[uni
 
 TEST_CASE("unique_ptr<int[]> is swappable with non move-assignable deleter", "[unique_ptr][unique_ptr::swap][swap]")
 {
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   raii::unique_ptr<int[], B::Deleter> ptr1{ new int[1]{ 1 }, B::Deleter{ -1 } };
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   raii::unique_ptr<int[], B::Deleter> ptr2{ new int[2]{ 2, 2 }, B::Deleter{ -2 } };
 
   int const *const pi1 = ptr1.get();
