@@ -62,13 +62,13 @@ TEST_CASE("Move assign array objects unique_ptr with deleter base and derived", 
 {
   constexpr auto INIT_VALUE = 28;
 
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   raii::unique_ptr<int[], DA1> ptr_da1{ new int[]{ INIT_VALUE } };
 
   // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
   CHECK(ptr_da1[0] == INIT_VALUE);
 
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   raii::unique_ptr<int[], DA2> ptr_da2;
   ptr_da2 = std::move(ptr_da1);
 

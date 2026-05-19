@@ -30,12 +30,12 @@ TEST_CASE("Move assign array objects unique_ptr to default initialised unique_pt
   // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
   auto *const raw_d = new Derived[3];
 
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   raii::unique_ptr<Derived[]> ptr1(raw_d);
   CHECK(ptr1.get() == raw_d);
   CHECK(ptr1);
 
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   raii::unique_ptr<Derived[]> ptr2;
   CHECK(ptr2.get() == nullptr);
   CHECK_FALSE(ptr2);

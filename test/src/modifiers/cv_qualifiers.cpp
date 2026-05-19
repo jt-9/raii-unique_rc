@@ -101,7 +101,7 @@ TEST_CASE("unique_ptr base class with const, volatile qualifiers, array objects 
   constexpr A_Like_Ptr like_ptr;
 
   {
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
     raii::unique_ptr<const A[]> c_ptr_a;
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     c_ptr_a.reset(new A[1]);
@@ -114,7 +114,7 @@ TEST_CASE("unique_ptr base class with const, volatile qualifiers, array objects 
   }
 
   {
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
     raii::unique_ptr<volatile A[]> v_ptr_a;
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     v_ptr_a.reset(new A[1]);
@@ -127,7 +127,7 @@ TEST_CASE("unique_ptr base class with const, volatile qualifiers, array objects 
   }
 
   {
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
     raii::unique_ptr<const volatile A[]> cv_ptr_a;
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     cv_ptr_a.reset(new A[1]);
