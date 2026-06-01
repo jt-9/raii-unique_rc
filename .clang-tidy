@@ -17,6 +17,13 @@ Checks: "*,
         -misc-use-anonymous-namespace,
         -misc-use-internal-linkage
 "
+# Cannot filter by regex, therefore hardcoded whole argument
+RemovedArgs: 
+  - '-fdeps-format=p1689r5'
+  - '-fmodule-mapper=sample_app/CMakeFiles/sample_app.dir/src/main.cpp.o.modmap'
+  - '-fmodules-ts'
+
+
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 FormatStyle:     none

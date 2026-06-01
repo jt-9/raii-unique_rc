@@ -77,6 +77,7 @@ TEST_CASE("raii::make_unique_for_overwrite via malloc with memset non-trivial ty
   struct NonTrivial
   {
     int init = constInitMem;
+    // cppcheck-suppress uninitMemberVarNoCtor;
     int uninit;
   };
 
