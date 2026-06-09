@@ -25,6 +25,26 @@ function(add_lib_interface lib_name)
           include/urc/unique_rc.hpp
           include/urc/unique_ptr.hpp
   )
+
+  if (WIN32)
+    target_sources(${lib_name} ${WARNING_GUARD}
+      INTERFACE
+      FILE_SET HEADERS
+      BASE_DIRS ./include
+      FILES include/urc/deleter_windows_gdi.hpp
+          include/urc/deleter_windows_kernel.hpp
+    )
+  endif()
+
+  if (WIN32 AND RAII_URC_ENABLE_COM_DELETERS)
+    target_sources(${lib_name} ${WARNING_GUARD}
+      INTERFACE
+      FILE_SET HEADERS
+      BASE_DIRS ./include
+      FILES include/urc/deleter_com.hpp
+          include/urc/deleter_com_shell.hpp
+    )
+  endif()
 endfunction()
 
 
