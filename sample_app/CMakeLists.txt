@@ -24,8 +24,8 @@ target_sources(${EXEC_TARGET}
 target_compile_features(${EXEC_TARGET} PUBLIC cxx_std_23)
 
 target_link_libraries(${EXEC_TARGET} 
-              PRIVATE myproject::myproject_options
-                      myproject::myproject_warnings
+              PRIVATE urc::project_options
+                      urc::project_warnings
                       urc::urc
 )
 
