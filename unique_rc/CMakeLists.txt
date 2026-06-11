@@ -6,8 +6,8 @@ function(add_lib_interface lib_name)
   add_library(${lib_name} INTERFACE)
   
   target_link_libraries(${lib_name} INTERFACE 
-                myproject::myproject_options 
-                myproject::myproject_warnings)
+                urc::project_options 
+                urc::project_warnings)
 
   #cmake_print_variables(PROJECT_SOURCE_DIR)
   #cmake_print_variables(CMAKE_CURRENT_LIST_DIR)
@@ -51,7 +51,7 @@ endfunction()
 add_lib_interface(urc)
 add_library(urc::urc ALIAS urc)
 
-#urc library uses c++ 20 which is set via myproject::myproject_options
+#urc library uses c++ 20 which is set via urc::project_options
 
 
 #generate_export_header(unique_rc EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/unique_rc/include/unique_rc_export.hpp)

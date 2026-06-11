@@ -7,9 +7,9 @@ project(CmakeConfigPackageTests LANGUAGES CXX)
 if(PROJECT_IS_TOP_LEVEL OR TEST_INSTALLED_VERSION)
   enable_testing()
 
-  find_package(myproject CONFIG REQUIRED) # for sample_app, project_options, ...
+  find_package(urc CONFIG REQUIRED) # for sample_app, project_options, ...
 
-  if(NOT TARGET myproject_options)
+  if(NOT TARGET urc_options)
     message(FATAL_ERROR "Required config package not found!")
     return() # be strictly paranoid for Template Janitor github action! CK
   endif()
@@ -92,8 +92,8 @@ add_executable(tests ${TESTS_HEADERS} ${TESTS_SOURCES})
 
 target_link_libraries(
   tests
-  PRIVATE myproject::myproject_warnings
-          myproject::myproject_options
+  PRIVATE urc::project_warnings
+          urc::project_options
           urc::urc
           Catch2::Catch2WithMain)
 
@@ -150,8 +150,8 @@ add_executable(constexpr_tests ${TESTS_HEADERS} ${CONSTEXPR_TESTS_SOURCES})
 
 target_link_libraries(
   constexpr_tests
-  PRIVATE myproject::myproject_warnings
-          myproject::myproject_options
+  PRIVATE urc::project_warnings
+          urc::project_options
           urc::urc
           Catch2::Catch2WithMain)
 
@@ -179,8 +179,8 @@ add_executable(relaxed_constexpr_tests ${TESTS_HEADERS} constexpr_tests.cpp)
 
 target_link_libraries(
   relaxed_constexpr_tests
-  PRIVATE myproject::myproject_warnings
-          myproject::myproject_options
+  PRIVATE urc::project_warnings
+          urc::project_options
           urc::urc
           Catch2::Catch2WithMain)
 

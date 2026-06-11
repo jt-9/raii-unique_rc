@@ -22,19 +22,19 @@ project(
 include(cmake/PreventInSourceBuilds.cmake)
 include(ProjectOptions.cmake)
 
-myproject_setup_options()
+urc_setup_options()
 
-myproject_global_options()
+urc_global_options()
 
 include(Dependencies.cmake)
-myproject_setup_dependencies()
+urc_setup_dependencies()
 
-myproject_local_options()
+urc_local_options()
 
-target_compile_features(myproject_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
+target_compile_features(urc_project_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
 
-add_library(myproject::myproject_options ALIAS myproject_options)
-add_library(myproject::myproject_warnings ALIAS myproject_warnings)
+add_library(urc::project_options ALIAS urc_project_options)
+add_library(urc::project_warnings ALIAS urc_project_warnings)
 
 # configure files based on CMake configuration options
 add_subdirectory(configured_files)
@@ -42,7 +42,7 @@ add_subdirectory(configured_files)
 # Adding the src:
 add_subdirectory(unique_rc)
 
-if(myproject_BUILD_EXAMPLE)
+if(urc_BUILD_EXAMPLE)
   add_subdirectory(sample_app)
 endif()
 
@@ -59,9 +59,9 @@ if(BUILD_TESTING)
   add_subdirectory(test)
 endif()
 
-# if(myproject_BUILD_FUZZ_TESTS)
+# if(urc_BUILD_FUZZ_TESTS)
 #   message(AUTHOR_WARNING "Building Fuzz Tests, using fuzzing sanitizer https://www.llvm.org/docs/LibFuzzer.html")
-#   if (NOT myproject_ENABLE_SANITIZER_ADDRESS AND NOT myproject_ENABLE_SANITIZER_THREAD)
+#   if (NOT urc_ENABLE_SANITIZER_ADDRESS AND NOT urc_ENABLE_SANITIZER_THREAD)
 #     message(WARNING "You need asan or tsan enabled for meaningful fuzz testing")
 #   endif()
 #   add_subdirectory(fuzz_test)
@@ -77,6 +77,6 @@ if(MSVC)
 endif()
 
 # set the startup project for the "play" button in MSVC
-if (myproject_BUILD_EXAMPLE AND MSVC)
+if (urc_BUILD_EXAMPLE AND MSVC)
   set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT sample_app)
 endif()
