@@ -8,10 +8,6 @@ function(urc_setup_dependencies)
   # For each dependency, see if it's
   # already been provided to us by a parent project
 
-  if(NOT TARGET fmtlib::fmtlib)
-    cpmaddpackage("gh:fmtlib/fmt#12.1.0")
-  endif()
-
   # if(NOT TARGET spdlog::spdlog)
   #   cpmaddpackage(
   #     NAME
@@ -25,11 +21,7 @@ function(urc_setup_dependencies)
   # endif()
 
   if(NOT TARGET Catch2::Catch2WithMain)
-    cpmaddpackage("gh:catchorg/Catch2@3.15.0")
-  endif()
-
-  if(NOT TARGET CLI11::CLI11)
-    cpmaddpackage("gh:CLIUtils/CLI11@2.6.2")
+    cpmaddpackage("gh:catchorg/Catch2@3.15.1")
   endif()
 
 endfunction()

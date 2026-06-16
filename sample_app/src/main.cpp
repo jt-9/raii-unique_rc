@@ -1,7 +1,7 @@
 // This file will be generated automatically when cur_you run the CMake
 // configuration step. It creates a namespace called `myproject`. You can modify
 // the source template at `configured_files/config.hpp.in`.
-#include "internal_use_only/config.hpp"
+// #include "internal_use_only/config.hpp"
 
 // #include "test_deleter.hpp"
 
@@ -11,12 +11,6 @@
 #include "urc/memory_delete.hpp"
 #include "urc/unique_ptr.hpp"
 #include "urc/unique_rc.hpp"
-
-#include <fmt/base.h>
-#include <fmt/core.h>
-#include <fmt/format.h>
-
-#include <CLI/CLI.hpp>
 
 #include <memory>
 #include <utility>
@@ -54,15 +48,6 @@ void measureAndPrintUniquePtrSize() noexcept
   std::println("Sizeof 'std::tuple<int*, raii::memory_delete<int*>>' is {} bytes"sv, sizeof(tp_ptr_to_deleter));
 }
 
-void printLibVersion(std::string_view lib_name) noexcept
-{
-  fmt::println("{0} {1}.{2}.{3}",
-    lib_name,
-    raii::cmake::project_version_major,
-    raii::cmake::project_version_minor,
-    raii::cmake::project_version_patch);
-}
-
 }// namespace
 
 
@@ -88,41 +73,33 @@ struct SwapTestDel
 
   void operator()(void * /*unused*/) const {}
 
+  // NOLINTNEXTLINE(bugprone-exception-escape)
   void swap(SwapTestDel &rhs) noexcept
   {
-    fmt::println("Member SwapTestDel::swap(this: {}, SwapTestDel &rhs: {}) called", fmt::ptr(this), fmt::ptr(&rhs));
+    std::println("Member SwapTestDel::swap(this: {}, SwapTestDel &rhs: {}) called",
+      static_cast<void *>(this),
+      static_cast<void *>(&rhs));
 
     std::ranges::swap(m_tag, rhs.m_tag);
   }
 };
 // NOLINTEND(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
 
-// NOLINTNEXTLINE(misc-use-internal-linkage)
+// NOLINTNEXTLINE(bugprone-exception-escape)
 void swap(SwapTestDel &lhs, SwapTestDel &rhs) noexcept
 {
-  fmt::println("Function swap(SwapTestDel &lhs: {}, SwapTestDel &rhs: {}) called", fmt::ptr(&lhs), fmt::ptr(&rhs));
+  std::println("Function swap(SwapTestDel &lhs: {}, SwapTestDel &rhs: {}) called",
+    static_cast<void *>(&lhs),
+    static_cast<void *>(&rhs));
 
   lhs.swap(rhs);
 }
 
 
 // NOLINTNEXTLINE(bugprone-exception-escape)
-int main(int argc, char **argv) noexcept
+int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) noexcept
 {
   using namespace std::literals;
-
-  CLI::App app{};
-
-  argv = app.ensure_utf8(argv);
-  auto *version_flag = app.add_flag("-v,--version", "print raii::unique_rc library version and exit")->ignore_case();
-
-  CLI11_PARSE(app, argc, argv);
-
-  if (*version_flag) {
-    printLibVersion("raii::unique_rc"sv);
-
-    return 0;
-  }
 
   // raii_sample::testTypeConstructAssignWithConsteval();
   std::puts("=======================================================");
@@ -166,7 +143,7 @@ int main(int argc, char **argv) noexcept
 
     // std::cout << "Sizeof unique_rc<int*, raii::memory_delete<int*> of long long is "sv << sizeof(rc1) << "
     // bytes\n"sv;
-    fmt::println("Sizeof unique_rc<int*, raii::memory_delete<int*> of long long is {} bytes"sv, sizeof(rc1));
+    std::println("Sizeof unique_rc<int*, raii::memory_delete<int*> of long long is {} bytes"sv, sizeof(rc1));
   }
 
   {
@@ -180,7 +157,7 @@ int main(int argc, char **argv) noexcept
 
     rc2 = std::move(rc1);
 
-    fmt::println(
+    std::println(
       "After move assignment from unique_rc<int*, raii::memory_delete<int*>> to unique_rc<std::int32_t*, "
       "raii::memory_delete<std::int32_t*>> {}",
       *rc2);
@@ -193,11 +170,12 @@ int main(int argc, char **argv) noexcept
     raii::unique_ptr<int> ptr1{ new int{ kVal1 } };
     // NOLINTEND(bugprone-unhandled-exception-at-new)
 
-    fmt::println("Value initialised unique_ptr<int> address: {}, value: {}", fmt::ptr(ptr1.get()), *ptr1.get());
+    std::println(
+      "Value initialised unique_ptr<int> address: {}, value: {}", static_cast<void *>(ptr1.get()), *ptr1.get());
 
     ptr1.reset();
 
-    if (nullptr == ptr1) { fmt::println("ptr1 is empty"); }
+    if (nullptr == ptr1) { std::println("ptr1 is empty"); }
   }
 
   //*/
@@ -205,7 +183,8 @@ int main(int argc, char **argv) noexcept
     std::puts("=======================================================");
     const auto kSampleFloat = 3.864F;
     raii::unique_ptr<float> dynamicVal = raii::make_unique<float>(kSampleFloat);
-    fmt::println("Value initialised unique_ptr<float> address: {}, value: {}", fmt::ptr(dynamicVal.get()), *dynamicVal);
+    std::println(
+      "Value initialised unique_ptr<float> address: {}, value: {}", static_cast<void *>(dynamicVal.get()), *dynamicVal);
 
     // const auto failes_require_class_or_unit = dynamicVal.operator->();
   }
@@ -221,7 +200,7 @@ int main(int argc, char **argv) noexcept
 
     std::cout << "Array of arrayUniquePtr: " << arrayUniquePtr << '\n';
     // const auto deleted_op = arrayUniquePtr.operator->();
-        arrayUniquePtr.reset(new int[2]);
+    arrayUniquePtr.reset(new int[2]);
 
     // const auto stdUniquePtr = std::make_unique_for_overwrite<int[]>(kArraySize);
     // stdUniquePtr[0] = 5;
@@ -253,7 +232,7 @@ int main(int argc, char **argv) noexcept
     raii::unique_ptr<int, SwapTestDel> ptrA{ &initA, SwapTestDel{ initA } };
     raii::unique_ptr<int, SwapTestDel> ptrB{ &initB, SwapTestDel{ initB } };
 
-    fmt::println("Before swap ptrA {{v:{}, tag:{}}}, ptrB {{v:{}, tag:{}}}",
+    std::println("Before swap ptrA {{v:{}, tag:{}}}, ptrB {{v:{}, tag:{}}}",
       *ptrA,
       ptrA.get_deleter().m_tag,
       *ptrB,
@@ -264,7 +243,7 @@ int main(int argc, char **argv) noexcept
 
     // constexpr auto isDeleterSwappable = std::is_swappable_v<SwapTestDel>;
 
-    fmt::println("After swap ptrA {{v:{}, tag:{}}}, ptrB {{v:{}, tag:{}}}",
+    std::println("After swap ptrA {{v:{}, tag:{}}}, ptrB {{v:{}, tag:{}}}",
       *ptrA,
       ptrA.get_deleter().m_tag,
       *ptrB,
@@ -275,13 +254,13 @@ int main(int argc, char **argv) noexcept
   //*/
   {
     std::puts("=======================================================");
-    fmt::println("Demonstrating simple coroutine generator...");
+    std::println("Demonstrating simple coroutine generator...");
     for (const auto rangeElem : raii_sample::range(65, 123)) {
-      fmt::print("{:c} ", rangeElem);
+      std::print("{:c} ", rangeElem);
       // std::cout << i << ' ';
     }
     // std::cout << '\n';
-    fmt::println("");
+    std::println("");
   }
   //*/
 
