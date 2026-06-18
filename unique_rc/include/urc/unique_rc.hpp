@@ -659,7 +659,6 @@ template<typename H,
   template<typename, typename> class TR,
   typename IH,
   template<typename, typename> class IHPolicy>
-// NOLINTNEXTLINE(bugprone-std-namespace-modification, cert-dcl58-cpp)
 struct std::hash<raii::unique_rc<H, D, TR, IH, IHPolicy>>
   : public raii::detail::unique_rc_hash_base<raii::unique_rc<H, D, TR, IH, IHPolicy>,
       typename raii::unique_rc<H, D, TR, IH, IHPolicy>::handle>
