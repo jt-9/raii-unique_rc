@@ -3,8 +3,8 @@
 #include "urc/unique_ptr.hpp"
 #include "urc/unique_rc.hpp"
 
-#include <cstddef>//std::nullptr_t
-#include <utility>//std::declval
+#include <cstddef>// std::nullptr_t
+#include <utility>// std::declval
 
 
 namespace {

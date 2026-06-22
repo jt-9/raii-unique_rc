@@ -24,6 +24,7 @@ function(add_lib_interface lib_name)
 
           include/urc/unique_rc.hpp
           include/urc/unique_ptr.hpp
+          include/urc/unique_coroutine_handle.hpp
   )
 
   if (WIN32)

@@ -14,8 +14,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 project(
     UniqueRC 
-    VERSION 1.0.1
-    DESCRIPTION "Unique RAII abstraction"
+    DESCRIPTION "Generic unique RAII lib"
     LANGUAGES CXX
 )
 
