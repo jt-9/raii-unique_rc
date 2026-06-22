@@ -4,7 +4,7 @@
 #pragma once
 
 #include "urc/coroutine_destroy.hpp"
-#include "urc/unique_rc.hpp"
+#include "urc/unique_coroutine_handle.hpp"
 
 #include <coroutine>
 #include <optional>
@@ -35,20 +35,20 @@ public:
     std::optional<T> current_value;
   };// promise_type
 
-  using CoroHandle = std::coroutine_handle<promise_type>;
-  using CoroutineHolder = raii::unique_rc<CoroHandle,
-    raii::coroutine_destroy,
-    raii::resolve_handle_type,
-    CoroHandle,
-    raii::coro_invalid_handle_policy>;
+
+  using CoroutineHolder = raii::unique_coroutine_handle<promise_type>;
+  using CoroHandle = typename CoroutineHolder::handle;
 
   explicit Generator(const CoroHandle coroutine) noexcept : m_coroutine{ coroutine } {}
 
-  Generator() = default;
-  ~Generator() = default;
+  constexpr Generator() = default;
+  constexpr ~Generator() = default;
 
   Generator(const Generator &) = delete;
   Generator &operator=(const Generator &) = delete;
+
+  constexpr Generator(Generator &&other) noexcept = default;
+  constexpr Generator &operator=(Generator &&other) noexcept = default;
 
   // Generator(Generator &&other) noexcept : m_coroutine{ other.m_coroutine } { other.m_coroutine = {}; }
   // Generator &operator=(Generator &&other) noexcept
@@ -81,7 +81,8 @@ public:
 
   constexpr Iter begin() const noexcept
   {
-    if (m_coroutine) m_coroutine.get().resume();
+    if (m_coroutine) { m_coroutine.get().resume(); }
+
     return Iter{ m_coroutine.get() };
   }
 
