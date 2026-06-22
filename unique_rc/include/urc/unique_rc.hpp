@@ -1,11 +1,9 @@
-// Defines template class for handles
-//
+// unique_rc implementation -*- C++ -*-
 
 #ifndef UNIQUE_RC_HPP
 #define UNIQUE_RC_HPP
 
 #include "raii_defs.hpp"
-
 #include "concepts.hpp"
 
 #include <cassert>
@@ -647,7 +645,7 @@ std::basic_ostream<Elem, Traits> &
 RAII_NS_END
 
 
-/// @brief std::hash specialization for unique_rc.
+/// @brief std::hash specialization for raii::unique_rc.
 /// @tparam H the type of the object managed by unique_rc
 /// @tparam D function object or lvalue reference to function or to function object, to be called from the
 /// destructor

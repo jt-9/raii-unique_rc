@@ -42,7 +42,7 @@ struct DelArray
 }// namespace
 
 
-TEST_CASE("is_constructible unique_ptr of array of base objects from unique_ptr of array of derived objects",
+TEST_CASE("unique_ptr of array of base objects is not constructible from unique_ptr of array of derived objects",
   "[unique_ptr][unique_ptr::unique_ptr][std::is_constructible_v]")
 {
   // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
@@ -52,7 +52,7 @@ TEST_CASE("is_constructible unique_ptr of array of base objects from unique_ptr 
 }
 
 // Conversion from non-array form of unique_ptr
-TEST_CASE("is_constructible unique_ptr of array of base objects from unique_ptr of single derived object",
+TEST_CASE("unique_ptr of array of base objects is not constructible from unique_ptr of single derived object",
   "[unique_ptr][unique_ptr::unique_ptr][std::is_constructible_v]")
 {
   // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)

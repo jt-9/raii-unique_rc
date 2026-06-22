@@ -4,7 +4,7 @@
 #include "urc/unique_ptr.hpp"
 #include "urc/unique_rc.hpp"
 
-#include <cstddef>//std::nullptr_t
+#include <cstddef>// std::nullptr_t
 #include <type_traits>
 
 TEST_CASE("DR 2899 is_(nothrow_)move_constructible unique_rc", "[unique_rc::unique_rc]")

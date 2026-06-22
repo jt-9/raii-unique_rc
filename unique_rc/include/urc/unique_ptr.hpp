@@ -1,9 +1,10 @@
+// unique_ptr implementation -*- C++ -*-
+
 #ifndef UNIQUE_PTR_HPP
 #define UNIQUE_PTR_HPP
 
-#include "raii_defs.hpp"
-
 #include "concepts.hpp"
+#include "raii_defs.hpp"
 #include "unique_rc.hpp"
 
 #include <cassert>
@@ -148,13 +149,24 @@ private:
 public:
   // False positive while calling base class constructor, it interprets as new function with the same name which hides
   // implementation in base class
-  // cppcheck-suppress-begin [functionStatic, missingReturn, duplInheritedMember]
+  // cppcheck-suppress-begin [functionStatic, missingReturn]
+
+  /// @brief Creates a unique_ptr that owns nothing
   raii_inline constexpr unique_ptr() noexcept
     requires not_pointer_and_is_default_constructable_v<Deleter>
+    // cppcheck-suppress [duplInheritedMember]
     : Base()
   {}
 
-  raii_inline explicit constexpr unique_ptr(pointer ptr) noexcept
+  /// @brief Creates a unique_ptr that owns nothing
+  /// @param std::nullptr_t
+  raii_inline constexpr explicit unique_ptr(std::nullptr_t) noexcept
+    requires not_pointer_and_is_default_constructable_v<Deleter>
+    // cppcheck-suppress [duplInheritedMember]
+    : Base()
+  {}
+
+  raii_inline constexpr explicit unique_ptr(pointer ptr) noexcept
     requires not_pointer_and_is_default_constructable_v<Deleter>
     : Base(ptr)
   {}
@@ -168,11 +180,11 @@ public:
     requires std::conjunction_v<std::negation<std::is_reference<Deleter>>, std::is_move_constructible<Deleter>>
     : Base(ptr, std::move(del))
   {}
-  // cppcheck-suppress-end [functionStatic, missingReturn, duplInheritedMember]
+  // cppcheck-suppress-end [functionStatic, missingReturn]
 
-  template<class D = Deleter>
-    requires std::conjunction_v<std::is_reference<D>, std::is_constructible<D, std::remove_reference_t<D>>>
-  unique_ptr(pointer, std::remove_reference_t<Deleter> &&) = delete;
+  template<class D = deleter_type>
+    requires std::is_lvalue_reference_v<D>
+  unique_ptr(pointer, std::remove_reference_t<D> &&) = delete;
 
   constexpr unique_ptr(unique_ptr && /*src*/) noexcept = default;
 
@@ -234,7 +246,8 @@ public:
  * @note This specialisation manages dynamically-allocated array of objects (e.g., allocated with new[]).
  **/
 template<typename T, class Deleter>
-// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions, hicpp-special-member-functions, cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays)
+// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions, hicpp-special-member-functions,
+// cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays)
 class unique_ptr<T[], Deleter> : public unique_rc<T *, Deleter, resolve_pointer_type, std::nullptr_t>
 {
 private:
@@ -295,6 +308,13 @@ public:
     : Base()
   {}
 
+  /// @brief Creates a unique_ptr that owns nothing
+  /// @param std::nullptr_t
+  raii_inline constexpr explicit unique_ptr(std::nullptr_t) noexcept
+    requires not_pointer_and_is_default_constructable_v<Deleter>
+    : Base()
+  {}
+
   template<typename U>
   raii_inline constexpr explicit unique_ptr(U ptr) noexcept
     requires std::conjunction_v<not_pointer_and_is_default_constructable<Deleter>, safe_conversion_raw<U>>
@@ -321,12 +341,6 @@ public:
   // False positive on move constructor
   // cppcheck-suppress noExplicitConstructor
   constexpr unique_ptr(unique_ptr && /*src*/) noexcept = default;
-
-  /// Creates a unique_ptr that owns nothing.
-  template<class D = Deleter>
-    requires not_pointer_and_is_default_constructable_v<D>
-  raii_inline explicit constexpr unique_ptr(std::nullptr_t) noexcept : Base()
-  {}
 
   // Converting constructor from another type
   template<typename U, class D>
@@ -497,7 +511,7 @@ void make_unique_for_overwrite(Types &&...) = delete;
 RAII_NS_END
 
 
-// std::hash specialization for unique_rc.
+// std::hash specialization for raii::unique_ptr.
 template<typename H, class D>
 struct std::hash<raii::unique_ptr<H, D>>
   : public raii::detail::unique_rc_hash_base<raii::unique_ptr<H, D>, typename raii::unique_ptr<H, D>::pointer>
