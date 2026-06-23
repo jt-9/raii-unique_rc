@@ -38,8 +38,8 @@ set(TESTS_HEADERS
 )
 
 set(TESTS_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/unique_ptr_tests.cpp
-
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/access/array_subscript.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/access/single_dereference.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/forward_deleter.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/deleter_inheritance.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/move_assign_neg.cpp
@@ -129,7 +129,6 @@ catch_discover_tests(
 
 set(CONSTEXPR_TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/constexpr_tests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/unique_ptr_tests.cpp
 
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/move_assign_neg.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/construct_default_coro.cpp
