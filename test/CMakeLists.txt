@@ -40,12 +40,14 @@ set(TESTS_HEADERS
 set(TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/access/array_subscript.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/access/single_dereference.cpp
+  
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/forward_deleter.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/deleter_inheritance.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/move_assign_neg.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/move_array.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/move_single.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/nullptr.cpp
+  
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/construct_default_coro.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/construct_default.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/construct_move.cpp
@@ -55,22 +57,30 @@ set(TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/from_pointer_array.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/from_pointer_deleter.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/lwg2905.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/noexcept_construct_coro.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/noexcept_construct.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/nullptr.cpp
+  
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/creation/aggregate.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/creation/array.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/creation/for_overwrite.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/creation/single.cpp
+
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/hash/constexpr_hash.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/hash/hash_coro.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/hash/hash.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/hash/types.cpp
+
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/io/lwg2948.cpp
+
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_release.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_reset.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/release.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/reset.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/cv_qualifiers.cpp
+
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/observers/constexpr_observers.cpp
+
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/dr2228.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/dr2899.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/lwg2762.cpp
@@ -78,6 +88,7 @@ set(TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/lwg4324.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/ptr_type_single.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/ptr_type_array.cpp
+
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/specialised_algorithms/compare.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/specialised_algorithms/constexpr_compare.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/specialised_algorithms/swap.cpp
@@ -131,19 +142,26 @@ set(CONSTEXPR_TESTS_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/constexpr_tests.cpp
 
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/assignment/move_assign_neg.cpp
+
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/construct_default_coro.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/construct_default.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/construct_move.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/noexcept_construct_coro.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/noexcept_construct.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/construction/nullptr.cpp
+
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/hash/constexpr_hash.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/hash/types.cpp
+
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_release.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/modifiers/constexpr_reset.cpp
+
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/observers/constexpr_observers.cpp
+
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/lwg2762.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/lwg4148.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/requirements/lwg4324.cpp
+  
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/specialised_algorithms/constexpr_compare.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_SOURCE_PREFIX}/specialised_algorithms/constexpr_swap.cpp
 )

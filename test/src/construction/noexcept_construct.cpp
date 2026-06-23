@@ -7,7 +7,7 @@
 #include <type_traits>
 
 
-TEST_CASE("unique_ptr must be noexcept move constructible", "[unique_ptr][unique_ptr::unique_ptr][noexcept]")
+TEST_CASE("unique_ptr must be noexcept move constructible", "[unique_ptr][unique_ptr::unique_ptr][noexcept][constexpr]")
 {
   using iuptr = raii::unique_ptr<int>;
   STATIC_CHECK(std::is_nothrow_move_constructible_v<iuptr>);
@@ -17,7 +17,7 @@ TEST_CASE("unique_ptr must be noexcept move constructible", "[unique_ptr][unique
   STATIC_CHECK(std::is_nothrow_move_constructible_v<iauptr>);
 }
 
-TEST_CASE("unique_rc must be noexcept move constructible", "[unique_rc][unique_rc::unique_rc][noexcept]")
+TEST_CASE("unique_rc must be noexcept move constructible", "[unique_rc][unique_rc::unique_rc][noexcept][constexpr]")
 {
   using lurc = raii::unique_rc<long *, raii::memory_delete<long *>>;
   STATIC_CHECK(std::is_nothrow_move_constructible_v<lurc>);
