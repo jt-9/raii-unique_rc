@@ -37,8 +37,6 @@ public:
   /// @brief Promise, the type of the object managed by this unique_coroutine_handle
   using element_type = Promise;
 
-  using promise_type = Promise;
-
   /// @brief Deleter, the function object or lvalue reference or to function object, to be called from the destructor
   using typename Base::deleter_type;
 
@@ -89,9 +87,9 @@ public:
   {}
   // cppcheck-suppress-end [functionStatic, missingReturn]
 
-  template<class D = Deleter>
-    requires std::conjunction_v<std::is_reference<D>, std::is_constructible<D, std::remove_reference_t<D>>>
-  unique_coroutine_handle(handle, std::remove_reference_t<Deleter> &&) = delete;
+  template<class D = deleter_type>
+    requires std::is_lvalue_reference_v<D>
+  unique_coroutine_handle(handle, std::remove_reference_t<D> &&) = delete;
 
   constexpr unique_coroutine_handle(unique_coroutine_handle && /*src*/) noexcept = default;
 
