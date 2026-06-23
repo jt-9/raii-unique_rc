@@ -10,6 +10,9 @@
 #include <optional>
 
 namespace raii_sample {
+
+//Example from https://en.cppreference.com/cpp/coroutine/coroutine_handle
+// uses raii::unique_coroutine_handle<> to manage std::coroutine_handle
 template<typename /*std::movable*/ T>
   requires std::movable<T>
 class Generator
@@ -49,17 +52,6 @@ public:
 
   constexpr Generator(Generator &&other) noexcept = default;
   constexpr Generator &operator=(Generator &&other) noexcept = default;
-
-  // Generator(Generator &&other) noexcept : m_coroutine{ other.m_coroutine } { other.m_coroutine = {}; }
-  // Generator &operator=(Generator &&other) noexcept
-  //{
-  //   if (this != &other) {
-  //     if (m_coroutine) m_coroutine.destroy();
-  //     m_coroutine = other.m_coroutine;
-  //     other.m_coroutine = {};
-  //   }
-  //   return *this;
-  // }
 
   // Range-based for loop support.
   class Iter
