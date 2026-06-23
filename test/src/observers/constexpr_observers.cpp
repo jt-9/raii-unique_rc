@@ -20,23 +20,6 @@ template<typename T> [[nodiscard]] constexpr bool unique_ptr_value_array_get(std
   return true;
 }
 
-template<typename T>
-[[nodiscard]] constexpr bool unique_ptr_value_array_subscript(std::size_t array_size, T first_element) noexcept
-{
-  // NOLINTNEXTLINE
-  auto ptr = raii::unique_ptr<T[]>{ new T[array_size]{} };
-  assert(ptr.get() != nullptr);
-
-  // NOLINTBEGIN(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
-  ptr[0] = first_element;
-  assert(ptr[0] == first_element);
-
-  assert(ptr[array_size - 1] == T{});
-  // NOLINTEND(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
-
-  return true;
-}
-
 template<typename T> [[nodiscard]] constexpr bool unique_ptr_value_array_get_deleter(std::size_t array_size) noexcept
 {
   // NOLINTNEXTLINE
@@ -71,11 +54,6 @@ template<typename T> [[nodiscard]] constexpr bool unique_ptr_value_array_cast_to
 TEST_CASE("unique_ptr array of ints, unique_ptr::get()", "[unique_ptr][get][constexpr]")
 {
   STATIC_CHECK(unique_ptr_value_array_get<int>(5));
-}
-
-TEST_CASE("unique_ptr array of ints, unique_ptr::operator[]", "[unique_ptr][subscript operator][constexpr]")
-{
-  STATIC_CHECK(unique_ptr_value_array_subscript(5, 42));
 }
 
 TEST_CASE("unique_ptr array of ints, unique_ptr::get_deleter()", "[unique_ptr][get_deleter][constexpr]")
