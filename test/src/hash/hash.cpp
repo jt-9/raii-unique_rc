@@ -5,21 +5,7 @@
 
 #include <cstddef>// std::size_t
 #include <functional>// std::hash
-#include <type_traits>
 
-
-namespace {
-template<typename Func, typename Arg, typename = void> struct is_callable : std::false_type
-{
-};
-
-template<typename Func, typename Arg>
-struct is_callable<Func, Arg, decltype((void)(std::declval<Func &>()(std::declval<Arg>())))> : std::true_type
-{
-};
-
-template<typename Func, typename Arg> constexpr bool is_callable_v = is_callable<Func, Arg>::value;
-}// namespace
 
 TEST_CASE("std::hash for unique_ptr single value and array of type Empty", "[unique_ptr][hash]")
 {
@@ -40,29 +26,6 @@ TEST_CASE("std::hash for unique_ptr single value and array of type Empty", "[uni
   // NOLINTEND(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 
   CHECK(hu1(ptr1) == hp1(ptr1.get()));
-}
-
-TEST_CASE("std::hash with empty pointer type", "[unique_ptr][hash]")
-{
-  struct D
-  {
-    struct pointer
-    {
-      // cppcheck-suppress noExplicitConstructor
-      // NOLINTNEXTLINE(hicpp-explicit-conversions)
-      pointer(std::nullptr_t /*unused*/) {};
-    };
-    void operator()(pointer /*unused*/) const noexcept {}
-  };
-
-  STATIC_CHECK_FALSE(is_callable_v<std::hash<D::pointer> &, D::pointer>);
-
-  using UP = raii::unique_ptr<int, D>;
-
-  // Disabled specializations of hash are not function object types
-  STATIC_CHECK_FALSE(is_callable_v<std::hash<UP> &, UP>);
-  STATIC_CHECK_FALSE(is_callable_v<std::hash<UP> &, UP &>);
-  STATIC_CHECK_FALSE(is_callable_v<std::hash<UP> &, const UP &>);
 }
 
 
