@@ -47,3 +47,11 @@ TEST_CASE(
   STATIC_CHECK_FALSE(unique_ptr_is_constructible<int[], void (*)(int *), std::nullptr_t>());
   // NOLINTEND(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 }
+
+TEST_CASE("Default initialised unique_ptr<char>", "[unique_ptr][unique_ptr::unique_ptr]")
+{
+  constexpr raii::unique_ptr<char> ptr1{};
+
+  STATIC_CHECK(ptr1.get() == nullptr);
+  STATIC_CHECK_FALSE(ptr1);
+}

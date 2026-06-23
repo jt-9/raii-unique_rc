@@ -165,3 +165,16 @@ TEST_CASE("Test deleter operator() is called as expected", "[unique_ptr][reset]"
   iptr.release();
   CHECK(D2::count == 1);
 }
+
+TEST_CASE("Reset empty unique_ptr<float> default", "[unique_ptr][reset]")
+{
+  raii::unique_ptr<float> ptr1{};
+
+  CHECK_FALSE(ptr1);
+  CHECK(ptr1.get() == nullptr);
+
+  REQUIRE_NOTHROW(ptr1.reset());
+
+  CHECK(ptr1.get() == nullptr);
+  CHECK_FALSE(ptr1);
+}

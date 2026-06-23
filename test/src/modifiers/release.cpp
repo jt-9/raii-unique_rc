@@ -2,7 +2,7 @@
 
 #include "urc/memory_delete.hpp"
 #include "urc/unique_rc.hpp"
-// #include "urc/unique_ptr.hpp"
+#include "urc/unique_ptr.hpp"
 
 
 TEST_CASE("Release value initialised unique_rc<float*, memory_delete<float*>>", "[unique_rc][release]")
@@ -28,5 +28,31 @@ TEST_CASE("Release default unique_rc<T *, memory_delete<T *>>", "[unique_rc][rel
 
   int const *raw_ptr = ptr1.release();
   CHECK(raw_ptr == nullptr);
+  CHECK_FALSE(ptr1);
+}
+
+TEST_CASE("Release empty initialised unique_ptr<float>", "[unique_ptr][release]")
+{
+  raii::unique_ptr<float> default_init{};
+
+  CHECK_FALSE(default_init);
+  CHECK(default_init.get() == nullptr);
+
+  CHECK(default_init.release() == nullptr);
+  CHECK_FALSE(default_init);
+}
+
+TEST_CASE("Release initialised unique_ptr<float>", "[unique_ptr][release]")
+{
+  constexpr auto test_number = 496.0F;
+  raii::unique_ptr<float> ptr1{ new float{ test_number } };
+
+  CHECK(ptr1);
+  CHECK(ptr1.get() != nullptr);
+
+  decltype(ptr1) init_from_release{ ptr1.release() };
+  CHECK(init_from_release);
+
+  CHECK(ptr1.get() == nullptr);
   CHECK_FALSE(ptr1);
 }
