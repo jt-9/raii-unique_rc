@@ -6,13 +6,16 @@
 #include "urc/coroutine_destroy.hpp"
 #include "urc/unique_coroutine_handle.hpp"
 
+#include "CallLog.hpp"
+#include "StdPrint.hpp"
+
 #include <coroutine>
 #include <optional>
 
 namespace raii_sample {
 
-//Example from https://en.cppreference.com/cpp/coroutine/coroutine_handle
-// uses raii::unique_coroutine_handle<> to manage std::coroutine_handle
+// Example from https://en.cppreference.com/cpp/coroutine/coroutine_handle
+//  uses raii::unique_coroutine_handle<> to manage std::coroutine_handle
 template<typename /*std::movable*/ T>
   requires std::movable<T>
 class Generator
@@ -20,20 +23,37 @@ class Generator
 public:
   struct promise_type
   {
-    Generator<T> get_return_object() { return Generator{ CoroHandle::from_promise(*this) }; }
-    static std::suspend_always initial_suspend() noexcept { return {}; }
-    static std::suspend_always final_suspend() noexcept { return {}; }
+    Generator<T> get_return_object()
+    {
+      ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
+      return Generator{ CoroHandle::from_promise(*this) };
+    }
+    static std::suspend_always initial_suspend() noexcept
+    {
+      ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
+      return {};
+    }
+    static std::suspend_always final_suspend() noexcept
+    {
+      ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
+      return {};
+    }
     std::suspend_always yield_value(T value) noexcept
     {
+      //ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
       current_value = std::move(value);
       return {};
     }
     // Disallow co_await in generator coroutines.
     void await_transform() = delete;
 
-    [[noreturn]] static void unhandled_exception() { std::terminate(); }
+    [[noreturn]] static void unhandled_exception()
+    {
+      ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
+      std::terminate();
+    }
 
-    static void return_void() noexcept {}
+    static void return_void() noexcept { ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy); }
 
     std::optional<T> current_value;
   };// promise_type
@@ -42,16 +62,26 @@ public:
   using CoroutineHolder = raii::unique_coroutine_handle<promise_type>;
   using CoroHandle = typename CoroutineHolder::handle;
 
-  explicit Generator(const CoroHandle coroutine) noexcept : m_coroutine{ coroutine } {}
+  explicit Generator(const CoroHandle coroutine) noexcept : m_coroutine{ coroutine }
+  { ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy); }
 
-  constexpr Generator() = default;
-  constexpr ~Generator() = default;
+  constexpr Generator() { ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy); }
+
+  constexpr ~Generator() { ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy); }
 
   Generator(const Generator &) = delete;
   Generator &operator=(const Generator &) = delete;
 
-  constexpr Generator(Generator &&other) noexcept = default;
-  constexpr Generator &operator=(Generator &&other) noexcept = default;
+  constexpr Generator(Generator &&other) noexcept : m_coroutine{ std::move(other.m_coroutine) }
+  { ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy); };
+
+  constexpr Generator &operator=(Generator &&other) noexcept
+  {
+    ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
+
+    m_coroutine = std::move(other.m_coroutine);
+    return *this;
+  };
 
   // Range-based for loop support.
   class Iter
@@ -86,6 +116,7 @@ private:
 
 template<std::integral T> Generator<T> range(T first, const T last)
 {
+  ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
   while (first < last) co_yield first++;
 }
 
