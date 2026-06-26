@@ -77,5 +77,5 @@ endif()
 
 # set the startup project for the "play" button in MSVC
 if (urc_BUILD_EXAMPLE AND MSVC)
-  set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT sample_app)
+  set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT demo_unique_rc)
 endif()

@@ -43,21 +43,6 @@ struct coroutine_destroy
   { hnd.destroy(); }
 };
 
-struct noop_coroutine_destroy
-{
-  constexpr noop_coroutine_destroy() noexcept = default;
-
-  template<typename Promise>
-#ifdef __cpp_static_call_operator
-  // False poisitive, guarded by feature #ifdef __cpp_static_call_operator
-  // NOLINTNEXTLINE(clang-diagnostic-c++23-extensions)
-  raii_inline static void operator()(std::coroutine_handle<Promise> hnd) noexcept
-#else
-  raii_inline void operator()(std::coroutine_handle<Promise> hnd) const noexcept
-#endif
-  { /* Empty body */ }
-};
-
 RAII_NS_END
 
 #endif// COROUTINE_DESTROY_HPP
