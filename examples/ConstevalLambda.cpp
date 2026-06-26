@@ -1,8 +1,6 @@
 #ifndef CONSTEVAL_LAMBDA_EXAMPLE_HPP
 #define CONSTEVAL_LAMBDA_EXAMPLE_HPP
 
-#pragma once
-
 #include "urc/unique_ptr.hpp"
 
 #include <cassert>

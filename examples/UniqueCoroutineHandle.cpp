@@ -1,16 +1,18 @@
-#ifndef COROUTINE_EXAMPLE_HPP
-#define COROUTINE_EXAMPLE_HPP
 
-#pragma once
-
-#include "urc/coroutine_destroy.hpp"
 #include "urc/unique_coroutine_handle.hpp"
 
 #include "CallLog.hpp"
 #include "StdPrint.hpp"
 
+#include <concepts>
 #include <coroutine>
+#include <cstdio>// std::puts
+#include <exception>// std::terminate
+#include <iterator>// std::default_sentinel_t
 #include <optional>
+#include <print>
+#include <utility>// std::move
+
 
 namespace raii_sample {
 
@@ -25,22 +27,22 @@ public:
   {
     Generator<T> get_return_object()
     {
-      ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
+      const ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
       return Generator{ CoroHandle::from_promise(*this) };
     }
     static std::suspend_always initial_suspend() noexcept
     {
-      ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
+      const ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
       return {};
     }
     static std::suspend_always final_suspend() noexcept
     {
-      ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
+      const ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
       return {};
     }
     std::suspend_always yield_value(T value) noexcept
     {
-      //ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
+      // ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
       current_value = std::move(value);
       return {};
     }
@@ -49,31 +51,31 @@ public:
 
     [[noreturn]] static void unhandled_exception()
     {
-      ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
+      const ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
       std::terminate();
     }
 
-    static void return_void() noexcept { ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy); }
+    static void return_void() noexcept { const ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy); }
 
     std::optional<T> current_value;
   };// promise_type
 
 
   using CoroutineHolder = raii::unique_coroutine_handle<promise_type>;
-  using CoroHandle = typename CoroutineHolder::handle;
+  using CoroHandle = CoroutineHolder::handle;
 
   explicit Generator(const CoroHandle coroutine) noexcept : m_coroutine{ coroutine }
-  { ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy); }
+  { const ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy); }
 
-  constexpr Generator() { ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy); }
+  constexpr Generator() noexcept { const ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy); }
 
-  constexpr ~Generator() { ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy); }
+  constexpr ~Generator() noexcept { const ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy); }
 
   Generator(const Generator &) = delete;
   Generator &operator=(const Generator &) = delete;
 
   constexpr Generator(Generator &&other) noexcept : m_coroutine{ std::move(other.m_coroutine) }
-  { ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy); };
+  { ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy); }
 
   constexpr Generator &operator=(Generator &&other) noexcept
   {
@@ -81,7 +83,7 @@ public:
 
     m_coroutine = std::move(other.m_coroutine);
     return *this;
-  };
+  }
 
   // Range-based for loop support.
   class Iter
@@ -92,8 +94,14 @@ public:
       m_coroutine.resume();
       return *this;
     }
-    const T &operator*() const { return *m_coroutine.promise().current_value; }
-    bool operator==(std::default_sentinel_t) const { return !m_coroutine || m_coroutine.done(); }
+
+    const T &operator*() const
+    {
+      // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+      return *m_coroutine.promise().current_value;
+    }
+
+    bool operator==(std::default_sentinel_t /*unused*/) const { return !m_coroutine || m_coroutine.done(); }
 
     explicit Iter(const CoroHandle &coroutine) noexcept : m_coroutine{ coroutine } {}
 
@@ -116,11 +124,24 @@ private:
 
 template<std::integral T> Generator<T> range(T first, const T last)
 {
-  ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
-  while (first < last) co_yield first++;
+  const ltu::LOG_FUNC_INOUT(ltu::StdPrintStrategy);
+  while (first < last) { co_yield first++; }
 }
 
 }// namespace raii_sample
 
 
-#endif// COROUTINE_EXAMPLE_HPP
+// NOLINTNEXTLINE(bugprone-exception-escape)
+int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) noexcept
+{
+  std::puts("=======================================================");
+  std::println("Demonstrating simple coroutine generator...");
+  constexpr auto lastElem = 123;
+  for (const auto rangeElem : raii_sample::range(65, lastElem)) {
+    std::print("{:c} ", rangeElem);
+    if (rangeElem == lastElem - 1) { std::println(); }
+  }
+  // std::cout << '\n';
+
+  return 0;
+}

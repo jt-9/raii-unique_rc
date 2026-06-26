@@ -17,15 +17,23 @@ template<class PrintStrategy> struct ScopedLogger
 
   explicit constexpr ScopedLogger(std::string_view name, std::uint_least32_t line) noexcept : name_{ name }
   {
-    PrintStrategy::println(
-      "{}\\{}\n\tat line: {}\n\tthread id: {}", std::string(indent, ' '), name_, line, std::this_thread::get_id());
+    const std::string indent_spaces(indent, ' ');
+    PrintStrategy::println("{}\\{}\n{}|\tat line: {}\n{}|\tthread id: {}",
+      indent_spaces,
+      name_,
+      indent_spaces,
+      line,
+      indent_spaces,
+      std::this_thread::get_id());
     indent++;
   }
 
   constexpr ~ScopedLogger() noexcept
   {
     indent--;
-    PrintStrategy::println("{}/{}\n\tthread id: {}", std::string(indent, ' '), name_, std::this_thread::get_id());
+    PrintStrategy::println("{}/{}", std::string(indent, ' '), name_);
+    // PrintStrategy::println("{}/{}\n{} \tthread id: {}", indent_spaces, name_, indent_spaces,
+    // std::this_thread::get_id());
   }
 
   // ScopedLogger is non-movable, non-copyable
