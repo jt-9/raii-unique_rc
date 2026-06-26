@@ -6,7 +6,6 @@
 // #include "test_deleter.hpp"
 
 // #include "consteval_lambda_example.hpp"
-#include "coroutine_example.hpp"
 #include "test_deleter.hpp"
 #include "urc/memory_delete.hpp"
 #include "urc/unique_ptr.hpp"
@@ -248,19 +247,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) noexcept
       ptrA.get_deleter().m_tag,
       *ptrB,
       ptrB.get_deleter().m_tag);
-  }
-  //*/
-
-  //*/
-  {
-    std::puts("=======================================================");
-    std::println("Demonstrating simple coroutine generator...");
-    for (const auto rangeElem : raii_sample::range(65, 123)) {
-      std::print("{:c} ", rangeElem);
-      // std::cout << i << ' ';
-    }
-    // std::cout << '\n';
-    std::println("");
   }
   //*/
 

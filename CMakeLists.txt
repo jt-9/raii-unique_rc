@@ -42,7 +42,7 @@ add_subdirectory(configured_files)
 add_subdirectory(unique_rc)
 
 if(urc_BUILD_EXAMPLE)
-  add_subdirectory(sample_app)
+  add_subdirectory(examples)
 endif()
 
 # Don't even look at tests if we're not top level
