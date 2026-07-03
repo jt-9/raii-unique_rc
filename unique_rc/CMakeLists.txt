@@ -20,6 +20,7 @@ function(add_lib_interface lib_name)
           include/urc/concepts.hpp
           include/urc/coroutine_destroy.hpp
           include/urc/memory_delete.hpp
+          include/urc/memory_free.hpp
           include/urc/stdio_fclose.hpp
 
           include/urc/unique_rc.hpp
