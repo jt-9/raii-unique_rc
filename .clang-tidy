@@ -20,8 +20,8 @@ Checks: "*,
 # Cannot filter by regex, therefore hardcoded whole argument
 RemovedArgs: 
   - '-fdeps-format=p1689r5'
-  - '-fmodule-mapper=examples/CMakeFiles/demo_unique_rc.dir/UniquePtr.cpp.o.modmap'
-  - '-fmodule-mapper=examples/CMakeFiles/demo_coroutine.dir/UniqueCoroutineHandle.cpp.o.modmap'
+  - '-fmodule-mapper=examples/CMakeFiles/demo_unique_rc.dir/demo_unique_rc.cpp.o.modmap'
+  - '-fmodule-mapper=examples/CMakeFiles/demo_coroutine.dir/demo_coroutine.cpp.o.modmap'
   - '-fmodules-ts'
 
 

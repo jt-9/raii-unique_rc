@@ -8,6 +8,7 @@
 // #include "consteval_lambda_example.hpp"
 #include "test_deleter.hpp"
 #include "urc/memory_delete.hpp"
+#include "urc/memory_free.hpp"
 #include "urc/unique_ptr.hpp"
 #include "urc/unique_rc.hpp"
 
@@ -17,6 +18,7 @@
 #include <concepts>
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 
 #include <string_view>
 #include <tuple>
@@ -221,6 +223,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) noexcept
 
     arrayWithStdDeleter.reset(new int[2]);
     // NOLINTEND
+  }
+
+  {
+    std::puts("=======================================================");
+    using TypeOfUrcMalloc = int;
+    const raii::unique_rc<TypeOfUrcMalloc *, raii::memory_free<TypeOfUrcMalloc *>> urcMalloc{
+      //NOLINTNEXTLINE(cppcoreguidelines-no-malloc, hicpp-no-malloc)
+      static_cast<TypeOfUrcMalloc *>(std::malloc(10 * sizeof(TypeOfUrcMalloc)))
+    };
+    std::println("unique_rc with malloc/free: {}", static_cast<void*>(urcMalloc.get()));
   }
 
   {

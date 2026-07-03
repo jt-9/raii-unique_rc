@@ -1,12 +1,10 @@
 #include(CMakePrintHelpers)
 
 
-#cmake_print_variables(SAMPLE_APP_HEADERS SAMPLE_APP_SOURCES)
-
 
 add_executable(demo_unique_rc)
 target_sources(demo_unique_rc 
-      PRIVATE UniquePtr.cpp
+      PRIVATE demo_unique_rc.cpp
 )
 
 # Request minimum c++ standard, default c++20
@@ -22,7 +20,7 @@ target_include_directories(demo_unique_rc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/in
 
 add_executable(demo_coroutine)
 target_sources(demo_coroutine 
-      PRIVATE UniqueCoroutineHandle.cpp
+      PRIVATE demo_coroutine.cpp
 )
 
 # Request minimum c++ standard, default c++20
