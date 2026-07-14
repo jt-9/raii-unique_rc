@@ -12,7 +12,7 @@ namespace {
 template<typename T> [[nodiscard]] constexpr bool unique_ptr_default_single() noexcept
 {
   raii::unique_ptr<T> ptr1;
-  auto *const raw_ptr = ptr1.release();
+  const auto *const raw_ptr = ptr1.release();
   assert(raw_ptr == nullptr);
   assert(!ptr1);
 
@@ -23,7 +23,7 @@ template<typename T> [[nodiscard]] constexpr bool unique_ptr_value_single(T cons
 {
   // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new)
   raii::unique_ptr<T> ptr2(new T{ val });
-  auto *const raw_ptr = ptr2.release();
+  const auto *const raw_ptr = ptr2.release();
   assert(raw_ptr);
   assert(!ptr2);
 
@@ -37,7 +37,7 @@ template<typename T> [[nodiscard]] constexpr bool unique_ptr_default_array() noe
 {
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
   raii::unique_ptr<T[]> ptr1;
-  auto *raw_ptr = ptr1.release();
+  const auto *raw_ptr = ptr1.release();
   assert(raw_ptr == nullptr);
   assert(!ptr1);
 
@@ -48,7 +48,7 @@ template<typename T> [[nodiscard]] constexpr bool unique_ptr_default_array() noe
 {
   // NOLINTNEXTLINE
   raii::unique_ptr<int[]> ptr2{ new int[]{ elem1, elem2, elem3 } };
-  auto *const raw_ptr = ptr2.release();
+  const auto *const raw_ptr = ptr2.release();
   assert(raw_ptr);
   assert(!ptr2);
 

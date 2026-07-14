@@ -21,7 +21,7 @@ template<bool B> struct TestDeleter
     explicit pointer(int * = nullptr);
 
     // cppcheck-suppress noExplicitConstructor
-    // NOLINTNEXTLINE(hicpp-explicit-conversions)
+    // NOLINTNEXTLINE(cppcoreguidelines-explicit-constructor, misc-explicit-constructor)
     pointer(std::nullptr_t);
 
     bool operator==(const pointer &) const noexcept;

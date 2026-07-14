@@ -98,7 +98,7 @@ void swap(SwapTestDel &lhs, SwapTestDel &rhs) noexcept
 
 
 // NOLINTNEXTLINE(bugprone-exception-escape)
-int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) noexcept
+int main() noexcept
 {
   using namespace std::literals;
 

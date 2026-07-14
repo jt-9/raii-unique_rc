@@ -42,7 +42,7 @@ template<typename Func, typename Arg, typename = void> struct is_callable : std:
 };
 
 template<typename Func, typename Arg>
-struct is_callable<Func, Arg, decltype((void)(std::declval<Func &>()(std::declval<Arg>())))> : std::true_type
+struct is_callable<Func, Arg, decltype((void)std::declval<Func &>()(std::declval<Arg>()))> : std::true_type
 {
 };
 
@@ -57,7 +57,7 @@ TEST_CASE("std::hash with empty pointer type", "[unique_ptr][hash]")
     struct pointer
     {
       // cppcheck-suppress noExplicitConstructor
-      // NOLINTNEXTLINE(hicpp-explicit-conversions)
+      // NOLINTNEXTLINE(cppcoreguidelines-explicit-constructor, misc-explicit-constructor)
       pointer(std::nullptr_t /*unused*/) {};
     };
     void operator()(pointer /*unused*/) const noexcept {}

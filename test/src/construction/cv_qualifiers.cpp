@@ -25,7 +25,7 @@ struct B : A
 
 struct A_Like_Ptr
 {
-  // NOLINTNEXTLINE(hicpp-explicit-conversions) // intended implicit conversion
+  // NOLINTNEXTLINE(cppcoreguidelines-explicit-constructor, misc-explicit-constructor) // intended implicit conversion
   operator A *() const { return nullptr; }
 };
 }// namespace

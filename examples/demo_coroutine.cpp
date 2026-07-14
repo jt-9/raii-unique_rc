@@ -132,7 +132,7 @@ template<std::integral T> Generator<T> range(T first, const T last)
 
 
 // NOLINTNEXTLINE(bugprone-exception-escape)
-int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) noexcept
+int main() noexcept
 {
   std::puts("=======================================================");
   std::println("Demonstrating simple coroutine generator...");

@@ -35,7 +35,7 @@ struct D
   struct pointer
   {
     // cppcheck-suppress noExplicitConstructor
-    // NOLINTNEXTLINE(hicpp-explicit-conversions)
+    // NOLINTNEXTLINE(cppcoreguidelines-explicit-constructor, misc-explicit-constructor)
     constexpr pointer(std::nullptr_t = nullptr) {};
 
     bool operator==(std::nullptr_t) const { return false; }
@@ -50,7 +50,7 @@ struct F
   struct pointer
   {
     // cppcheck-suppress noExplicitConstructor
-    // NOLINTNEXTLINE(hicpp-explicit-conversions)
+    // NOLINTNEXTLINE(cppcoreguidelines-explicit-constructor, misc-explicit-constructor)
     constexpr pointer(std::nullptr_t = nullptr) {};
 
     bool operator==(std::nullptr_t) const { return false; }
@@ -65,13 +65,13 @@ struct F
 namespace std {
 template<> struct hash<D::pointer>
 {
-  // NOLINTNEXTLINE(hicpp-exception-baseclass)
+  // NOLINTNEXTLINE(bugprone-std-exception-baseclass)
   std::size_t operator()(D::pointer /*unused*/) const { throw 1; }
 };
 
 template<> struct hash<F::pointer>
 {
-  // NOLINTNEXTLINE(hicpp-exception-baseclass)
+  // NOLINTNEXTLINE(bugprone-std-exception-baseclass)
   std::size_t operator()(F::pointer /*unused*/) const { throw 3; }
 };
 }// namespace std

@@ -37,7 +37,7 @@ template<typename T> struct default_delete
 #endif
   {
     static_assert(!std::is_void_v<T>, "can't delete pointer to incomplete type");
-    // cppcheck-suppress sizeofVoid;
+    // cppcheck-suppress [sizeofVoid];
     // NOLINTNEXTLINE(bugprone-sizeof-expression)
     static_assert(sizeof(T) > 0, "can't delete pointer to incomplete type");
 
@@ -171,6 +171,7 @@ public:
     : Base(ptr)
   {}
 
+  // cppcheck-suppress [cstyleCast]; // false positive
   raii_inline constexpr unique_ptr(pointer ptr, const Deleter &del) noexcept
     requires std::is_copy_constructible_v<Deleter>
     : Base(ptr, del)

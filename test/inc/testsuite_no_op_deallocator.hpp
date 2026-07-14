@@ -15,7 +15,7 @@ struct mock_deallocator_no_op
   constexpr mock_deallocator_no_op() noexcept = default;
 
   template<typename U>
-  raii_inline constexpr mock_deallocator_no_op(const mock_deallocator_no_op<U> &) noexcept
+  raii_inline explicit constexpr mock_deallocator_no_op(const mock_deallocator_no_op<U> &) noexcept
     requires std::is_convertible_v<U, Handle>
   {}
 

@@ -26,7 +26,7 @@ struct DestructionTracker : public raii::memory_free<Handle>
   explicit constexpr DestructionTracker(const DestructionTracker<U> &src) noexcept : Base(src), free_called{ 0 }
   {}
 
-  // cppcheck-suppress duplInheritedMember;
+  // cppcheck-suppress [duplInheritedMember]
   constexpr void operator()(Handle ptr) noexcept
   {
     Base::operator()(ptr);
