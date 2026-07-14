@@ -21,7 +21,7 @@ function(urc_setup_dependencies)
   # endif()
 
   if(NOT TARGET Catch2::Catch2WithMain)
-    cpmaddpackage("gh:catchorg/Catch2@3.15.1")
+    cpmaddpackage("gh:catchorg/Catch2@3.15.2")
   endif()
 
 endfunction()
