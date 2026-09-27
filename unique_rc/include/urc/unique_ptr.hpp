@@ -37,7 +37,7 @@ template<typename T> struct default_delete
 #endif
   {
     static_assert(!std::is_void_v<T>, "can't delete pointer to incomplete type");
-    // cppcheck-suppress [sizeofVoid];
+    // cppcheck-suppress [sizeofVoid]; // false positive, static_assert above checks for void
     // NOLINTNEXTLINE(bugprone-sizeof-expression)
     static_assert(sizeof(T) > 0, "can't delete pointer to incomplete type");
 
@@ -55,7 +55,7 @@ template<typename T> struct default_delete<T[]>
   template<typename U>
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays)
     requires std::is_convertible_v<U (*)[], T (*)[]>
-  // cppcheck-suppress noExplicitConstructor; intended converting constructor
+  // cppcheck-suppress [noExplicitConstructor]; intended converting constructor
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, hicpp-explicit-conversions)
   raii_inline constexpr default_delete(const default_delete<U[]> & /*src*/) noexcept
   {}
@@ -71,7 +71,6 @@ template<typename T> struct default_delete<T[]>
   raii_inline constexpr void operator()(U *ptr) const noexcept
 #endif
   {
-    // cppcheck-suppress sizeofVoid;
     // NOLINTNEXTLINE(bugprone-sizeof-expression)
     static_assert(sizeof(U) > 0, "can't delete pointer to incomplete type");
 

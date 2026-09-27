@@ -20,7 +20,6 @@ template<bool B> struct TestDeleter
     // Needed for NullablePointer requirements
     explicit pointer(int * = nullptr);
 
-    // cppcheck-suppress noExplicitConstructor
     // NOLINTNEXTLINE(cppcoreguidelines-explicit-constructor, misc-explicit-constructor)
     pointer(std::nullptr_t);
 
