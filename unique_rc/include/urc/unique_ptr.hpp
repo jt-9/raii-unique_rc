@@ -470,8 +470,9 @@ template<class T, class... Types>
   requires(!std::is_array_v<T>)
 [[nodiscard]] raii_inline constexpr raii::unique_ptr<T> make_unique(Types &&...Args)
 {
-  // NOLINTNEXTLINE(clang-diagnostic-missing-field-initializers)
-  return raii::unique_ptr<T>{ new T{ std::forward<Types>(Args)... } };
+  // direct initialisation, and not direct list initialisation, latter can be achieved by passing
+  // std::initializer_list as Args
+  return raii::unique_ptr<T>(new T(std::forward<Types>(Args)...));
 }
 
 template<class T>
@@ -480,7 +481,8 @@ template<class T>
 [[nodiscard]] raii_inline constexpr raii::unique_ptr<T> make_unique(const std::size_t size)
 {
   using Elem = std::remove_extent_t<T>;
-  return raii::unique_ptr<T>{ new Elem[size]{} };
+  // direct initialisation, and not direct list initialisation
+  return raii::unique_ptr<T>(new Elem[size]());
 }
 
 template<class T, class... Types>
@@ -492,7 +494,7 @@ template<typename T>
 [[nodiscard]] raii_inline constexpr raii::unique_ptr<T> make_unique_for_overwrite()
 {
   // with default initialization
-  return raii::unique_ptr<T>{ new T };
+  return raii::unique_ptr<T>(new T);
 }
 
 template<typename T>
@@ -501,7 +503,7 @@ template<typename T>
 {
   // only memory allocation
   using Elem = std::remove_extent_t<T>;
-  return raii::unique_ptr<T>{ new Elem[size] };
+  return raii::unique_ptr<T>(new Elem[size]);
 }
 
 template<typename T, class... Types>

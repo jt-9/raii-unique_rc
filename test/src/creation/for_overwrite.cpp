@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "urc/unique_ptr.hpp"
-// #include <memory>
+
 
 #include <cassert>
 #include <cstddef>
@@ -9,12 +9,13 @@
 #include <cstring>// std::memset
 
 namespace {
-constexpr auto constFillValue = static_cast<unsigned char>(0xAA);
-constexpr std::size_t constArraySize = 4;
-constexpr auto constInitMem = 0xBB;
+constexpr inline auto constFillValue = static_cast<unsigned char>(0xAA);
+constexpr inline std::size_t constArraySize = 4;
+constexpr inline auto constInitMem = 0xBB;
 }// namespace
 
 // NOLINTBEGIN(cppcoreguidelines-no-malloc, hicpp-no-malloc, cppcoreguidelines-owning-memory)
+
 void *operator new(std::size_t size)
 {
   void *ptr = std::malloc(size);
